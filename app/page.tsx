@@ -1,17 +1,25 @@
-import { Button } from '@/components/ui/button'
-import React from 'react'
+"use client";
+import Navbar from '@/app/components/navbar/Navbar';
+import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
 
-const page = () => {
+const Page = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => {
+    setIsMenuOpen(prevState => !prevState);
+  };
+
   return (
     <div>
-      <section className='py-24'>
-        <div className='container'>
-          <h1 className='text-3xl font-bold'>Nextjs stater</h1>
-          <Button>Click me</Button>
+      <section className="">
+        <div className="container">
+          <Navbar toggle={toggleMenu} />
+          <Button onClick={toggleMenu} className="mt-4">Toggle Menu</Button>
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default page
+export default Page;
