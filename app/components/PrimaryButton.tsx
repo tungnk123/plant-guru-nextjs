@@ -1,12 +1,12 @@
 import { Button } from '@/components/ui/button'
 import React from 'react'
-import { Mail } from "lucide-react"
+import { Plus } from "lucide-react"
 
 const PrimaryButton = () => {
   return (
-    <Button>
-      <Mail /> Login with Email
-    </Button>
+    <Button className='bg-yellow-300 hover:bg-yellow-600 text-black'>
+    <Plus /> Create post
+  </Button>
   )
 }
 

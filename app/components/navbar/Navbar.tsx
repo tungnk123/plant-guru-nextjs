@@ -17,11 +17,10 @@ import PrimaryButton from '@/app/components/PrimaryButton';
 
 const Navbar = ({ toggle }: { toggle: () => void }) => {
   return (
-    <div className='sticky top-0 h-20 w-full bg-emerald-800'>
-      <div className='container mx-auto h-full px-4 flex items-center justify-center'>
-        <div className='flex h-full w-full items-center justify-between'>
+    <div className='sticky top-0 h-20 w-full bg-white shadow'>
+      <div className='container mx-auto h-full px-20 flex items-center justify-between'>
+        <div className='flex items-center gap-4'>
           <Logo />
-
           <button
             type='button'
             className='inline-flex items-center md:hidden'
@@ -29,64 +28,63 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
-              width='40'
-              height='40'
+              width='24'
+              height='24'
               viewBox='0 0 24 24'
             >
               <path
-                fill='#fff'
+                fill='#000'
                 d='M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z'
               />
             </svg>
           </button>
+        </div>
 
-          <ul className='hidden gap-x-6 text-white md:flex items-center'>
-            <li>
-              <Link href='/pages'>
-                <p>Home</p>
-              </Link>
-            </li>
-            <li>
-              <NavigationMenu className="bg-transparent">
-                <NavigationMenuList className="bg-transparent">
-                  <NavigationMenuItem className="bg-transparent">
-                    <NavigationMenuTrigger className="bg-transparent">Plant Enclyclopedia</NavigationMenuTrigger>
-                    <NavigationMenuContent className="bg-transparent">
-                      <NavigationMenuLink className="bg-red-700">Link</NavigationMenuLink>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
-            </li>
-            <li>
-              <Link href='/identify-plant'>
-                <p>Identify plant</p>
-              </Link>
-            </li>
-            <li>
-              <Link href='/plant-guides'>
-                <p>Plant Guides</p>
-              </Link>
-            </li>
-            <li>
-              <Link href='/storage'>
-                <p>Storage</p>
-              </Link>
-            </li>
-            <li>
-              <Link href='/leaderboard'>
-                <p>Leaderboard</p>
-              </Link>
-            </li>
+        <ul className='hidden md:flex gap-x-6 text-black items-center justify-center flex-1'>
+          <li>
+            <Link href='/home' className='inter-medium text-1xl'>
+              <p>Home</p>
+            </Link>
+          </li>
+          <li>
+            <NavigationMenu className="bg-transparent">
+              <NavigationMenuList className="bg-transparent">
+                <NavigationMenuItem className="bg-transparent">
+                  <NavigationMenuTrigger className="bg-transparent inter-medium text-1xl">Plant Encyclopedia</NavigationMenuTrigger>
+                  <NavigationMenuContent className="bg-transparent">
+                    <NavigationMenuLink className="bg-red-700">Link</NavigationMenuLink>
+                  </NavigationMenuContent>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </li>
+          <li>
+            <Link href='/identify-plant' className='inter-medium text-1xl'>
+              <p>Identify Plant</p>
+            </Link>
+          </li>
+          <li>
+            <Link href='/plant-guides' className='inter-medium text-1xl'>
+              <p>Plant Guides</p>
+            </Link>
+          </li>
+          <li>
+            <Link href='/storage' className='inter-medium text-1xl'>
+              <p>Storage</p>
+            </Link>
+          </li>
+          <li>
+            <Link href='/leaderboard' className='inter-medium text-1xl'>
+              <p>Leaderboard</p>
+            </Link>
+          </li>
+        </ul>
 
-            <li>
-                <PrimaryButton/>
-            </li>
-          </ul>
-
-          <div className='hidden md:block'>
-            <Button />
-          </div>
+        <div className='hidden md:flex items-center gap-4'>
+          <PrimaryButton />
+          <button>
+            <img src='/images/ic_user.svg' alt='User Icon' className='w-8 h-8 rounded-full' />
+          </button>
         </div>
       </div>
     </div>

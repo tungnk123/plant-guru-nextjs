@@ -16,6 +16,7 @@ const Logo = () => {
     window.addEventListener("resize", updateWidth);
     updateWidth();
 
+    return () => window.removeEventListener("resize", updateWidth);
   }, []);
 
   const [showButton, setShowButton] = useState(false);
@@ -30,28 +31,25 @@ const Logo = () => {
 
   useEffect(() => {
     window.addEventListener("scroll", changeNavButton);
+
+    return () => window.removeEventListener("scroll", changeNavButton);
   }, []);
 
   return (
-    <>
+    <div className="flex items-center space-x-1">
       <Link href="/" style={{ display: showButton ? "none" : "block" }}>
         <Image
-          src="/public/images/ic_logo.svg"
+          src="/images/ic_logo.svg"
           alt="Logo"
-          width={width < 1024 ? "150" : "250"}
-          height={width < 1024 ? "45" : "74"}
+          width="48"
+          height="48"
           className="relative"
         />
       </Link>
-      <div
-        style={{
-          display: showButton ? "block" : "none",
-        }}
-      >
-        <Button />
-      </div>
-    </>
+      <p className="text-2xl text-green-500 font-bold">PLANTGURU</p>
+    </div>
   );
+  
 };
 
 export default Logo;
