@@ -1,6 +1,8 @@
 'use client'
 import React from 'react';
 import PostCard from '@/app/components/home/PostCard';
+import ButtonCard from '../components/home/ButtonCard';
+import Footer from '../components/home/Footer';
 
 const HomePage = () => {
   const posts = [
@@ -56,6 +58,58 @@ const HomePage = () => {
     },
   ];
 
+  const buttons = [
+    {
+      title: "Plant Encyclopedia",
+      subtitle: "Discover the World of Plants",
+      icon: "/images/img_encyclopedia.svg",
+      onClick: ()=>{
+
+      }
+    },
+    {
+      title: "Identify plant ",
+      subtitle: "Identify Any Plant in Seconds",
+      icon: "/images/img_identify_plant.svg",
+      onClick: ()=>{
+
+      }
+    },
+    {
+      title: "Plant Guides",
+      subtitle: "Expert Guides for Every Type of Plant",
+      icon: "/images/img_plant_guide.svg",
+      onClick: ()=>{
+
+      }
+    },
+    {
+      title: "Storage",
+      subtitle: "Grow Your Expertise",
+      icon: "/images/img_storage.svg",
+      onClick: ()=>{
+
+      }
+    },
+    {
+      title: "Leaderboard",
+      subtitle: "Compare with your community",
+      icon: "/images/img_leaderboard.svg",
+      onClick: ()=>{
+
+      }
+    },
+    {
+      title: "Plant Guru",
+      subtitle: "Ask a Plant Guru",
+      icon: "/images/img_plant_guru.svg",
+      onClick: ()=>{
+
+      }
+    },
+    
+  ]
+
   return (
     <div>
       <head>
@@ -64,11 +118,21 @@ const HomePage = () => {
 
       <span className="flex justify-center mb-24 font-medium text-[50px] font-inter">Plants shared by community</span>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-40 ">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-40 mb-20">
         {posts.map((post, index) => (
           <PostCard key={index} {...post} />
         ))}
       </div>
+
+      <span className="flex justify-center mb-14 font-medium text-[50px] font-inter">All Features</span>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 px-36 mb-20">
+        {buttons.map((button, index) => (
+          <ButtonCard key={index} {...button}></ButtonCard>
+        ))}
+      </div>
+
+      <Footer></Footer>
     </div>
   );
 };
