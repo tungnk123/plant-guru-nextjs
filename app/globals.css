@@ -149,8 +149,13 @@
     background-color: blue;
   }
 
+  .shadowBottomEnd {
+    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+  }
+
   .heroSection {
-    background-image: url('/images/img_hero.png'); /* Update with your image path */
+    background-image: url('/images/img_hero.png');
     background-size: cover;
     background-position: center;
     height: 50vh;
