@@ -3,19 +3,10 @@ import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import Image from 'next/image'
 import { Search } from 'lucide-react'
+import CategoryCards from '@/app/components/CategoryCards'
 
 export default function HeroSection() {
   const stats = { plants: 10, posts: 10, users: 10 }
-  const categories = [
-    { name: 'All Categories', color: 'green' },
-    { name: 'Plants', color: 'yellow' },
-    { name: 'Flowers', color: 'lightyellow' },
-    { name: 'Sell & Trade', color: 'red' },
-    { name: 'Guides & Tips', color: 'lightgreen' },
-    { name: 'Diseases', color: 'pink' },
-    { name: 'Q&A', color: 'lightblue' },
-    { name: 'DIY Projects', color: 'blue' }
-  ]
 
   return (
     <div>
@@ -23,7 +14,7 @@ export default function HeroSection() {
         <title>Plant GURU</title>
       </Head>
 
-      <div className="container mx-auto mt-10 flex flex-col items-center space-y-4 rounded-3xl py-6">
+      <div className="container mx-auto flex flex-col items-center space-y-4 rounded-3xl py-6">
         <header className='w-full heroSection header flex flex-col items-center space-y-4 text-center rounded-3xl shadowBottomEnd'>
           <div className='flex flex-row items-center space-x-2'>
             <Image src='/images/ic_logo.svg' alt='Logo' width={48} height={48} />
@@ -37,8 +28,8 @@ export default function HeroSection() {
           />
         </header>
 
-        <section className='stats flex justify-start space-x-8 text-lg text-gray-700 w-full px-6'>
-          <div className='flex flex-row items-center'>
+        <section className='stats  flex justify-start space-x-8 text-lg text-gray-700 w-full px-6'>
+          <div className='flex flex-row items-center mt-2'>
             <Image
               src='/images/ic_plant_status.svg'
               alt='Logo'
@@ -47,7 +38,7 @@ export default function HeroSection() {
             />
             <p className='inter-bold mx-1 mt-1'>{stats.plants}</p> plants
           </div>
-          <div className='flex flex-row items-center'>
+          <div className='flex flex-row items-center mt-2'>
             <Image
               src='/images/ic_post_status.svg'
               alt='Logo'
@@ -56,7 +47,7 @@ export default function HeroSection() {
             />
             <p className='inter-bold mx-1 mt-1'>{stats.posts}</p> posts
           </div>
-          <div className='flex flex-row items-center'>
+          <div className='flex flex-row items-center mt-2'>
             <Image
               src='/images/ic_user_status.svg'
               alt='Logo'
@@ -67,6 +58,8 @@ export default function HeroSection() {
           </div>
         </section>
       </div>
+
+      <CategoryCards/>
     </div>
   )
 }
