@@ -3,6 +3,7 @@ import Navbar from '@/app/components/navbar/Navbar';
 import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
 import HeroSection from '@/app/home/HeroSection';
+import PostSection from '@/app/home/PostSection';
 
 const Page = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,6 +17,7 @@ const Page = () => {
       <section className="w-full">
         <Navbar toggle={toggleMenu} />
         <HeroSection />
+        <PostSection />
       </section>
     </div>
   );

@@ -4,8 +4,9 @@ import PostCard from '@/app/components/home/PostCard';
 import ButtonCard from '../components/home/ButtonCard';
 import Footer from '../components/home/Footer';
 import Link from 'next/link';
+import Head from 'next/head';
 
-const HomePage = () => {
+const PostSection = () => {
   const posts = [
     {
       userName: "Tung Doan",
@@ -88,9 +89,9 @@ const HomePage = () => {
 
   return (
     <div>
-      <head>
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@500&display=swap" rel="stylesheet" />
-      </head>
+      <Head>
+        <title>Plant GURU</title>
+      </Head>
 
       <span className="flex justify-center mb-24 font-medium text-[50px] font-inter">Plants shared by community</span>
 
@@ -113,4 +114,4 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
+export default PostSection;
