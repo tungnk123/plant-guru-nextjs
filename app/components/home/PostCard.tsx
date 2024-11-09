@@ -1,17 +1,17 @@
-import React from 'react';
-import VoteButton from './VoteButton';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
+import React from 'react'
+import VoteButton from './VoteButton'
+import Image from 'next/image'
+import { Button } from '@/components/ui/button'
 
 interface PostCardProps {
-  userName: string;
-  userAvatar: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  upvotes: number;
-  comments: number;
-  shares: number;
+  userName: string
+  userAvatar: string
+  title: string
+  description: string
+  imageUrl: string
+  upvotes: number
+  comments: number
+  shares: number
 }
 
 const PostCard: React.FC<PostCardProps> = ({
@@ -22,40 +22,35 @@ const PostCard: React.FC<PostCardProps> = ({
   imageUrl,
   upvotes,
   comments,
-  shares,
+  shares
 }) => {
-
-  const handleComment = () => {
-
-  };
-
-  const handleShare = () => {
-
-  };
-
-  const handleMore = () => {
-
-  };
+  const handleComment = () => {}
+  const handleShare = () => {}
+  const handleMore = () => {}
 
   return (
-    <div className="border aspect-square w-full rounded-3xl shadow-md p-4 bg-white">
-      <div className="flex items-center justify-between mb-5">
-        <div className="flex items-center space-x-2">
+    <div className='aspect-square w-full rounded-3xl border bg-white p-4 shadow-md'>
+      <div className='mb-5 flex items-center justify-between'>
+        <div className='flex items-center space-x-2'>
           <Image
             src={userAvatar}
             alt={userName}
             width={32}
             height={32}
-            className="w-8 h-8 rounded-full mr-2"
+            className='mr-2 h-8 w-8 rounded-full'
           />
-          <span className="font-semibold text-gray-800">{userName}</span>
+          <span className='font-semibold text-gray-800'>{userName}</span>
         </div>
-        <Button className="text-gray-400 bg-transparent shadow-none hover:bg-transparent">✕</Button>
+        <Button className='bg-transparent text-gray-400 shadow-none hover:bg-transparent'>
+          ✕
+        </Button>
       </div>
 
-      <div className="mb-6">
-        <h3 className="text-lg font-bold text-gray-900">{title}</h3>
-        <p className="text-sm text-gray-600 overflow-hidden line-clamp-3">{description}</p>
+      <div className='mb-6'>
+        <h3 className='text-lg font-bold text-gray-900'>{title}</h3>
+        <p className='line-clamp-3 overflow-hidden text-sm text-gray-600'>
+          {description}
+        </p>
       </div>
 
       <Image
@@ -63,39 +58,57 @@ const PostCard: React.FC<PostCardProps> = ({
         alt={title}
         height={478}
         width={478}
-        className="rounded-lg mb-6 object-cover"
+        className='mb-6 rounded-lg object-cover'
       />
 
-      <div className="flex items-center justify-between text-sm text-gray-500">
-        <div className="flex items-center space-x-1">
-          <div className="flex items-center justify-between text-sm text-gray-500">
-            <VoteButton initialVotes={upvotes}></VoteButton>
-          </div>
+      <div className='flex justify-between text-sm text-gray-500'>
+        <div className='flex items-center space-x-2'>
+          <VoteButton initialVotes={upvotes} />
+
           <Button
-            className="flex items-center space-x-1 bg-transparent shadow-none hover:bg-transparent text-gray-700"
-            onClick={handleComment}>
-            <Image src="/images/img_chat_bubble_icon.svg" height={20} width={20} alt="Comments" className="w-5 h-5" />
+            className='flex items-center space-x-1 bg-transparent text-gray-700 shadow-none hover:bg-transparent'
+            onClick={handleComment}
+          >
+            <Image
+              src='/images/img_chat_bubble_icon.svg'
+              height={20}
+              width={20}
+              alt='Comments'
+              className='h-5 w-5'
+            />
             <span>{comments}</span>
           </Button>
 
           <Button
-            className="flex items-center space-x-1 bg-transparent shadow-none hover:bg-transparent text-gray-700"
-            onClick={handleShare}>
-            <Image src="/images/img_share_icon.svg" height={20} width={20} alt="Share" className="w-5 h-5" />
+            className='flex items-center space-x-1 bg-transparent text-gray-700 shadow-none hover:bg-transparent'
+            onClick={handleShare}
+          >
+            <Image
+              src='/images/img_share_icon.svg'
+              height={20}
+              width={20}
+              alt='Share'
+              className='h-5 w-5'
+            />
             <span>{shares}</span>
           </Button>
         </div>
-        <Button
-          className="text-gray-700 bg-transparent shadow-none hover:bg-transparent"
-          onClick={handleMore}>
-          <div className="relative w-5 h-5">
-            <Image src="/images/img_more_icon.svg" height={20} width={20} alt="More options" className="w-5 h-5" />
-          </div>
 
+        <Button
+          className='bg-transparent text-gray-700 shadow-none hover:bg-transparent'
+          onClick={handleMore}
+        >
+          <Image
+            src='/images/img_more_icon.svg'
+            height={20}
+            width={20}
+            alt='More options'
+            className='h-5 w-5'
+          />
         </Button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default PostCard;
+export default PostCard
