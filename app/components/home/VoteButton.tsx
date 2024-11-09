@@ -1,3 +1,5 @@
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
 import React, { useState } from 'react';
 
 interface VoteButtonProps {
@@ -32,22 +34,31 @@ const VoteButton: React.FC<VoteButtonProps> = ({ initialVotes }) => {
   };
 
   return (
-    <div className="flex items-center space-x-2 p-2 rounded-full bg-gray-100 border border-gray-300">
-      <button
+    <div className="flex items-center space-x-2 rounded-full bg-gray-100 border border-gray-300">
+      <Button
         onClick={handleUpvote}
-        className={`flex items-center space-x-1 ${isUpvoted ? 'text-green-500' : 'text-gray-500'}`}
+        className={`flex items-center bg-transparent shadow-none hover:bg-transparent ${isUpvoted ? 'text-green-500' : 'text-gray-500'}`}
       >
-        <img src="/images/img_post_upvote.svg" alt="Upvote" className="w-5 h-5" />
+        <Image src="/images/img_post_upvote.svg" height={20} width={20} alt="Upvote" className="" />
         <span>Upvote</span>
-      </button>
+      </Button>
       <span className="text-black font-medium">{votes}</span>
       <div className="w-px h-5 bg-gray-300" />
-      <button
+      <Button
         onClick={handleDownvote}
-        className={`flex items-center space-x-1 ${isDownvoted ? 'text-red-500' : 'text-gray-500'}`}
+        className={`relative flex items-center w-10 h-10 p-0 bg-transparent shadow-none hover:bg-transparent ${
+          isDownvoted ? 'text-red-500' : 'text-gray-500'
+        }`}
       >
-        <img src="/images/img_post_downvote.svg" alt="Downvote" className="w-5 h-5" />
-      </button>
+        <div className="relative w-5 h-5">
+          <Image
+            src="/images/img_post_downvote.svg"
+            alt="Downvote"
+            fill
+            style={{ objectFit: 'contain' }}
+          />
+        </div>
+      </Button>
     </div>
   );
 };

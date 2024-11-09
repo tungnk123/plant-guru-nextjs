@@ -3,6 +3,7 @@ import React from 'react';
 import PostCard from '@/app/components/home/PostCard';
 import ButtonCard from '../components/home/ButtonCard';
 import Footer from '../components/home/Footer';
+import Link from 'next/link';
 
 const HomePage = () => {
   const posts = [
@@ -63,7 +64,7 @@ const HomePage = () => {
       title: "Plant Encyclopedia",
       subtitle: "Discover the World of Plants",
       icon: "/images/img_encyclopedia.svg",
-      onClick: ()=>{
+      onClick: () => {
 
       }
     },
@@ -71,7 +72,7 @@ const HomePage = () => {
       title: "Identify plant ",
       subtitle: "Identify Any Plant in Seconds",
       icon: "/images/img_identify_plant.svg",
-      onClick: ()=>{
+      onClick: () => {
 
       }
     },
@@ -79,35 +80,10 @@ const HomePage = () => {
       title: "Plant Guides",
       subtitle: "Expert Guides for Every Type of Plant",
       icon: "/images/img_plant_guide.svg",
-      onClick: ()=>{
+      onClick: () => {
 
       }
     },
-    {
-      title: "Storage",
-      subtitle: "Grow Your Expertise",
-      icon: "/images/img_storage.svg",
-      onClick: ()=>{
-
-      }
-    },
-    {
-      title: "Leaderboard",
-      subtitle: "Compare with your community",
-      icon: "/images/img_leaderboard.svg",
-      onClick: ()=>{
-
-      }
-    },
-    {
-      title: "Plant Guru",
-      subtitle: "Ask a Plant Guru",
-      icon: "/images/img_plant_guru.svg",
-      onClick: ()=>{
-
-      }
-    },
-    
   ]
 
   return (
@@ -118,7 +94,7 @@ const HomePage = () => {
 
       <span className="flex justify-center mb-24 font-medium text-[50px] font-inter">Plants shared by community</span>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 px-40 mb-20">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-5 px-40 mb-20">
         {posts.map((post, index) => (
           <PostCard key={index} {...post} />
         ))}
