@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -29,6 +30,7 @@
     --chart-5: 27 87% 67%;
     --radius: 0.5rem
   }
+
   .dark {
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
@@ -56,26 +58,117 @@
     --chart-5: 340 75% 55%
   }
 }
+
 @layer base {
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
-@layer base {
-
-}
+@layer base {}
 
 @layer components {
+  .header {
+    text-align: center;
+    background-color: #9FE49D;
+    padding: 20px;
+    border-radius: 10px;
+  }
 
+  .header input {
+    margin-top: 10px;
+    padding: 10px;
+    width: 60%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+
+  .stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 20px 0;
+  }
+
+  .categories {
+    text-align: center;
+  }
+
+  .category-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+  }
+
+  .category-button {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: white;
+  }
+
+  .green {
+    background-color: green;
+  }
+
+  .yellow {
+    background-color: yellow;
+    color: black;
+  }
+
+  .lightyellow {
+    background-color: #FFFFE0;
+    color: black;
+  }
+
+  .red {
+    background-color: red;
+  }
+
+  .lightgreen {
+    background-color: lightgreen;
+    color: black;
+  }
+
+  .pink {
+    background-color: pink;
+    color: black;
+  }
+
+  .lightblue {
+    background-color: lightblue;
+    color: black;
+  }
+
+  .blue {
+    background-color: blue;
+  }
+
+  .shadowBottomEnd {
+    box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.2);
+    border-radius: 20px;
+  }
+
+  .heroSection {
+    background-image: url('/images/img_hero.png');
+    background-size: cover;
+    background-position: center;
+    height: 50vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 @layer utilities {
   .text-mini {
-    @apply text-red-400 
+    @apply text-red-400
   }
 
   .inter-regular {
@@ -84,18 +177,21 @@
     font-weight: 400;
     font-style: normal;
   }
+
   .inter-medium {
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
     font-weight: 500;
     font-style: normal;
   }
+
   .inter-semibold {
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;
     font-weight: 600;
     font-style: normal;
   }
+
   .inter-bold {
     font-family: "Inter", sans-serif;
     font-optical-sizing: auto;

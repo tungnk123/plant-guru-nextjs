@@ -2,6 +2,7 @@
 import Navbar from '@/app/components/navbar/Navbar';
 import { Button } from '@/components/ui/button';
 import React, { useState } from 'react';
+import HeroSection from '@/app/home/HeroSection';
 
 const Page = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -11,12 +12,10 @@ const Page = () => {
   };
 
   return (
-    <div>
-      <section className="">
-        <div className="container">
-          <Navbar toggle={toggleMenu} />
-          <Button onClick={toggleMenu} className="mt-4">Toggle Menu</Button>
-        </div>
+    <div className="w-full">
+      <section className="w-full">
+        <Navbar toggle={toggleMenu} />
+        <HeroSection />
       </section>
     </div>
   );
