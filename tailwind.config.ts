@@ -49,7 +49,10 @@ const config: Config = {
   				'3': 'hsl(var(--chart-3))',
   				'4': 'hsl(var(--chart-4))',
   				'5': 'hsl(var(--chart-5))'
-  			}
+  			},
+			green1: '#00FF9C',
+			green2: '#01DD88',
+			yellow1: '#FEFFA7'
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
