@@ -1,8 +1,8 @@
 'use client'
 import React from 'react'
 import PostCard from '@/app/components/home/PostCard'
-import ButtonCard from '../components/home/ButtonCard'
-import Footer from '../components/home/Footer'
+import ButtonCard from '../../components/home/ButtonCard'
+import Footer from '../../components/home/Footer'
 import Link from 'next/link'
 import Head from 'next/head'
 
