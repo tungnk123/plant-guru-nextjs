@@ -39,8 +39,8 @@ const VoteButton: React.FC<VoteButtonProps> = ({ initialVotes }) => {
         onClick={handleUpvote}
         className={`flex items-center bg-transparent shadow-none hover:bg-transparent ${isUpvoted ? 'text-green-500' : 'text-gray-500'}`}
       >
-        <Image src="/images/img_post_upvote.svg" height={20} width={20} alt="Upvote" className="" />
-        <span>Upvote</span>
+        <Image src="/images/img_post_upvote.svg" height={20} width={20} alt="Upvote" className="pointer-events-none select-none" />
+        <span className='pointer-events-none select-none'>Upvote</span>
       </Button>
       <span className="text-black font-medium">{votes}</span>
       <div className="w-px h-5 bg-gray-300" />
@@ -56,6 +56,7 @@ const VoteButton: React.FC<VoteButtonProps> = ({ initialVotes }) => {
             alt="Downvote"
             fill
             style={{ objectFit: 'contain' }}
+            className='pointer-events-none select-none'
           />
         </div>
       </Button>
