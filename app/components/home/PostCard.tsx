@@ -37,11 +37,11 @@ const PostCard: React.FC<PostCardProps> = ({
             alt={userName}
             width={32}
             height={32}
-            className='mr-2 h-8 w-8 rounded-full'
+            className='mr-2 h-8 w-8 rounded-full pointer-events-none select-none'
           />
           <span className='font-semibold text-gray-800'>{userName}</span>
         </div>
-        <Button className='bg-transparent text-gray-400 shadow-none hover:bg-transparent'>
+        <Button className='bg-transparent text-gray-400 shadow-none hover:bg-transparent pointer-events-none select-none'>
           ✕
         </Button>
       </div>
@@ -58,7 +58,7 @@ const PostCard: React.FC<PostCardProps> = ({
         alt={title}
         height={478}
         width={478}
-        className='mb-6 rounded-lg object-cover'
+        className='mb-6 rounded-lg object-cover pointer-events-none select-none'
       />
 
       <div className='flex justify-between text-sm text-gray-500'>
@@ -74,7 +74,7 @@ const PostCard: React.FC<PostCardProps> = ({
               height={20}
               width={20}
               alt='Comments'
-              className='h-5 w-5'
+              className='h-5 w-5 pointer-events-none select-none'
             />
             <span>{comments}</span>
           </Button>
@@ -88,7 +88,7 @@ const PostCard: React.FC<PostCardProps> = ({
               height={20}
               width={20}
               alt='Share'
-              className='h-5 w-5'
+              className='h-5 w-5 pointer-events-none select-none'
             />
             <span>{shares}</span>
           </Button>
@@ -103,7 +103,7 @@ const PostCard: React.FC<PostCardProps> = ({
             height={20}
             width={20}
             alt='More options'
-            className='h-5 w-5'
+            className='h-5 w-5 pointer-events-none select-none'
           />
         </Button>
       </div>

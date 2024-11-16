@@ -5,8 +5,21 @@ import ButtonCard from '../../components/home/ButtonCard'
 import Footer from '../../components/home/Footer'
 import Link from 'next/link'
 import Head from 'next/head'
+import PostCardGrid from './PostCardGrid'
+import ButtonCardGrid from './ButtonCardGrid'
 
 const PostSection = () => {
+
+  const fetchPosts = async (page: number) => {
+    // const response = await fetch(`/api/posts?page=${page}`);
+    // const data = await response.json();
+    
+    return {
+      posts: posts,
+      totalPages: 9,
+    };
+  };
+  
   const posts = [
     {
       userName: 'Tung Doan',
@@ -96,21 +109,13 @@ const PostSection = () => {
           Plants shared by community
         </span>
 
-        <div className='mb-20 grid grid-cols-1 gap-x-5 gap-y-5 sm:grid-cols-2 md:grid-cols-3'>
-          {posts.map((post, index) => (
-            <PostCard key={index} {...post} />
-          ))}
-        </div>
+        <PostCardGrid fetchPosts={fetchPosts} />
 
         <span className='font-inter mb-14 flex justify-center text-[50px] font-medium'>
           All Features
         </span>
 
-        <div className='mb-20 grid grid-cols-1 gap-5 px-36 sm:grid-cols-2 md:grid-cols-3'>
-          {buttons.map((button, index) => (
-            <ButtonCard key={index} {...button}></ButtonCard>
-          ))}
-        </div>
+        <ButtonCardGrid buttons={buttons} />
       </div>
 
       <Footer></Footer>

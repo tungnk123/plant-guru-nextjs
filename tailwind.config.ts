@@ -52,7 +52,11 @@ const config: Config = {
   			},
 			green1: '#00FF9C',
 			green2: '#01DD88',
-			yellow1: '#FEFFA7'
+			yellow1: '#FEFFA7',
+			gray1: '#919EAB',
+			gray2: '#C4CDD5',
+			gray3: '#DFE3E8',
+			blue1: '#4200FF',
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
