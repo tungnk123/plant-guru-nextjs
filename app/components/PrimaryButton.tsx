@@ -1,13 +1,19 @@
-import { Button } from '@/components/ui/button'
-import React from 'react'
-import { Plus } from "lucide-react"
+import { Button } from "@/components/ui/button";
+import React from "react";
 
-const PrimaryButton = () => {
-  return (
-    <Button className='bg-yellow-300 hover:bg-yellow-600 text-black'>
-    <Plus /> Create post
-  </Button>
-  )
+interface PrimaryButtonProps {
+  text: string; 
+  icon?: React.ReactNode;
+  className?: string;
 }
 
-export default PrimaryButton
+const PrimaryButton: React.FC<PrimaryButtonProps> = ({ text, icon, className }) => {
+  return (
+    <Button className={`bg-yellow-300 hover:bg-yellow-600 text-black flex items-center gap-2 ${className}`}>
+      {icon}
+      {text}
+    </Button>
+  );
+};
+
+export default PrimaryButton;

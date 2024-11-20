@@ -1,21 +1,23 @@
 "use client";
-import Navbar from '@/app/components/navbar/Navbar'
-import { useState } from 'react'
+import Navbar from "@/app/components/navbar/Navbar";
+import PlantIdentifier from "@/app/identify-plant/PlantIdentifier";
+import { useState } from "react";
 
 const Page = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => {
-    setIsMenuOpen(prevState => !prevState)
-  }
+    setIsMenuOpen((prevState) => !prevState);
+  };
+
   return (
-    <div className='w-full'>
-      <section className='w-full'>
+    <div className="w-full">
+      <section className="w-full">
         <Navbar toggle={toggleMenu} />
-        <p>Identify plant</p>
+        <PlantIdentifier />
       </section>
     </div>
-  )
-}
+  );
+};
 
 export default Page;

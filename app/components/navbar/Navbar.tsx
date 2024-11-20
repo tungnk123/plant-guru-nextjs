@@ -1,8 +1,8 @@
-'use client';
-import React from 'react';
-import Link from 'next/link';
-import Logo from './Logo';
-import { Button } from '@/components/ui/button';
+'use client'
+import React from 'react'
+import Link from 'next/link'
+import Logo from './Logo'
+import { Button } from '@/components/ui/button'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,13 +12,14 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
   NavigationMenuViewport
-} from '@/components/ui/navigation-menu';
-import PrimaryButton from '@/app/components/PrimaryButton';
+} from '@/components/ui/navigation-menu'
+import PrimaryButton from '@/app/components/PrimaryButton'
+import { Plus } from 'lucide-react'
 
 const Navbar = ({ toggle }: { toggle: () => void }) => {
   return (
     <div className='sticky top-0 h-20 w-full bg-white shadow'>
-      <div className='container mx-auto h-full px-20 flex items-center justify-between'>
+      <div className='container mx-auto flex h-full items-center justify-between px-20'>
         <div className='flex items-center gap-4'>
           <Logo />
           <button
@@ -40,19 +41,23 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
           </button>
         </div>
 
-        <ul className='hidden md:flex gap-x-6 text-black items-center justify-center flex-1'>
+        <ul className='hidden flex-1 items-center justify-center gap-x-6 text-black md:flex'>
           <li>
             <Link href='/home' className='inter-medium text-1xl'>
               <p>Home</p>
             </Link>
           </li>
           <li>
-            <NavigationMenu className="bg-transparent">
-              <NavigationMenuList className="bg-transparent">
-                <NavigationMenuItem className="bg-transparent">
-                  <NavigationMenuTrigger className="bg-transparent inter-medium text-1xl">Plant Encyclopedia</NavigationMenuTrigger>
-                  <NavigationMenuContent className="bg-transparent">
-                    <NavigationMenuLink className="bg-red-700">Link</NavigationMenuLink>
+            <NavigationMenu className='bg-transparent'>
+              <NavigationMenuList className='bg-transparent'>
+                <NavigationMenuItem className='bg-transparent'>
+                  <NavigationMenuTrigger className='inter-medium text-1xl bg-transparent'>
+                    Plant Encyclopedia
+                  </NavigationMenuTrigger>
+                  <NavigationMenuContent className='bg-transparent'>
+                    <NavigationMenuLink className='bg-red-700'>
+                      Link
+                    </NavigationMenuLink>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -70,15 +75,19 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
           </li>
         </ul>
 
-        <div className='hidden md:flex items-center gap-4'>
-          <PrimaryButton />
+        <div className='hidden items-center gap-4 md:flex'>
+          <PrimaryButton text='Create Post' icon={<Plus />} />
           <button>
-            <img src='/images/ic_user.svg' alt='User Icon' className='w-8 h-8 rounded-full' />
+            <img
+              src='/images/ic_user.svg'
+              alt='User Icon'
+              className='h-8 w-8 rounded-full'
+            />
           </button>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Navbar;
+export default Navbar
