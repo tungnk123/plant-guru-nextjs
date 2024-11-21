@@ -76,7 +76,10 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
         </ul>
 
         <div className='hidden items-center gap-4 md:flex'>
-          <PrimaryButton text='Create Post' icon={<Plus />} />
+          <Link href='/create-post' className='inter-medium text-1xl'>
+            <PrimaryButton text='Create Post' icon={<Plus />} />
+          </Link>
+
           <button>
             <img
               src='/images/ic_user.svg'
