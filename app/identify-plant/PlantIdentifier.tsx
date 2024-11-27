@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import { Upload } from 'lucide-react'
 import { Root } from '@/app/api/data/models/ApiResponse'
+import Image from 'next/image'
 
 const PlantIdentifier = () => {
   const [image, setImage] = useState<string | null>(
@@ -41,22 +42,41 @@ const PlantIdentifier = () => {
     try {
       const base64Image = await base64Promise
 
-      const response = await fetch(`/api/identify?image=${encodeURIComponent(base64Image)}`, {
-        method: 'GET',
+      const apiKey = 'URWBmEBcg06oPXxGwSF8gE5vqYIosQ7x30gG2I98DOd9dADPzM'
+      const apiUrl = 'https://plant.id/api/v3/identification'
+      const params = new URLSearchParams({
+        details:
+          'common_names,url,description,taxonomy,rank,gbif_id,inaturalist_id,image,synonyms,edible_parts,watering',
+        language: 'vi'
+      })
+
+      const fullApiUrl = `${apiUrl}?${params.toString()}`
+
+      const requestBody = {
+        images: [base64Image],
+        latitude: 14.0583,
+        longitude: 108.2772,
+        similar_images: true
+      }
+
+      const response = await fetch(fullApiUrl, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Api-Key': apiKey
         },
+        body: JSON.stringify(requestBody)
       })
 
       if (!response.ok) {
-        throw new Error('Failed to identify the plant')
+        throw new Error('Failed to identify the plant via Plant.id API')
       }
 
       const data = await response.json()
       setPlantInfo(data)
     } catch (error) {
-      console.error('Error identifying plant:', error)
-      alert('Failed to identify plant. Please try again.')
+      console.error('Error calling Plant.id API directly:', error)
+      alert('Failed to identify plant directly. Please try again.')
     } finally {
       setIsLoading(false)
     }
@@ -109,32 +129,45 @@ const PlantIdentifier = () => {
       </div>
 
       {isLoading && (
-        <p className='mt-4 text-yellow-500'>Identifying the plant...</p>
+        <div className='mt-4 flex items-center gap-2'>
+          <div className='h-4 w-4 animate-spin rounded-full border-2 border-yellow-500 border-t-transparent'></div>
+          <p className='text-yellow-500'>Identifying the plant...</p>
+        </div>
       )}
 
-      {plantInfo && (
+      {plantInfo && plantInfo.result.classification?.suggestions?.length > 0 ? (
         <div className='mt-8 w-[600px] rounded-md border bg-gray-50 p-4 shadow-md'>
-          <h2 className='text-lg font-bold'>
-            {plantInfo.result.classification.suggestions[0]?.name}
+          <h2 className='mb-4 text-lg font-bold'>
+            Plant Identification Results
           </h2>
-          <p>
-            Probability:{' '}
-            {plantInfo.result.classification.suggestions[0]?.probability.toFixed(
-              2
-            )}
-          </p>
-          <p>
-            Common Names:{' '}
-            {plantInfo.result.classification.suggestions[0]?.details.common_names.join(
-              ', '
-            )}
-          </p>
-          <p>
-            Description:{' '}
-            {plantInfo.result.classification.suggestions[0]?.details.description
-              ?.value || 'No description available'}
-          </p>
+          {plantInfo.result.classification.suggestions.map(
+            (suggestion, index) => (
+              <div
+                key={index}
+                className='mb-4 flex items-center gap-4 rounded-md border bg-white p-4 shadow-sm'
+              >
+                <Image
+                  src={(suggestion.details?.image.value || '/images/placeholder.png') as string}
+                  alt={suggestion.name || 'Unknown'}
+                  width={64}
+                  height={64}
+                  className='h-16 w-16 rounded-md border object-cover'
+                />
+
+                <div>
+                  <p className='text-lg font-bold'>
+                    {suggestion.name || 'Unknown Plant'}
+                  </p>
+                  <p>
+                    Probability: {(suggestion.probability * 100).toFixed(2)}%
+                  </p>
+                </div>
+              </div>
+            )
+          )}
         </div>
+      ) : (
+        <p className='mt-8 text-gray-500'>No plant information found.</p>
       )}
     </div>
   )
