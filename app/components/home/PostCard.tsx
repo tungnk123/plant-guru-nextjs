@@ -1,14 +1,14 @@
-import React from 'react'
+import React, { useState } from "react";
 import VoteButton from './VoteButton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 
-interface PostCardProps {
+export interface PostCardProps {
   userName: string
   userAvatar: string
   title: string
   description: string
-  imageUrl: string
+  imageUrls: string[]
   upvotes: number
   comments: number
   shares: number
@@ -19,17 +19,28 @@ const PostCard: React.FC<PostCardProps> = ({
   userAvatar,
   title,
   description,
-  imageUrl,
+  imageUrls,
   upvotes,
   comments,
   shares
 }) => {
-  const handleComment = () => {}
-  const handleShare = () => {}
-  const handleMore = () => {}
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const handleImageClick = (imageUrl: string) => {
+    setSelectedImage(imageUrl);
+    setModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedImage(null);
+  };
+  const handleComment = () => { }
+  const handleShare = () => { }
+  const handleMore = () => { }
 
   return (
-    <div className='aspect-square w-full rounded-3xl border bg-white p-4 shadow-md'>
+    <div className='w-full rounded-3xl border bg-white p-4 shadow-md'>
       <div className='mb-5 flex items-center justify-between'>
         <div className='flex items-center space-x-2'>
           <Image
@@ -41,9 +52,6 @@ const PostCard: React.FC<PostCardProps> = ({
           />
           <span className='font-semibold text-gray-800'>{userName}</span>
         </div>
-        <Button className='bg-transparent text-gray-400 shadow-none hover:bg-transparent pointer-events-none select-none'>
-          ✕
-        </Button>
       </div>
 
       <div className='mb-6'>
@@ -53,13 +61,26 @@ const PostCard: React.FC<PostCardProps> = ({
         </p>
       </div>
 
-      <Image
+      {/* <Image
         src={imageUrl}
         alt={title}
         height={478}
         width={478}
         className='mb-6 rounded-lg object-cover pointer-events-none select-none'
-      />
+      /> */}
+      <div className="mb-4 flex gap-1">
+        {imageUrls.slice(0, 2).map((imageUrl, index) => (
+          <Image
+            key={index}
+            src={imageUrl}
+            alt={`Image ${index + 1}`}
+            width={220}
+            height={220}
+            className="cursor-pointer rounded-md object-cover"
+            onClick={() => handleImageClick(imageUrl)}
+          />
+        ))}
+      </div>
 
       <div className='flex justify-between text-sm text-gray-500'>
         <div className='flex items-center space-x-2'>
@@ -107,6 +128,28 @@ const PostCard: React.FC<PostCardProps> = ({
           />
         </Button>
       </div>
+
+      {isModalOpen && selectedImage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+        onClick={handleModalClose}>
+          <div className="relative"
+          onClick={(e) => e.stopPropagation()}>
+            <Image
+              src={selectedImage}
+              alt="Zoomed Image"
+              width={600}
+              height={600}
+              className="rounded-lg"
+            />
+            <button
+              className="absolute top-1 right-1 text-white"
+              onClick={handleModalClose}
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

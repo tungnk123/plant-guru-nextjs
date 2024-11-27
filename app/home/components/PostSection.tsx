@@ -26,8 +26,8 @@ const PostSection = () => {
       userAvatar: '/images/img_default_user_avatar.png',
       title: 'Rose flower',
       description:
-        'Some beautifulSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrl: '/images/img_default_post.png', // Replace with actual image paths
+        'Some beautifulSomeme beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower',
+      imageUrls: ['/images/img_default_post.png', '/images/img_default_post.png'], // Replace with actual image paths
       upvotes: 323,
       comments: 323,
       shares: 323
@@ -38,7 +38,7 @@ const PostSection = () => {
       title: 'Rose flower',
       description:
         'Some beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrl: '/images/img_default_post.png', // Replace with actual image paths
+      imageUrls: ['/images/img_default_post.png'], // Replace with actual image paths
       upvotes: 323,
       comments: 323,
       shares: 323
@@ -49,28 +49,7 @@ const PostSection = () => {
       title: 'Rose flower',
       description:
         'Some beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrl: '/images/img_default_post.png', // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    },
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description:
-        'Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower Some beautiful flower',
-      imageUrl: '/images/img_default_post.png', // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    },
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description: 'Some beautiful flower',
-      imageUrl: '/images/img_default_post.png', // Replace with actual image paths
+      imageUrls: ['/images/img_default_post.png'], // Replace with actual image paths
       upvotes: 323,
       comments: 323,
       shares: 323
@@ -104,7 +83,7 @@ const PostSection = () => {
         <title>Plant GURU</title>
       </Head>
 
-      <div className="container mx-auto flex flex-col items-center space-y-4 rounded-3xl py-6">
+      <div className="container mx-auto flex flex-col items-center space-y-1 rounded-3xl py-1">
         <span className='font-inter mb-24 flex justify-center text-[40px] font-medium'>
           Plants shared by community
         </span>
