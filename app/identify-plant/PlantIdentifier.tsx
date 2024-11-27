@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Upload } from 'lucide-react'
 import { Root } from '@/app/api/data/models/ApiResponse'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const PlantIdentifier = () => {
   const [image, setImage] = useState<string | null>(
@@ -144,16 +145,18 @@ const PlantIdentifier = () => {
             (suggestion, index) => (
               <div
                 key={index}
-                className='mb-4 flex items-center gap-4 rounded-md border bg-white p-4 shadow-sm'
+                className='mb-4 flex cursor-pointer items-center gap-4 rounded-md border bg-white p-4 shadow-sm'
               >
                 <Image
-                  src={(suggestion.details?.image.value || '/images/placeholder.png') as string}
+                  src={
+                    (suggestion.details?.image.value ||
+                      '/images/placeholder.png') as string
+                  }
                   alt={suggestion.name || 'Unknown'}
                   width={64}
                   height={64}
                   className='h-16 w-16 rounded-md border object-cover'
                 />
-
                 <div>
                   <p className='text-lg font-bold'>
                     {suggestion.name || 'Unknown Plant'}
@@ -162,6 +165,16 @@ const PlantIdentifier = () => {
                     Probability: {(suggestion.probability * 100).toFixed(2)}%
                   </p>
                 </div>
+
+                <Link
+                  href={{
+                    pathname: '/plant-detail',
+                    query: { data: JSON.stringify(suggestion) }
+                  }}
+                  className='text-blue-500 hover:underline'
+                >
+                  View Details
+                </Link>
               </div>
             )
           )}
