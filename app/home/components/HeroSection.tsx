@@ -14,52 +14,35 @@ export default function HeroSection() {
         <title>Plant GURU</title>
       </Head>
 
-      <div className="container mx-auto flex flex-col items-center space-y-4 rounded-3xl py-6">
-        <header className='w-full heroSection header flex flex-col items-center space-y-4 text-center rounded-3xl shadowBottomEnd'>
-          <div className='flex flex-row items-center space-x-2'>
-            <Image src='/images/ic_logo.svg' alt='Logo' width={48} height={48} />
-            <h1 className='inter-medium text-5xl'>Plant GURU</h1>
-          </div>
-          <p className='inter-medium text-2xl'>Your Ultimate Plant Companion</p>
-          <Input
-            type='text'
-            placeholder='Search for a plant or ask a question...'
-            className='w-full rounded-md border border-gray-300 bg-white p-2'
-          />
-        </header>
+      <div className="w-full flex flex-col items-center">
+        <header
+          className="relative w-full flex flex-col justify-center bg-[#e8f5e9] bg-[url('/images/img_hero_background.svg')]"
+          style={{ height: '600px' }}
+        >
+          <div className="px-8 md:px-16 lg:px-24">
+            <h1 className="inter-bold text-7xl text-[#1A5319]">PLANTGURU</h1>
+            <p className="inter-medium text-5xl text-[#C0C0C0] mt-4">
+              Your Ultimate Plant Companion
+            </p>
 
-        <section className='stats  flex justify-start space-x-8 text-lg text-gray-700 w-full px-6'>
-          <div className='flex flex-row items-center mt-2'>
-            <Image
-              src='/images/ic_plant_status.svg'
-              alt='Logo'
-              width={32}
-              height={32}
-            />
-            <p className='inter-bold mx-1 mt-1'>{stats.plants}</p> plants
+            <div className="relative mt-6 w-full max-w-2xl">
+              <Input
+                type="text"
+                placeholder="Search products..."
+                className="mt-6 rounded-2xl border-gray-300 bg-white p-3 shadow-sm focus:outline-none focus:ring focus:ring-green-300 w-full max-w-2xl"
+              />
+              <button
+                type="button"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-[#508D4E] p-2 text-white shadow-md hover:bg-green-600"
+              >
+                <Search className="h-3 w-3" />
+              </button>
+            </div>
           </div>
-          <div className='flex flex-row items-center mt-2'>
-            <Image
-              src='/images/ic_post_status.svg'
-              alt='Logo'
-              width={32}
-              height={32}
-            />
-            <p className='inter-bold mx-1 mt-1'>{stats.posts}</p> posts
-          </div>
-          <div className='flex flex-row items-center mt-2'>
-            <Image
-              src='/images/ic_user_status.svg'
-              alt='Logo'
-              width={32}
-              height={32}
-            />
-            <p className='inter-bold mx-1 mt-1'>{stats.users}</p> users
-          </div>
-        </section>
+        </header>
       </div>
 
-      <CategoryCards/>
+      <CategoryCards />
     </div>
   )
 }

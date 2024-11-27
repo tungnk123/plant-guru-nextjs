@@ -4,17 +4,7 @@ import React, { useState, useEffect } from 'react';
 import PostCard from '@/app/components/home/PostCard';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-
-interface PostCardProps {
-  userName: string;
-  userAvatar: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  upvotes: number;
-  comments: number;
-  shares: number;
-}
+import { PostCardProps } from '@/app/components/home/PostCard';
 
 interface PostCardResponse {
   posts: PostCardProps[];

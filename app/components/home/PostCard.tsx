@@ -3,7 +3,7 @@ import VoteButton from './VoteButton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 
-interface PostCardProps {
+export interface PostCardProps {
   userName: string
   userAvatar: string
   title: string

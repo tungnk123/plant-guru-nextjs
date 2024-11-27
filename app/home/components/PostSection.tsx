@@ -5,7 +5,7 @@ import ButtonCard from '../../components/home/ButtonCard'
 import Footer from '../../components/home/Footer'
 import Link from 'next/link'
 import Head from 'next/head'
-import PostCardGrid from './PostCardGrid'
+import PostCardPreview from './PostGridPreview'
 import ButtonCardGrid from './ButtonCardGrid'
 
 const PostSection = () => {
@@ -13,13 +13,13 @@ const PostSection = () => {
   const fetchPosts = async (page: number) => {
     // const response = await fetch(`/api/posts?page=${page}`);
     // const data = await response.json();
-    
+
     return {
       posts: posts,
       totalPages: 9,
     };
   };
-  
+
   const posts = [
     {
       userName: 'Tung Doan',
@@ -64,16 +64,6 @@ const PostSection = () => {
       upvotes: 323,
       comments: 323,
       shares: 323
-    },
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description: 'Some beautiful flower',
-      imageUrl: '/images/img_default_post.png', // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
     }
   ]
 
@@ -82,19 +72,19 @@ const PostSection = () => {
       title: 'Plant Encyclopedia',
       subtitle: 'Discover the World of Plants',
       icon: '/images/img_encyclopedia.svg',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       title: 'Identify plant ',
       subtitle: 'Identify Any Plant in Seconds',
       icon: '/images/img_identify_plant.svg',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       title: 'Plant Guides',
       subtitle: 'Expert Guides for Every Type of Plant',
       icon: '/images/img_plant_guide.svg',
-      onClick: () => {}
+      onClick: () => { }
     }
   ]
 
@@ -105,11 +95,10 @@ const PostSection = () => {
       </Head>
 
       <div className="container mx-auto flex flex-col items-center space-y-4 rounded-3xl py-6">
-        <span className='font-inter mb-24 flex justify-center text-[40px] font-medium'>
-          Plants shared by community
-        </span>
+        <h1 className="inter-bold text-5xl text-[#1A5319]">COMMUNITY</h1>
+        <p className="inter-medium text-4xl text-[#C0C0C0] mt-4">Explore PlantGuru’s community</p>
 
-        <PostCardGrid fetchPosts={fetchPosts} />
+        <PostCardPreview fetchPosts={fetchPosts} />
 
         <span className='font-inter mb-14 flex justify-center text-[50px] font-medium'>
           All Features
