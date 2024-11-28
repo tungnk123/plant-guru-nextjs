@@ -4,17 +4,10 @@ import React, { useState, useEffect } from 'react';
 import PostCard from '@/app/components/home/PostCard';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
-
-interface PostCardProps {
-  userName: string;
-  userAvatar: string;
-  title: string;
-  description: string;
-  imageUrl: string;
-  upvotes: number;
-  comments: number;
-  shares: number;
-}
+import FilterButton from './FilterButton';
+import { PostCardProps } from '@/app/components/home/PostCard'
+import PrimaryButton from '@/app/components/PrimaryButton'
+import { Plus } from 'lucide-react'
 
 interface PostCardResponse {
   posts: PostCardProps[];
@@ -30,6 +23,11 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [activeFilter, setActiveFilter] = useState("All");
+
+  const handleFilterClick = (filter: string) => {
+    setActiveFilter(filter);
+  };
 
   const getVisiblePageNumbers = () => {
     const maxVisiblePages = 5;
@@ -73,8 +71,28 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
   };
 
   return (
-    <div>
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3">
+    <div className='px-40'>
+      <div className="flex items-center justify-between py-4">
+        <div className="flex space-x-4">
+          <FilterButton
+            label="All"
+            isActive={activeFilter === "All"}
+            onClick={() => handleFilterClick("All")}
+          />
+          <FilterButton
+            label="Trending"
+            isActive={activeFilter === "Trending"}
+            onClick={() => handleFilterClick("Trending")}
+          />
+          <FilterButton
+            label="Latest"
+            isActive={activeFilter === "Latest"}
+            onClick={() => handleFilterClick("Latest")}
+          />
+        </div>
+        <PrimaryButton text="Create Post" icon={<Plus />} />
+      </div>
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-1">
         {loading ? (
           <div className="col-span-full flex justify-center py-10">
             {/* <span>Loading...</span> */}
@@ -88,7 +106,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
         <Button
           onClick={() => changePage(currentPage - 1)}
           disabled={currentPage === 1 || loading}
-          className="aspect-square p-0 rounded-sm bg-gray1 text-gray2 hover:bg-gray-300 disabled:bg-white disabled:border-black border-[1px]"
+          className="aspect-square p-0 rounded-sm bg-white text-[#C4CDD5] border-[#DFE3E8] border-[1px] hover:bg-gray-300 disabled:bg-[#919EAB]"
         >
           <Image className='h-auto w-auto pointer-events-none select-none'
             src="/images/img_paging_arrow_left.svg" alt="img_arrow_left" width={60} height={60} />
@@ -99,11 +117,10 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
             <Button
               key={index}
               onClick={() => changePage(page)}
-              className={`px-3 py-2 rounded-sm ${
-                page === currentPage
-                  ? 'aspect-square bg-transparent text-blue1 border border-blue1 hover:bg-gray-100'
-                  : 'aspect-square bg-transparent text-black border border-gray3 hover:bg-gray-100'
-              }`}
+              className={`px-3 py-2 rounded-sm ${page === currentPage
+                ? 'aspect-square bg-transparent text-blue1 border border-blue1 hover:bg-gray-100'
+                : 'aspect-square bg-transparent text-black border border-gray3 hover:bg-gray-100'
+                }`}
               disabled={loading}
             >
               {page}
@@ -118,7 +135,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
         <Button
           onClick={() => changePage(currentPage + 1)}
           disabled={currentPage === totalPages || loading}
-          className="aspect-square p-0 rounded-sm bg-gray1 text-gray2 hover:bg-gray-300 disabled:bg-white disabled:border-black border-[1px]"
+          className="aspect-square p-0 rounded-sm bg-white text-[#C4CDD5] border-[#DFE3E8] border-[1px] hover:bg-gray-300 disabled:bg-[#919EAB]"
         >
           <Image className='h-auto w-auto pointer-events-none select-none'
             src="/images/img_paging_arrow_right.svg" alt="img_arrow_right" width={60} height={60} />

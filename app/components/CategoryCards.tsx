@@ -8,13 +8,13 @@ const categories = [
     icon: "/images/ic_category_all.svg",
     color: 'bg-green-500'
   },
-  { id: 2, name: 'Plants', icon: "/images/ic_category_plant.svg", color: 'bg-yellow-500' },
-  { id: 3, name: 'Flowers', icon: "/images/ic_category_flower.svg", color: 'bg-yellow-300' },
-  { id: 4, name: 'Sell & Trade', icon: "/images/ic_category_sell.svg", color: 'bg-red-500' },
-  { id: 5, name: 'Guides & Tips', icon: "/images/ic_category_guide.svg", color: 'bg-purple-500' },
-  { id: 6, name: 'Diseases', icon: "/images/ic_category_disease.svg", color: 'bg-red-300' },
-  { id: 7, name: 'Q&A', icon: "/images/ic_category_qa.svg", color: 'bg-orange-400' },
-  { id: 8, name: 'DIY Projects', icon: "/images/ic_category_all.svg", color: 'bg-blue-500' }
+  { id: 2, name: 'Plants', icon: "/images/ic_category_plant.svg", color: 'bg-[#00FF9C]' },
+  { id: 3, name: 'Flowers', icon: "/images/ic_category_flower.svg", color: 'bg-[#00FF9C]' },
+  { id: 4, name: 'Sell & Trade', icon: "/images/ic_category_sell.svg", color: 'bg-[#00FF9C]' },
+  { id: 5, name: 'Guides & Tips', icon: "/images/ic_category_guide.svg", color: 'bg-[#00FF9C]' },
+  { id: 6, name: 'Diseases', icon: "/images/ic_category_disease.svg", color: 'bg-[#00FF9C]' },
+  { id: 7, name: 'Q&A', icon: "/images/ic_category_qa.svg", color: 'bg-[#00FF9C]' },
+  { id: 8, name: 'DIY Projects', icon: "/images/ic_category_all.svg", color: 'bg-[#00FF9C]' }
 ]
 
 const CategoryCards = () => {
