@@ -1,4 +1,4 @@
-import Link from 'next/link'; // Import Link from Next.js
+import Link from 'next/link';
 import { useState } from 'react';
 import { Upload } from 'lucide-react';
 import Image from 'next/image';
@@ -44,7 +44,7 @@ const PlantIdentifier = () => {
       const params = new URLSearchParams({
         details:
           'common_names,url,description,taxonomy,rank,gbif_id,inaturalist_id,image,synonyms,edible_parts,watering',
-        language: 'vi',
+        language: 'en',
       });
 
       const fullApiUrl = `${apiUrl}?${params.toString()}`;
