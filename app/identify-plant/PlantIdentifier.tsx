@@ -1,9 +1,9 @@
 'use client'
 import { useState } from 'react'
 import { Upload } from 'lucide-react'
-import { Root } from '@/app/api/data/models/ApiResponse'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Root } from '@/app/api/data/models/ApiResponse'
+import { Details } from '@/app/api/data/models/DetailApiDetectPlant'
 
 const PlantIdentifier = () => {
   const [image, setImage] = useState<string | null>(
@@ -11,6 +11,7 @@ const PlantIdentifier = () => {
   )
   const [plantInfo, setPlantInfo] = useState<Root | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+  const [selectedPlantDetails, setSelectedPlantDetails] = useState<Details | null>(null)
 
   const handleFileUpload = async (
     event: React.ChangeEvent<HTMLInputElement>
@@ -83,6 +84,44 @@ const PlantIdentifier = () => {
     }
   }
 
+  const fetchPlantDetails = async (accessToken: string) => {
+    // accessToken = "oSAXvYedP4NPS7a"
+    console.log("Current access tolen:" + accessToken)
+    const apiKey = 'URWBmEBcg06oPXxGwSF8gE5vqYIosQ7x30gG2I98DOd9dADPzM'
+    const apiUrl = `https://plant.id/api/v3/identification/${accessToken}`
+    const params = new URLSearchParams({
+      details:
+        'common_names,url,description,taxonomy,rank,gbif_id,inaturalist_id,image,synonyms,edible_parts,watering',
+      language: 'vi'
+    })
+    
+    try {
+      const response = await fetch(`${apiUrl}?${params.toString()}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Api-Key': apiKey
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch plant details.')
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error fetching plant details:', error)
+      alert('Failed to fetch plant details. Please try again.')
+    }
+  }
+
+  const handleViewDetails = async (accessToken: string) => {
+    const details = await fetchPlantDetails(accessToken)
+    console.log(details)
+    setSelectedPlantDetails(details)
+  }
+
   return (
     <div className='flex min-h-screen flex-col items-center bg-white'>
       <h1 className='mt-4 text-2xl font-bold text-gray-800'>
@@ -149,8 +188,8 @@ const PlantIdentifier = () => {
               >
                 <Image
                   src={
-                    (suggestion.details?.image.value ||
-                      '/images/placeholder.png') as string
+                    suggestion.details?.image.value ||
+                    '/images/placeholder.png'
                   }
                   alt={suggestion.name || 'Unknown'}
                   width={64}
@@ -166,21 +205,46 @@ const PlantIdentifier = () => {
                   </p>
                 </div>
 
-                <Link
-                  href={{
-                    pathname: '/plant-detail',
-                    query: { data: JSON.stringify(suggestion) }
-                  }}
+                <button
+                  onClick={() => handleViewDetails(suggestion.details.entity_id)}
                   className='text-blue-500 hover:underline'
                 >
                   View Details
-                </Link>
+                </button>
               </div>
             )
           )}
         </div>
       ) : (
         <p className='mt-8 text-gray-500'>No plant information found.</p>
+      )}
+
+      {selectedPlantDetails && (
+        <div className='mt-8 w-[600px] rounded-md border bg-gray-50 p-4 shadow-md'>
+          <h2 className='mb-4 text-lg font-bold'>Detailed Information</h2>
+          <p>
+            <strong>Common Names:</strong>{' '}
+            {selectedPlantDetails.commonNames?.length > 0
+              ? selectedPlantDetails.commonNames.join(', ')
+              : 'Not available'}
+          </p>
+          <p>
+            <strong>Description:</strong>{' '}
+            {selectedPlantDetails.description?.value || 'Not available'}
+          </p>
+          <p>
+            <strong>Taxonomy:</strong>{' '}
+            {selectedPlantDetails.taxonomy?.genus
+              ? `${selectedPlantDetails.taxonomy.genus} (${selectedPlantDetails.taxonomy.family || 'Unknown'})`
+              : 'Not available'}
+          </p>
+          <p>
+            <strong>Edible Parts:</strong>{' '}
+            {selectedPlantDetails.edibleParts?.length > 0
+              ? selectedPlantDetails.edibleParts.join(', ')
+              : 'None'}
+          </p>
+        </div>
       )}
     </div>
   )
