@@ -1,41 +1,39 @@
+// postService.ts
+
 export interface PostData {
-  title: string
-  description: string
-  userId: string
-  imageUrl: string
-  tag: string
-  background: string
+  title: string;
+  description: string;
+  userId: string;
+  imageUrl: string;
+  tag: string;
+  background: string;
 }
 
-// app/api/postService.ts
-export const createPost = async (postData: PostData) => {
-  const url = 'https://ec9cc5c5-52a4-4a84-b5cf-5e74e57a2275.mock.pstmn.io/posts'
-
-  console.log('Sending data to API:', postData)
-
+export const createPost = async (postData: PostData): Promise<any> => {
   try {
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(postData)
-    })
-
-    console.log('API response:', response)
+    const response = await fetch(
+      'https://un-silent-backend-develop.azurewebsites.net/api/posts',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: '*/*',
+        },
+        body: JSON.stringify(postData),
+      }
+    );
 
     if (!response.ok) {
-      const errorData = await response.json()
-      console.error('API Error Response:', errorData)
-      throw new Error(errorData.message || 'Failed to create post')
+      // If the response is not OK, throw an error with the message from the response
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create post');
     }
 
-    const responseData = await response.json()
-    console.log('Success Response Data:', responseData)
-
-    return responseData
+    // Return the response data
+    const data = await response.json();
+    return data;
   } catch (error) {
-    console.error('Error while calling API:', error)
-    throw new Error(error instanceof Error ? error.message : 'Unknown error')
+    console.error('Error creating post:', error);
+    throw error;
   }
-}
+};
