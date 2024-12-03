@@ -1,27 +1,31 @@
-import { useState } from 'react';
-import Link from 'next/link';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { PlusIcon } from 'lucide-react';
-import { createPost, PostData } from '@/app/api/postService';
+import { useState } from "react";
+import Link from "next/link";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import { PlusIcon } from "lucide-react";
+import { createPost, PostData } from "@/app/api/postService";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
+} from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast"
+
 
 const CreatePost = () => {
-  const [backgroundColor, setBackgroundColor] = useState('#FFFF00');
+  const [backgroundColor, setBackgroundColor] = useState("#FFFF00");
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [tag, setTag] = useState('');
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [tag, setTag] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const { toast } = useToast();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -46,9 +50,9 @@ const CreatePost = () => {
     e.preventDefault();
     setLoading(true);
 
-    const userId = '4da5937d-9cba-4960-8009-2a1d6f836944';
+    const userId = "4da5937d-9cba-4960-8009-2a1d6f836944";
     const imageUrl =
-      'https://th.bing.com/th/id/R.bb456ae8d4b3b3c5e31eb3886aeb8fd2?rik=WcqO9ZNLQpZOmw&pid=ImgRaw&r=0';
+      "https://th.bing.com/th/id/R.bb456ae8d4b3b3c5e31eb3886aeb8fd2?rik=WcqO9ZNLQpZOmw&pid=ImgRaw&r=0";
 
     const postData: PostData = {
       title,
@@ -59,22 +63,30 @@ const CreatePost = () => {
       background: backgroundColor,
     };
 
-    console.log('Form data before sending:', postData);
-
     try {
       const data = await createPost(postData);
-      console.log('Post created successfully:', data);
-      alert('Post created successfully!');
+      console.log("Post created successfully:", data);
 
-      setTitle('');
-      setDescription('');
-      setTag('');
-      setBackgroundColor('#FFFF00');
+      toast({
+        title: "Post Created",
+        description: "Your plant post has been successfully created!",
+        variant: "success"
+      });
+
+      setTitle("");
+      setDescription("");
+      setTag("");
+      setBackgroundColor("#FFFF00");
       setSelectedImages([]);
       setImagePreviews([]);
     } catch (error: any) {
-      console.error('Error in form submission:', error);
-      alert(`Error: ${error.message}`);
+      console.error("Error in form submission:", error);
+
+      toast({
+        title: "Error",
+        description: `Failed to create post: ${error.message}`,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
@@ -138,7 +150,7 @@ const CreatePost = () => {
                   <div
                     className="flex h-[300px] w-[300px] cursor-pointer items-center justify-center rounded border border-dashed p-4"
                     onClick={() =>
-                      document.getElementById('imageUpload')?.click()
+                      document.getElementById("imageUpload")?.click()
                     }
                   >
                     <PlusIcon className="text-gray-500" />
@@ -180,7 +192,7 @@ const CreatePost = () => {
               </div>
 
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? 'Posting...' : 'Post'}
+                {loading ? "Posting..." : "Post"}
               </Button>
             </form>
           </CardContent>
