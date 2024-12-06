@@ -1,11 +1,9 @@
 import Head from 'next/head'
-import Link from 'next/link'
 import { Input } from '@/components/ui/input'
 import Image from 'next/image'
-import { Search } from 'lucide-react'
-import CategoryCards from '@/app/components/CategoryCards'
+import CategoryCards, { CategoryCardsProps } from '@/app/home/components/CategoryCards'
 
-export default function HeroSection() {
+export const HeroSection: React.FC<CategoryCardsProps> = ({ onTagChange }) => {
   const stats = { plants: 10, posts: 10, users: 10 }
 
   return (
@@ -59,7 +57,7 @@ export default function HeroSection() {
         </section>
       </div>
 
-      <CategoryCards/>
+      <CategoryCards onTagChange={onTagChange}/>
     </div>
   )
 }

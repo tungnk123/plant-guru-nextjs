@@ -1,60 +1,14 @@
 'use client'
 import React from 'react'
-import PostCard from '@/app/components/home/PostCard'
-import ButtonCard from '../../components/home/ButtonCard'
+import { useState, useEffect } from 'react';
 import Footer from '../../components/home/Footer'
 import Link from 'next/link'
 import Head from 'next/head'
 import PostCardGrid from './PostCardGrid'
 import ButtonCardGrid from './ButtonCardGrid'
+import { fetchPosts, PostResponse } from '@/app/api/postService';
 
-const PostSection = () => {
-
-  const fetchPosts = async (page: number) => {
-    // const response = await fetch(`/api/posts?page=${page}`);
-    // const data = await response.json();
-    
-    return {
-      posts: posts,
-      totalPages: 9,
-    };
-  };
-  
-  const posts = [
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description:
-        'Some beautifulSomeme beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrls: ['/images/img_default_post.png', '/images/img_default_post.png'], // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    },
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description:
-        'Some beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrls: ['/images/img_default_post.png'], // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    },
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description:
-        'Some beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrls: ['/images/img_default_post.png'], // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    }
-  ]
+const PostSection: React.FC<{ tag: string }> = ({ tag }) => {
 
   const buttons = [
     {
@@ -88,7 +42,7 @@ const PostSection = () => {
           Plants shared by community
         </span>
 
-        <PostCardGrid fetchPosts={fetchPosts} />
+        <PostCardGrid fetchPosts={fetchPosts} tag={tag} /> 
 
         <span className='font-inter mb-14 flex justify-center text-[50px] font-medium'>
           All Features

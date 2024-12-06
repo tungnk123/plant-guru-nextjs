@@ -17,7 +17,11 @@ const categories = [
   { id: 8, name: 'DIY Projects', icon: "/images/ic_category_all.svg", color: 'bg-[#00FF9C]' }
 ]
 
-const CategoryCards = () => {
+export interface CategoryCardsProps {
+  onTagChange: (tag: string) => void;
+}
+
+const CategoryCards: React.FC<CategoryCardsProps> = ({ onTagChange }) => {
   return (
     <div className='container mx-auto my-10'>
       <h2 className='mb-4 text-2xl font-bold'>Top Categories</h2>
@@ -26,6 +30,7 @@ const CategoryCards = () => {
           <div
             key={category.id}
             className='flex items-center rounded-lg border border-gray-300 bg-gray-100 shadow-md'
+            onClick={() => onTagChange(category.name)}
           >
             <div className={`${category.color} h-full w-5 rounded-l-lg`} />
 

@@ -2,28 +2,10 @@ import React, { useState } from "react";
 import VoteButton from './VoteButton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
+import { PostResponse } from "@/app/api/postService";
 
-export interface PostCardProps {
-  userName: string
-  userAvatar: string
-  title: string
-  description: string
-  imageUrls: string[]
-  upvotes: number
-  comments: number
-  shares: number
-}
 
-const PostCard: React.FC<PostCardProps> = ({
-  userName,
-  userAvatar,
-  title,
-  description,
-  imageUrls,
-  upvotes,
-  comments,
-  shares
-}) => {
+const PostCard: React.FC<PostResponse> = (postDat) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const handleImageClick = (imageUrl: string) => {
@@ -39,25 +21,37 @@ const PostCard: React.FC<PostCardProps> = ({
   const handleShare = () => { }
   const handleMore = () => { }
 
+  const postData = {
+    userAvatar: "https://www.gravatar.com/avatar",
+    imageUrl: "https://www.gravatar.com/avatar",
+    description: postDat.description,
+    title: postDat.title,
+    userNickName: postDat.userNickName,
+    numberOfUpvote: postDat.numberOfUpvote,
+    numberOfComment: postDat.numberOfComment,
+    numberOfShare: postDat.numberOfShare
+
+  }
+
   return (
     <div className='w-full rounded-3xl border bg-white p-4 shadow-md'>
       <div className='mb-5 flex items-center justify-between'>
         <div className='flex items-center space-x-2'>
           <Image
-            src={userAvatar}
-            alt={userName}
+            src={postData.userAvatar}
+            alt={postData.userAvatar}
             width={32}
             height={32}
             className='mr-2 h-8 w-8 rounded-full pointer-events-none select-none'
           />
-          <span className='font-semibold text-gray-800'>{userName}</span>
+          <span className='font-semibold text-gray-800'>{postData.userNickName}</span>
         </div>
       </div>
 
       <div className='mb-6'>
-        <h3 className='text-lg font-bold text-gray-900'>{title}</h3>
+        <h3 className='text-lg font-bold text-gray-900'>{postData.title}</h3>
         <p className='line-clamp-3 overflow-hidden text-sm text-gray-600'>
-          {description}
+          {postData.description}
         </p>
       </div>
 
@@ -69,22 +63,19 @@ const PostCard: React.FC<PostCardProps> = ({
         className='mb-6 rounded-lg object-cover pointer-events-none select-none'
       /> */}
       <div className="mb-4 flex gap-1">
-        {imageUrls.slice(0, 2).map((imageUrl, index) => (
           <Image
-            key={index}
-            src={imageUrl}
-            alt={`Image ${index + 1}`}
+            src={postData.imageUrl}
+            alt={postData.imageUrl}
             width={220}
             height={220}
             className="cursor-pointer rounded-md object-cover"
-            onClick={() => handleImageClick(imageUrl)}
+            onClick={() => handleImageClick(postData.imageUrl)}
           />
-        ))}
       </div>
 
       <div className='flex justify-between text-sm text-gray-500'>
         <div className='flex items-center space-x-2'>
-          <VoteButton initialVotes={upvotes} />
+          <VoteButton initialVotes={postData.numberOfUpvote} />
 
           <Button
             className='flex items-center space-x-1 bg-transparent text-gray-700 shadow-none hover:bg-transparent'
@@ -97,7 +88,7 @@ const PostCard: React.FC<PostCardProps> = ({
               alt='Comments'
               className='h-5 w-5 pointer-events-none select-none'
             />
-            <span>{comments}</span>
+            <span>{postData.numberOfComment}</span>
           </Button>
 
           <Button
@@ -111,7 +102,7 @@ const PostCard: React.FC<PostCardProps> = ({
               alt='Share'
               className='h-5 w-5 pointer-events-none select-none'
             />
-            <span>{shares}</span>
+            <span>{postData.numberOfShare}</span>
           </Button>
         </div>
 

@@ -5,28 +5,56 @@ import PostCard from '@/app/components/home/PostCard';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import FilterButton from './FilterButton';
-import { PostCardProps } from '@/app/components/home/PostCard'
 import PrimaryButton from '@/app/components/PrimaryButton'
 import { Plus } from 'lucide-react'
+import Link from 'next/link';
+import { fetchPosts, FetchPostsResponse, PostResponse } from '@/app/api/postService';
 
 interface PostCardResponse {
-  posts: PostCardProps[];
+  posts: PostResponse[];
   totalPages: number;
 }
 
 interface PostCardGridProps {
-  fetchPosts: (page: number) => Promise<PostCardResponse>;
+  fetchPosts: (page: number, limit: number, tag: string, filter: string) => Promise<FetchPostsResponse>;
+  tag: string;
 }
 
-const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
-  const [posts, setPosts] = useState<PostCardProps[]>([]);
+const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
+  const [posts, setPosts] = useState<PostResponse[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [activeFilter, setActiveFilter] = useState("All");
+  const [loading, setLoading] = useState(false);
+  const [activeFilter, setActiveFilter] = useState('All');
+
+  const limit = 3; 
+
+  const fetchPageData = async (page: number, filter: string) => {
+    setLoading(true);
+    try {
+      const { posts, totalPages } = await fetchPosts(page, limit, tag, filter);
+      setPosts(posts);
+      setTotalPages(totalPages);
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchPageData(currentPage, activeFilter);
+  }, [currentPage, activeFilter, tag]); 
+
+  const changePage = (page: number) => {
+    if (page > 0 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const handleFilterClick = (filter: string) => {
     setActiveFilter(filter);
+    setCurrentPage(1); 
   };
 
   const getVisiblePageNumbers = () => {
@@ -47,28 +75,6 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
     return pages;
   };
 
-  const fetchPageData = async (page: number) => {
-    setLoading(true);
-    try {
-      const { posts, totalPages } = await fetchPosts(page);
-      setPosts(posts);
-      setTotalPages(totalPages);
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchPageData(currentPage);
-  }, [currentPage]);
-
-  const changePage = (page: number) => {
-    if (page > 0 && page <= totalPages) {
-      setCurrentPage(page);
-    }
-  };
 
   return (
     <div className='px-40'>
@@ -90,12 +96,14 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts }) => {
             onClick={() => handleFilterClick("Latest")}
           />
         </div>
-        <PrimaryButton text="Create Post" icon={<Plus />} />
+        <Link href='/create-post' className='inter-medium text-1xl'>
+          <PrimaryButton text="Create Post" icon={<Plus />} />
+        </Link>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-1">
         {loading ? (
           <div className="col-span-full flex justify-center py-10">
-            {/* <span>Loading...</span> */}
+            <span>Loading...</span>
           </div>
         ) : (
           posts.map((post, index) => <PostCard key={index} {...post} />)

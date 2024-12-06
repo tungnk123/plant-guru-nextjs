@@ -7,6 +7,7 @@ const nextConfig = {
           hostname: 'plant-id.ams3.cdn.digitaloceanspaces.com',
         },
       ],
+      domains: ['www.gravatar.com']
     },
   };
 
