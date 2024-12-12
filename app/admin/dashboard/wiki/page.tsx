@@ -2,8 +2,7 @@ import { searchParamsCache } from '@/lib/searchparams'; // Assuming this handles
 import { SearchParams } from 'nuqs'; // Assuming this is a function for parsing search params
 import React from 'react';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import PostListingPage from './_components/post-listing-page';
-import TestApi from '@/app/components/TestApi';
+import EmployeeListingPage from './_components/employee-listing-page';
 
 type pageProps = {
   searchParams: SearchParams;
@@ -11,7 +10,7 @@ type pageProps = {
 
 const Page = ({ searchParams }: pageProps) => {
   searchParamsCache.parse(searchParams);
-  return <NuqsAdapter><PostListingPage/></NuqsAdapter>;
+  return <NuqsAdapter><EmployeeListingPage/></NuqsAdapter>;
 };
 
 export default Page;

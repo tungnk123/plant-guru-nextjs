@@ -1,4 +1,20 @@
 import { NavItem } from '@/types';
+export type Post = {
+  id: string; // Unique identifier for the post
+  userId: string; // ID of the user who created the post
+  user: string | null; // Optional user object or null if not available
+  title: string; // Title of the post
+  description: string; // Description of the post
+  imageUrl: string; // URL of the post's image
+  tag: string; // Tag or category for the post
+  background: string; // URL of the background image for the post
+  postUpvotes: any[]; // Array of upvotes (can be refined further)
+  postDevotes: any[]; // Array of downvotes (can be refined further)
+  postComments: any[]; // Array of comments (can be refined further)
+  postShares: any[]; // Array of shares (can be refined further)
+  createdAt: string; // Creation date of the post in ISO format
+  lastModifiedAt: string | null; // Last modification date or null if not modified
+};
 
 export type User = {
   id: number;

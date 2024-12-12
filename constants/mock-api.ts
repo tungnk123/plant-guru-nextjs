@@ -331,3 +331,14 @@ export const fakeProducts = {
 
 // Initialize sample products
 fakeProducts.initialize();
+
+export type Post = {
+  post_id: number;
+  title: string;
+  author: string;
+  content: string;
+  image_url: string;
+  category: string;
+  date: string; // ISO date string
+};
+
