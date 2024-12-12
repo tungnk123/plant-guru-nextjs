@@ -30,7 +30,7 @@ import {
   UserCircle2Icon,
   UserPen,
   UserX2Icon,
-  X
+  X,
 } from 'lucide-react';
 
 export type Icon = LucideIcon;

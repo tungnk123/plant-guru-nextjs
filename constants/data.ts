@@ -126,50 +126,61 @@ export const navItems: NavItem[] = [
     title: 'Dashboard',
     url: '/admin/dashboard/overview',
     icon: 'dashboard',
-    isActive: false,
+    isActive: true,
     shortcut: ['d', 'd'],
     items: [] // Empty array as there are no child items for Dashboard
   },
   {
-    title: 'post',
+    title: 'Post',
     url: '/admin/dashboard/post',
-    icon: 'user',
+    icon: 'post',
     shortcut: ['e', 'e'],
     isActive: false,
     items: [] // No child items
   },
   {
-    title: 'Product',
-    url: '/admin/dashboard/product',
+    title: 'Category',
+    url: '/admin/dashboard/category',
     icon: 'product',
     shortcut: ['p', 'p'],
     isActive: false,
     items: [] // No child items
   },
   {
-    title: 'Account',
-    url: '#', // Placeholder as there is no direct link for the parent
-    icon: 'billing',
-    isActive: true,
-
-    items: [
-      {
-        title: 'Profile',
-        url: '/dashboard/profile',
-        icon: 'userPen',
-        shortcut: ['m', 'm']
-      },
-      {
-        title: 'Login',
-        shortcut: ['l', 'l'],
-        url: '/',
-        icon: 'login'
-      }
-    ]
+    title: 'Plant Encyclopedia',
+    url: '/admin/dashboard/wiki',
+    icon: 'post',
+    shortcut: ['p', 'p'],
+    isActive: false,
+    items: [] // No child items
   },
   {
-    title: 'Kanban',
-    url: '/dashboard/kanban',
+    title: 'Plant Guide',
+    url: '/admin/dashboard/guide',
+    icon: 'kanban',
+    shortcut: ['k', 'k'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Membership',
+    url: '/admin/dashboard/membership',
+    icon: 'user',
+    shortcut: ['k', 'k'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Sales',
+    url: '/admin/dashboard/sales',
+    icon: 'billing',
+    shortcut: ['k', 'k'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'Report',
+    url: '/admin/dashboard/report',
     icon: 'kanban',
     shortcut: ['k', 'k'],
     isActive: false,
