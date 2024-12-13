@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { useState } from 'react';
 
 // components/CategoryCards.js
 const categories = [
@@ -6,7 +7,7 @@ const categories = [
     id: 1,
     name: 'All Categories',
     icon: "/images/ic_category_all.svg",
-    color: 'bg-green-500'
+    color: 'bg-[#00FF9C]'
   },
   { id: 2, name: 'Plants', icon: "/images/ic_category_plant.svg", color: 'bg-[#00FF9C]' },
   { id: 3, name: 'Flowers', icon: "/images/ic_category_flower.svg", color: 'bg-[#00FF9C]' },
@@ -22,6 +23,12 @@ export interface CategoryCardsProps {
 }
 
 const CategoryCards: React.FC<CategoryCardsProps> = ({ onTagChange }) => {
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+
+  const handleCardClick = (id: number, name: string) => {
+    setSelectedCategory(id);
+    onTagChange(name);
+  };
   return (
     <div className='container mx-auto my-10'>
       <h2 className='mb-4 text-2xl font-bold'>Top Categories</h2>
@@ -29,10 +36,12 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ onTagChange }) => {
         {categories.map(category => (
           <div
             key={category.id}
-            className='flex items-center rounded-lg border border-gray-300 bg-gray-100 shadow-md'
-            onClick={() => onTagChange(category.name)}
+            className='group cursor-pointer flex items-center rounded-lg border border-gray-300 bg-gray-100 shadow-md transition-transform duration-200 hover:scale-105 hover:shadow-lg'
+            onClick={() => handleCardClick(category.id, category.name)}
           >
-            <div className={`${category.color} h-full w-5 rounded-l-lg`} />
+            <div className={` ${
+              selectedCategory === category.id ? 'bg-green-500' : category.color
+            } h-full w-5 rounded-l-lg`} />
 
             <div className='flex w-full items-center p-4'>
               <Image

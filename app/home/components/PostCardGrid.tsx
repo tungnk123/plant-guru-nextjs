@@ -77,7 +77,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
 
 
   return (
-    <div className='px-40'>
+    <div className='px-40 w-full'>
       <div className="flex items-center justify-between py-4">
         <div className="flex space-x-4">
           <FilterButton
@@ -105,12 +105,20 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
           <div className="col-span-full flex justify-center py-10">
             <span>Loading...</span>
           </div>
+        ) : totalPages === 0 ? (
+          <div className="col-span-full flex justify-center py-10">
+            <div className="text-center border border-gray-300 rounded-md p-6 bg-gray-100">
+              <h2 className="text-xl font-semibold">No posts available</h2>
+              <p className="text-gray-500">Be the first to create a post or try a different filter.</p>
+            </div>
+          </div>
         ) : (
           posts.map((post, index) => <PostCard key={index} {...post} />)
         )}
       </div>
 
-      <div className="mt-6 flex justify-center items-center gap-2">
+      {totalPages > 0 && ( 
+        <div className="mt-6 flex justify-center items-center gap-2">
         <Button
           onClick={() => changePage(currentPage - 1)}
           disabled={currentPage === 1 || loading}
@@ -149,6 +157,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
             src="/images/img_paging_arrow_right.svg" alt="img_arrow_right" width={60} height={60} />
         </Button>
       </div>
+      )}
     </div>
   );
 };

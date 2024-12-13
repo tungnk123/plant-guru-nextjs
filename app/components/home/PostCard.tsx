@@ -3,10 +3,12 @@ import VoteButton from './VoteButton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { PostResponse } from "@/app/api/postService";
+import CommentSection from "@/app/home/components/CommentSection";
 
 
 const PostCard: React.FC<PostResponse> = (postDat) => {
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isCommentSectionOpen, setCommentSectionOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const handleImageClick = (imageUrl: string) => {
     setSelectedImage(imageUrl);
@@ -17,11 +19,37 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
     setModalOpen(false);
     setSelectedImage(null);
   };
-  const handleComment = () => { }
+  const handleCommentClick = () => {
+    setCommentSectionOpen((prev) => !prev);
+  };
+
+  const comments = [
+    {
+      id: "1",
+      userName: "Darren Johnson",
+      userAvatar: "https://via.placeholder.com/32",
+      content:
+        "I had a relative with a low IQ score. The parents decided not to reveal it...",
+      likes: 429,
+      replies: [
+        {
+          id: "2",
+          userName: "David Galipeau",
+          userAvatar: "https://via.placeholder.com/32",
+          content:
+            "Yeah, I totally agree with this, it’s part of the Pygmalion effect...",
+          likes: 201,
+          replies: [],
+        },
+      ],
+    },
+  ];
   const handleShare = () => { }
   const handleMore = () => { }
 
   const postData = {
+    postId: postDat.postId,
+    userId: postDat.userId,
     userAvatar: "https://www.gravatar.com/avatar",
     imageUrl: "https://www.gravatar.com/avatar",
     description: postDat.description,
@@ -30,7 +58,6 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
     numberOfUpvote: postDat.numberOfUpvote,
     numberOfComment: postDat.numberOfComment,
     numberOfShare: postDat.numberOfShare
-
   }
 
   return (
@@ -63,23 +90,28 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
         className='mb-6 rounded-lg object-cover pointer-events-none select-none'
       /> */}
       <div className="mb-4 flex gap-1">
-          <Image
-            src={postData.imageUrl}
-            alt={postData.imageUrl}
-            width={220}
-            height={220}
-            className="cursor-pointer rounded-md object-cover"
-            onClick={() => handleImageClick(postData.imageUrl)}
-          />
+        <Image
+          src={postData.imageUrl}
+          alt={postData.imageUrl}
+          width={220}
+          height={220}
+          className="cursor-pointer rounded-md object-cover"
+          onClick={() => handleImageClick(postData.imageUrl)}
+        />
       </div>
 
       <div className='flex justify-between text-sm text-gray-500'>
         <div className='flex items-center space-x-2'>
-          <VoteButton initialVotes={postData.numberOfUpvote} />
+          <VoteButton
+            initialVotes={postData.numberOfUpvote}
+            postId={postData.postId}
+            hasUpvoted={postDat.hasUpvoted} // Pass the prop to indicate upvote state
+            hasDevoted={postDat.hasDevoted} // Pass the prop to indicate downvote state
+          />
 
           <Button
             className='flex items-center space-x-1 bg-transparent text-gray-700 shadow-none hover:bg-transparent'
-            onClick={handleComment}
+            onClick={handleCommentClick}
           >
             <Image
               src='/images/img_chat_bubble_icon.svg'
@@ -91,7 +123,7 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
             <span>{postData.numberOfComment}</span>
           </Button>
 
-          <Button
+          {/* <Button
             className='flex items-center space-x-1 bg-transparent text-gray-700 shadow-none hover:bg-transparent'
             onClick={handleShare}
           >
@@ -103,10 +135,10 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
               className='h-5 w-5 pointer-events-none select-none'
             />
             <span>{postData.numberOfShare}</span>
-          </Button>
+          </Button> */}
         </div>
 
-        <Button
+        {/* <Button
           className='bg-transparent text-gray-700 shadow-none hover:bg-transparent'
           onClick={handleMore}
         >
@@ -117,14 +149,14 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
             alt='More options'
             className='h-5 w-5 pointer-events-none select-none'
           />
-        </Button>
+        </Button> */}
       </div>
 
       {isModalOpen && selectedImage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
-        onClick={handleModalClose}>
+          onClick={handleModalClose}>
           <div className="relative"
-          onClick={(e) => e.stopPropagation()}>
+            onClick={(e) => e.stopPropagation()}>
             <Image
               src={selectedImage}
               alt="Zoomed Image"
@@ -141,6 +173,7 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
           </div>
         </div>
       )}
+      {isCommentSectionOpen && <CommentSection comments={comments} />}
     </div>
   )
 }

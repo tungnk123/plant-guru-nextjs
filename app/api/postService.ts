@@ -10,7 +10,6 @@ export interface PostData {
 }
 
 export interface PostResponse {
-
   postId: string;
   userId: string;
   userNickName: string;
@@ -25,6 +24,8 @@ export interface PostResponse {
   numberOfComment: number;
   numberOfShare: number;
   createdDate: string;
+  hasUpvoted: boolean;
+  hasDevoted: boolean;
 }
 
 export interface FetchPostsResponse {
@@ -68,18 +69,78 @@ export const fetchPosts = async (
   filter: string
 ): Promise<FetchPostsResponse> => {
   try {
-    const response = await fetch(`${BASE_URL}?limit=${limit}&page=${page}&tag=${tag}&filter=${filter}`);
+    localStorage.setItem('userId', '59a840af-a96e-48a8-81bd-03e6ff3567ab');
+    const userId = localStorage.getItem('userId')
+    var userIdString = ""
+    if (userId != null) {
+     userIdString = `userId=${userId}`
+    }
+    const response = await fetch(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}&tag=${tag}&filter=${filter}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch posts: ${response.statusText}`);
     }
     const data = await response.json();
-    console.log(`${BASE_URL}?limit=${limit}&page=${page}&tag=${tag}&filter=${filter}`)
+    if (!data || data.length === 0) {
+      return {
+        posts: [],
+        totalPages: 0,
+      };
+    }
+    console.log(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}&tag=${tag}&filter=${filter}`)
     return {
-      posts: data,
-      totalPages: 10,
+      posts: data.plantPostDtos,
+      totalPages: data.numberOfPage,
     };
   } catch (error) {
     console.error('Error fetching posts:', error);
+    throw error;
+  }
+};
+
+export const upvotePost = async (targetId: string): Promise<{ numberOfUpvotes: number }> => {
+  try {
+    const userId = localStorage.getItem('userId')
+    const response = await fetch(`${BASE_URL}/upvote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: '*/*',
+      },
+      body: JSON.stringify({ userId, targetId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to upvote post: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return { numberOfUpvotes: data.numberOfUpvotes };
+  } catch (error) {
+    console.error('Error upvoting post:', error);
+    throw error;
+  }
+};
+
+export const downvotePost = async (targetId: string): Promise<{ numberOfUpvotes: number }> => {
+  try {
+    const userId = localStorage.getItem('userId')
+    const response = await fetch(`${BASE_URL}/devote`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: '*/*',
+      },
+      body: JSON.stringify({ userId, targetId }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to downvote post: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+    return { numberOfUpvotes: data.numberOfUpvotes };
+  } catch (error) {
+    console.error('Error downvoting post:', error);
     throw error;
   }
 };
