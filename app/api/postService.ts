@@ -33,6 +33,19 @@ export interface FetchPostsResponse {
   totalPages: number;
 }
 
+export interface Comment {
+  commentId: string;
+  userId: string;
+  name: string;
+  avatar: string;
+  message: string;
+  createdAt: string;
+  numberOfUpvote: number;
+  numberOfDevote: number;
+  hasUpvoted: boolean;
+  hasDevoted: boolean;
+}
+
 const BASE_URL = 'https://un-silent-backend-develop.azurewebsites.net/api/posts'
 
 export const createPost = async (postData: PostData): Promise<any> => {
@@ -141,6 +154,43 @@ export const downvotePost = async (targetId: string): Promise<{ numberOfUpvotes:
     return { numberOfUpvotes: data.numberOfUpvotes };
   } catch (error) {
     console.error('Error downvoting post:', error);
+    throw error;
+  }
+};
+
+export const fetchComments = async (
+  postId: string,
+  parentCommentId: string | null = null
+): Promise<Comment[]> => {
+  try {
+    const userId = localStorage.getItem('userId'); 
+    if (!userId) {
+      throw new Error('User ID not found in localStorage');
+    }
+
+    const url = new URL(
+      `${BASE_URL}/comments/posts/${postId}/comments`
+    );
+    url.searchParams.append('userId', userId);
+    if (parentCommentId) {
+      url.searchParams.append('parentCommentId', parentCommentId);
+    }
+
+    const response = await fetch(url.toString(), {
+      method: 'GET',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch comments: ${response.statusText}`);
+    }
+
+    const data: Comment[] = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching comments:', error);
     throw error;
   }
 };

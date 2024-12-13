@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import VoteButton from './VoteButton'
+import VoteButton from '../../home/components/VoteButton'
 import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { PostResponse } from "@/app/api/postService";
 import CommentSection from "@/app/home/components/CommentSection";
+import { Comment } from "@/app/api/postService";
 
 
 const PostCard: React.FC<PostResponse> = (postDat) => {
@@ -23,27 +24,6 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
     setCommentSectionOpen((prev) => !prev);
   };
 
-  const comments = [
-    {
-      id: "1",
-      userName: "Darren Johnson",
-      userAvatar: "https://via.placeholder.com/32",
-      content:
-        "I had a relative with a low IQ score. The parents decided not to reveal it...",
-      likes: 429,
-      replies: [
-        {
-          id: "2",
-          userName: "David Galipeau",
-          userAvatar: "https://via.placeholder.com/32",
-          content:
-            "Yeah, I totally agree with this, it’s part of the Pygmalion effect...",
-          likes: 201,
-          replies: [],
-        },
-      ],
-    },
-  ];
   const handleShare = () => { }
   const handleMore = () => { }
 
@@ -173,7 +153,7 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
           </div>
         </div>
       )}
-      {isCommentSectionOpen && <CommentSection comments={comments} />}
+      {isCommentSectionOpen && <CommentSection postId={postData.postId} />}
     </div>
   )
 }
