@@ -14,7 +14,7 @@ import {
   FormLabel,
   FormMessage
 } from '@/components/ui/form';
-import { Heading } from '@/components/ui/heading';
+import { Heading } from '@/components-admin/ui/heading';
 import { Input } from '@/components/ui/input';
 import {
   Select,
