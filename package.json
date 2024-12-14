@@ -60,6 +60,7 @@
     "react-dom": "^18",
     "react-dropzone": "^14.3.5",
     "react-hook-form": "^7.53.2",
+    "react-lottie-player": "^2.1.0",
     "react-resizable-panels": "^2.1.7",
     "react-responsive": "^10.0.0",
     "recharts": "^2.13.3",
