@@ -5,33 +5,8 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { Plus } from 'lucide-react';
 import Link from 'next/link';
-import PostTable from './post-tables'; // Post-specific table
-
-async function fetchPosts({ page, limit }: { page: number; limit: number }) {
-  console.log('Start call API:');
-  const response = await fetch(
-    `https://un-silent-backend-develop.azurewebsites.net/api/posts/test/get-all`,
-    {
-      method: 'GET',
-      headers: {
-        Accept: '*/*',
-      },
-    }
-  );
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch posts: ${response.statusText}`);
-  }
-
-  const data = await response.json();
-  console.log('API Response:', data);
-
-  return {
-    totalPosts: data.length,
-    posts: data,
-  };
-}
-
+import PostTable from './post-tables'; 
+import { fetchPosts } from '@/app/admin/api/post';
 
 export default async function PostListingPage() {
   const filters = {

@@ -1,6 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import React from 'react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import {
   Sidebar,
   SidebarContent,
@@ -13,25 +13,33 @@ import {
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
-  SidebarMenuSubItem,
-} from '@/components/ui/sidebar';
-import { navItems } from '@/constants/data';
-import { Icons } from '../icons';
+  SidebarMenuSubItem
+} from '@/components/ui/sidebar'
+import { navItems } from '@/constants/data'
+import { Icons } from '../icons'
+import Image from 'next/image'
 
 export default function AppSidebar({
-  onPageChange,
+  onPageChange
 }: {
-  onPageChange: (page: string) => void;
+  onPageChange: (page: string) => void
 }) {
-  const pathname = usePathname();
+  const pathname = usePathname()
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible='icon'>
       <SidebarHeader>
-        <div className="flex gap-2 py-2 text-sidebar-accent-foreground">
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <span className="truncate font-semibold">App Name</span>
-            <span className="truncate text-xs">App Plan</span>
+        <div className='flex items-center gap-2 py-2 text-sidebar-accent-foreground'>
+          <Image
+            src='/images/ic_logo.svg'
+            alt='Logo'
+            width='48'
+            height='48'
+            className='relative'
+          />
+          <div className='grid flex-1 text-left text-sm leading-tight'>
+            <span className='truncate font-semibold text-lg'>Plan Guru</span>
+            <span className='truncate text-xs'>Admin Page</span>
           </div>
         </div>
       </SidebarHeader>
@@ -39,8 +47,8 @@ export default function AppSidebar({
         <SidebarGroup>
           <SidebarGroupLabel>Overview</SidebarGroupLabel>
           <SidebarMenu>
-            {navItems.map((item) => {
-              const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+            {navItems.map(item => {
+              const Icon = item.icon ? Icons[item.icon] : Icons.logo
               return item?.items && item?.items?.length > 0 ? (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
@@ -51,9 +59,8 @@ export default function AppSidebar({
                     {item.icon && <Icon />}
                     <span>{item.title}</span>
                   </SidebarMenuButton>
-                  {/* Add a UL to wrap nested LI elements */}
                   <ul>
-                    {item.items.map((subItem) => (
+                    {item.items.map(subItem => (
                       <SidebarMenuSubItem key={subItem.title}>
                         <SidebarMenuSubButton
                           asChild
@@ -77,18 +84,21 @@ export default function AppSidebar({
                     tooltip={item.title}
                     isActive={pathname === item.url}
                   >
-                    <Link href={item.url} onClick={() => onPageChange(item.title)}>
+                    <Link
+                      href={item.url}
+                      onClick={() => onPageChange(item.title)}
+                    >
                       <Icon />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
-              );
+              )
             })}
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter>Footer Content</SidebarFooter>
     </Sidebar>
-  );
+  )
 }
