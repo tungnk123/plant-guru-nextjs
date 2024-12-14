@@ -1,8 +1,7 @@
-import NextAuth from 'next-auth';
 import CredentialsProvider from 'next-auth/providers/credentials';
 import GithubProvider from 'next-auth/providers/github';
 
-export default NextAuth({
+const authConfig = {
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID ?? '',
@@ -21,7 +20,7 @@ export default NextAuth({
         };
 
         if (user) {
-          return user; // Return the user object to complete the authentication
+          return user; // Authentication succeeded
         }
 
         return null; // Authentication failed
@@ -31,4 +30,7 @@ export default NextAuth({
   pages: {
     signIn: '/', // Custom sign-in page
   },
-});
+  secret: process.env.NEXTAUTH_SECRET,
+};
+
+export default authConfig;

@@ -25,8 +25,8 @@ const formSchema = z.object({
 type UserFormValue = z.infer<typeof formSchema>;
 
 export default function UserAuthForm() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl');
+  // const searchParams = useSearchParams();
+  // const callbackUrl = searchParams.get('callbackUrl');
   const [loading, startTransition] = useTransition();
   const defaultValues = {
     email: 'demo@gmail.com'
@@ -40,7 +40,7 @@ export default function UserAuthForm() {
     startTransition(() => {
       signIn('credentials', {
         email: data.email,
-        callbackUrl: callbackUrl ?? '/dashboard'
+        callbackUrl:  '/admin/dashboard'
       });
       toast.success('Signed In Successfully!');
     });
