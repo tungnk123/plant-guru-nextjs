@@ -13,6 +13,8 @@ import { addUser } from '@/app/admin/api/user';
 export default function AddNewUserPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [avatar, setAvatar] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
@@ -22,7 +24,7 @@ export default function AddNewUserPage() {
     setLoading(true);
 
     try {
-      const data = await addUser(email, password);
+      const data = await addUser(email, password, name, avatar); // Updated function call
       toast({
         title: 'Success',
         description: `User created with ID: ${data.userId}`,
@@ -46,10 +48,23 @@ export default function AddNewUserPage() {
     <PageContainer>
       <Heading
         title="Add New User"
-        description="Create a new user by providing an email and password."
+        description="Create a new user by providing the required details."
       />
       <Separator />
       <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+        <div>
+          <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+            Name
+          </label>
+          <Input
+            id="name"
+            type="text"
+            placeholder="Enter name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+        </div>
         <div>
           <label htmlFor="email" className="block text-sm font-medium text-gray-700">
             Email
@@ -76,8 +91,25 @@ export default function AddNewUserPage() {
             required
           />
         </div>
+        <div>
+          <label htmlFor="avatar" className="block text-sm font-medium text-gray-700">
+            Avatar URL
+          </label>
+          <Input
+            id="avatar"
+            type="text"
+            placeholder="Enter avatar URL"
+            value={avatar}
+            onChange={(e) => setAvatar(e.target.value)}
+          />
+        </div>
         <div className="flex items-center justify-end space-x-4">
-          <Button variant="outline" onClick={() => router.back()} type="button" disabled={loading}>
+          <Button
+            variant="outline"
+            onClick={() => router.back()}
+            type="button"
+            disabled={loading}
+          >
             Cancel
           </Button>
           <Button type="submit" disabled={loading}>

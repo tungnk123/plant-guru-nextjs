@@ -135,16 +135,24 @@ export async function setNameAndAvatar(userId: string, name: string, avatar: str
 }
 
 
-export async function addUser(email: string, password: string): Promise<{ userId: string }> {
+export async function addUser(
+  email: string,
+  password: string,
+  name: string,
+  avatar: string
+): Promise<{ userId: string }> {
   try {
-    const response = await fetch('https://un-silent-backend-develop.azurewebsites.net/api/users/signUp', {
-      method: 'POST',
-      headers: {
-        Accept: '*/*',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
+    const response = await fetch(
+      'https://un-silent-backend-develop.azurewebsites.net/api/users/signUp',
+      {
+        method: 'POST',
+        headers: {
+          Accept: '*/*',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password, name, avatar }), // Include name and avatar
+      }
+    );
 
     if (!response.ok) {
       const error = await response.json();
@@ -158,5 +166,6 @@ export async function addUser(email: string, password: string): Promise<{ userId
     throw error;
   }
 }
+
 
 
