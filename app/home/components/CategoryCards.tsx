@@ -23,16 +23,16 @@ export interface CategoryCardsProps {
 }
 
 const CategoryCards: React.FC<CategoryCardsProps> = ({ onTagChange }) => {
-  const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<number | null>(1);
 
   const handleCardClick = (id: number, name: string) => {
     setSelectedCategory(id);
     onTagChange(name);
   };
   return (
-    <div className='container mx-auto my-10'>
-      <h2 className='mb-4 text-2xl font-bold'>Top Categories</h2>
-      <div className='grid grid-cols-2 gap-4 sm:grid-cols-4'>
+    <div className='w-1/6 container mx-auto my-1'>
+      <h2 className='mb-4 text-2xl font-bold '>Top Categories</h2>
+      <div className='grid grid-cols-2 gap-4 sm:grid-cols-1'>
         {categories.map(category => (
           <div
             key={category.id}
@@ -43,7 +43,7 @@ const CategoryCards: React.FC<CategoryCardsProps> = ({ onTagChange }) => {
               selectedCategory === category.id ? 'bg-green-500' : category.color
             } h-full w-5 rounded-l-lg`} />
 
-            <div className='flex w-full items-center p-4'>
+            <div className='flex w-full items-center p-2'>
               <Image
                 src={category.icon}
                 alt='Logo'
