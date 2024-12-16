@@ -55,43 +55,78 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   // Handle upvote and downvote
   const handleUpvote = async (commentId: string) => {
     try {
-      const updatedVotes = await upvotePost(commentId);
-      setComments((prev) =>
-        prev.map((comment) =>
-          comment.commentId === commentId
-            ? {
-                ...comment,
-                numberOfUpvote: updatedVotes.numberOfUpvotes,
-                hasUpvoted: true,
-                hasDevoted: false,
-              }
-            : comment
-        )
-      );
+      const comment = comments.find((c) => c.commentId === commentId);
+      if (!comment) return;
+  
+      let updatedVotes: any;
+      if (comment.hasUpvoted) {
+        // If already upvoted, remove upvote
+        updatedVotes = await downvotePost(commentId); // Assuming downvote removes upvote when it's already upvoted
+        setComments((prev) =>
+          prev.map((c) =>
+            c.commentId === commentId
+              ? { ...c, numberOfUpvote: updatedVotes.numberOfUpvotes, hasUpvoted: false }
+              : c
+          )
+        );
+      } else {
+        // Add upvote
+        updatedVotes = await upvotePost(commentId);
+        setComments((prev) =>
+          prev.map((c) =>
+            c.commentId === commentId
+              ? {
+                  ...c,
+                  numberOfUpvote: updatedVotes.numberOfUpvotes,
+                  hasUpvoted: true,
+                  hasDevoted: false, // Remove devoted if toggling to upvote
+                }
+              : c
+          )
+        );
+      }
     } catch (error) {
-      console.error("Error upvoting comment:", error);
+      console.error("Error toggling upvote:", error);
     }
   };
-
+  
   const handleDownvote = async (commentId: string) => {
     try {
-      const updatedVotes = await downvotePost(commentId);
-      setComments((prev) =>
-        prev.map((comment) =>
-          comment.commentId === commentId
-            ? {
-                ...comment,
-                numberOfUpvote: updatedVotes.numberOfUpvotes,
-                hasUpvoted: false,
-                hasDevoted: true,
-              }
-            : comment
-        )
-      );
+      const comment = comments.find((c) => c.commentId === commentId);
+      if (!comment) return;
+  
+      let updatedVotes: any;
+      if (comment.hasDevoted) {
+        // If already downvoted, remove downvote
+        updatedVotes = await upvotePost(commentId); // Assuming upvote removes downvote when it's already downvoted
+        setComments((prev) =>
+          prev.map((c) =>
+            c.commentId === commentId
+              ? { ...c, numberOfUpvote: updatedVotes.numberOfUpvotes, hasDevoted: false }
+              : c
+          )
+        );
+      } else {
+        // Add downvote
+        updatedVotes = await downvotePost(commentId);
+        setComments((prev) =>
+          prev.map((c) =>
+            c.commentId === commentId
+              ? {
+                  ...c,
+                  numberOfUpvote: updatedVotes.numberOfUpvotes,
+                  hasDevoted: true,
+                  hasUpvoted: false, // Remove upvoted if toggling to downvote
+                }
+              : c
+          )
+        );
+      }
     } catch (error) {
-      console.error("Error downvoting comment:", error);
+      console.error("Error toggling downvote:", error);
     }
   };
+  
 
   return (
     <div className="mt-4">

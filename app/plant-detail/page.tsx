@@ -172,8 +172,8 @@ const Page = () => {
                 <p className="text-gray-800 font-semibold">Common Names</p>
                 {detailData.common_names && detailData.common_names.length > 0 ? (
                   <ul className="text-sm text-[#685F5F] list-disc list-inside">
-                    {detailData.edible_parts.map((part, index) => (
-                      <li key={index}>{part}</li>
+                    {detailData.common_names.slice(0, 3).map((name, index) => (
+                      <li key={index}>{name}</li>
                     ))}
                   </ul>
                 ) : (
@@ -185,8 +185,8 @@ const Page = () => {
                 <p className="text-gray-800 font-semibold">Synonyms</p>
                 {detailData.synonyms && detailData.synonyms.length > 0 ? (
                   <ul className="text-sm text-[#685F5F] list-disc list-inside">
-                    {detailData.synonyms.map((part, index) => (
-                      <li key={index}>{part}</li>
+                    {detailData.synonyms.slice(0, 3).map((synonym, index) => (
+                      <li key={index}>{synonym}</li>
                     ))}
                   </ul>
                 ) : (
