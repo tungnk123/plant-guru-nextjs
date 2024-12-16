@@ -19,26 +19,31 @@ import { useToast } from '@/hooks/use-toast';
 
 interface CellActionProps {
   data: User;
+  onUserUpdate: (user: User) => void; // Add callback to update user
 }
 
-export const CellAction: React.FC<CellActionProps> = ({ data }) => {
+export const CellAction: React.FC<CellActionProps> = ({ data, onUserUpdate }) => {
   const [loading, setLoading] = useState(false);
   const [isUpgradeDialogOpen, setIsUpgradeDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const router = useRouter();
   const { toast } = useToast();
 
-  // Function to promote user to premium
+  // Promote user to premium
   const handlePromoteToPremium = async () => {
     try {
       setLoading(true);
       await goPremium(data.userId);
+
+      // Update the user locally
+      const updatedUser = { ...data, isHavePremium: true };
+      onUserUpdate(updatedUser);
+
       toast({
         title: 'Success',
         description: `User "${data.name}" is now a premium member!`,
         variant: 'success',
       });
-      router.refresh();
       setIsUpgradeDialogOpen(false); // Close the dialog
     } catch (error) {
       console.error('Error promoting user to premium:', error);
@@ -52,18 +57,21 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
     }
   };
 
-  // Function to delete user
+  // Delete user
   const handleDeleteUser = async () => {
     try {
       setLoading(true);
-      await removePremium(data.userId);
+      await removePremium(data.userId); // Call the actual delete API here
+  
       toast({
         title: 'Success',
         description: `User "${data.name}" has been deleted.`,
         variant: 'success',
       });
-      router.refresh();
-      setIsDeleteDialogOpen(false); // Close the dialog
+      setIsDeleteDialogOpen(false);
+  
+      // Inform the parent to remove the user
+      onUserUpdate(data); 
     } catch (error) {
       console.error('Error deleting user:', error);
       toast({
@@ -75,14 +83,16 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
       setLoading(false);
     }
   };
+  
 
+  // View user details
   const handleViewDetails = () => {
     router.push(`/admin/dashboard/user/${data.userId}`);
   };
 
   return (
     <div className="flex space-x-1">
-      {/* Promote to Premium Button */}
+      {/* Upgrade to Premium Button */}
       <AlertDialog open={isUpgradeDialogOpen} onOpenChange={setIsUpgradeDialogOpen}>
         <AlertDialogTrigger asChild>
           <Button

@@ -1,3 +1,6 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import PageContainer from '@/components-admin/layout/page-container';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components-admin/ui/heading';
@@ -8,14 +11,45 @@ import Link from 'next/link';
 import UserTable from './user-tables/user-table';
 import { fetchUsers } from '@/app/admin/api/user';
 
-export default async function UserListingPage() {
-  let users = [];
+export default function UserListingPage() {
+  const [users, setUsers] = useState([]); 
+  const [loading, setLoading] = useState(true); 
 
-  try {
-    users = await fetchUsers(); // Fetch user data
-    console.log('Fetched Users:', users);
-  } catch (error) {
-    console.error('Error fetching users:', error);
+  useEffect(() => {
+    const loadUsers = async () => {
+      try {
+        const fetchedUsers = await fetchUsers();
+        setUsers(fetchedUsers);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUsers();
+  }, []);
+
+  const handleUserUpdate = (updatedUser) => {
+    if (!updatedUser) return;
+
+    if (updatedUser.isDeleted) {
+      setUsers((prevUsers) => prevUsers.filter((user) => user.userId !== updatedUser.userId));
+    } else {
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user.userId === updatedUser.userId ? updatedUser : user
+        )
+      );
+    }
+  };
+
+  if (loading) {
+    return (
+      <PageContainer>
+        <div>Loading...</div>
+      </PageContainer>
+    );
   }
 
   return (
@@ -23,19 +57,22 @@ export default async function UserListingPage() {
       <div className="space-y-4">
         <div className="flex items-start justify-between">
           <Heading
-            title={`Users (${users.length})`} // Updated heading for users
-            description="Manage users (Server-side table functionalities.)"
+            title={`Users (${users.length})`}
+            description="Manage users (Client-side table functionalities.)"
           />
-
           <Link
-            href={'/dashboard/user/new'}
+            href={'/admin/dashboard/user/new'}
             className={cn(buttonVariants({ variant: 'default' }))}
           >
             <Plus className="mr-2 h-4 w-4" /> Add New User
           </Link>
         </div>
         <Separator />
-        <UserTable data={users} totalData={users.length} />
+        <UserTable
+          data={users}
+          totalData={users.length}
+          onUserUpdate={handleUserUpdate}
+        />
       </div>
     </PageContainer>
   );

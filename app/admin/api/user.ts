@@ -1,3 +1,5 @@
+import { da } from "@faker-js/faker";
+
 export interface User {
   userId: string;
   name: string;
@@ -13,7 +15,7 @@ export async function fetchUsers(): Promise<User[]> {
       method: 'GET',
       headers: {
         Accept: '*/*',
-        'Cache-Control': 'no-cache',
+        'Cache-Control': 'no-store',
       },
     });
 
@@ -22,6 +24,7 @@ export async function fetchUsers(): Promise<User[]> {
     }
 
     const data: User[] = await response.json();
+    console.log("Get data: ", data)
     return data;
   } catch (error) {
     console.error('Error fetching users:', error);
@@ -47,6 +50,7 @@ export async function fetchUserById(userId: string): Promise<User> {
     }
 
     const data: User = await response.json();
+  
     return data;
   } catch (error) {
     console.error(`Error fetching user with ID ${userId}:`, error);
@@ -129,3 +133,30 @@ export async function setNameAndAvatar(userId: string, name: string, avatar: str
     throw error;
   }
 }
+
+
+export async function addUser(email: string, password: string): Promise<{ userId: string }> {
+  try {
+    const response = await fetch('https://un-silent-backend-develop.azurewebsites.net/api/users/signUp', {
+      method: 'POST',
+      headers: {
+        Accept: '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ email, password }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to add user');
+    }
+
+    const data = await response.json();
+    return data; // { userId: string }
+  } catch (error) {
+    console.error('Error adding user:', error);
+    throw error;
+  }
+}
+
+

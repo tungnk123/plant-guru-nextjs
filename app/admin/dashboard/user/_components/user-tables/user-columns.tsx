@@ -1,11 +1,9 @@
-'use client';
-
 import { ColumnDef } from '@tanstack/react-table';
 import { User } from '@/constants/data';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CellAction } from './cell-action'; // Import CellAction component
 
-export const userColumns: ColumnDef<User>[] = [
+export const userColumns = (onUserUpdate: (user: User) => void): ColumnDef<User>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -52,11 +50,11 @@ export const userColumns: ColumnDef<User>[] = [
     header: 'Avatar',
     cell: ({ row }) => (
       <img
-        src={row.original.avatar || '/img_default_user.png'}
+        src={row.original.avatar || '/images/ic_user.svg'}
         alt={`${row.original.name}'s avatar`}
         style={{
-          width: '50px',
-          height: '50px',
+          width: '32px',
+          height: '32px',
           objectFit: 'cover',
           borderRadius: '50%',
         }}
@@ -73,7 +71,7 @@ export const userColumns: ColumnDef<User>[] = [
   {
     id: 'actions',
     header: 'Actions',
-    cell: ({ row }) => <CellAction data={row.original} />, // Use CellAction here
+    cell: ({ row }) => <CellAction data={row.original} onUserUpdate={onUserUpdate} />, // Pass onUserUpdate here
     enableSorting: false,
     enableHiding: true,
   },

@@ -9,9 +9,11 @@ import { useUserTableFilters } from './use-user-table-filters'; // User-specific
 export default function UserTable({
   data,
   totalData,
+  onUserUpdate,
 }: {
   data: User[];
   totalData: number;
+  onUserUpdate: (user: User) => void; // Callback for user updates
 }) {
   const {
     searchQuery,
@@ -25,10 +27,9 @@ export default function UserTable({
     <div className="space-y-4">
       {/* Filter and Search Controls */}
       <div className="flex flex-wrap items-center gap-4">
-        {/* Search Bar */}
-        {/* Uncomment and configure if search functionality is needed */}
+        {/* Uncomment if you have a search bar */}
         {/* <DataTableSearch
-          searchKey="name" // Adjust searchKey to 'name' for user-specific search
+          searchKey="name"
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
           setPage={setPage}
@@ -43,7 +44,7 @@ export default function UserTable({
 
       {/* Table Component */}
       <DataTable
-        columns={userColumns} // User-specific columns
+        columns={userColumns(onUserUpdate)} // Pass onUserUpdate to userColumns
         data={data}
         totalItems={totalData}
       />
