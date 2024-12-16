@@ -54,7 +54,7 @@ export const userColumns = (onUserUpdate: (user: User) => void): ColumnDef<User>
         alt={`${row.original.name}'s avatar`}
         style={{
           width: '32px',
-          height: '32px',
+          height: 'px',
           objectFit: 'cover',
           borderRadius: '50%',
         }}
