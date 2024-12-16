@@ -1,81 +1,42 @@
 'use client'
 import React from 'react'
-import PostCard from '@/app/components/home/PostCard'
-import ButtonCard from '../../components/home/ButtonCard'
+import { useState, useEffect } from 'react';
 import Footer from '../../components/home/Footer'
 import Link from 'next/link'
 import Head from 'next/head'
 import PostCardGrid from './PostCardGrid'
 import ButtonCardGrid from './ButtonCardGrid'
+import { fetchPosts, PostResponse } from '@/app/api/postService';
+import CategoryCards from './CategoryCards';
 
 const PostSection = () => {
-
-  const fetchPosts = async (page: number) => {
-    // const response = await fetch(`/api/posts?page=${page}`);
-    // const data = await response.json();
-    
-    return {
-      posts: posts,
-      totalPages: 9,
-    };
-  };
-  
-  const posts = [
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description:
-        'Some beautifulSomeme beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrls: ['/images/img_default_post.png', '/images/img_default_post.png'], // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    },
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description:
-        'Some beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrls: ['/images/img_default_post.png'], // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    },
-    {
-      userName: 'Tung Doan',
-      userAvatar: '/images/img_default_user_avatar.png',
-      title: 'Rose flower',
-      description:
-        'Some beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flowerSome beautiful flower',
-      imageUrls: ['/images/img_default_post.png'], // Replace with actual image paths
-      upvotes: 323,
-      comments: 323,
-      shares: 323
-    }
-  ]
 
   const buttons = [
     {
       title: 'Plant Encyclopedia',
       subtitle: 'Discover the World of Plants',
       icon: '/images/img_encyclopedia.svg',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       title: 'Identify plant ',
       subtitle: 'Identify Any Plant in Seconds',
       icon: '/images/img_identify_plant.svg',
-      onClick: () => {}
+      onClick: () => { }
     },
     {
       title: 'Plant Guides',
       subtitle: 'Expert Guides for Every Type of Plant',
       icon: '/images/img_plant_guide.svg',
-      onClick: () => {}
+      onClick: () => { }
     }
   ]
+
+  const [tag, setTag] = useState('Plants');
+
+  const handleTagChange = (newTag: string) => {
+    setTag(newTag);
+  };
 
   return (
     <div>
@@ -83,17 +44,20 @@ const PostSection = () => {
         <title>Plant GURU</title>
       </Head>
 
-      <div className="container mx-auto flex flex-col items-center space-y-1 rounded-3xl py-1">
-        <span className='font-inter mb-24 flex justify-center text-[40px] font-medium'>
-          Plants shared by community
-        </span>
+      <div className='flex flex-col my-10'>
+        <div className='flex flex-row mx-4'>
+          <CategoryCards onTagChange={handleTagChange} />
+          <div className="container w-5/6 mx-auto flex flex-col items-center space-y-1 rounded-3xl py-1">
+            <span className='font-inter mb-2 flex justify-center text-[30px] font-medium'>
+              Plants shared by community
+            </span>
+            <PostCardGrid fetchPosts={fetchPosts} tag={tag} />
 
-        <PostCardGrid fetchPosts={fetchPosts} />
-
+          </div>
+        </div>
         <span className='font-inter mb-14 flex justify-center text-[50px] font-medium'>
           All Features
         </span>
-
         <ButtonCardGrid buttons={buttons} />
       </div>
 

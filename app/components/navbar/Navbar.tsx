@@ -18,7 +18,7 @@ import { Plus } from 'lucide-react'
 
 const Navbar = ({ toggle }: { toggle: () => void }) => {
   return (
-    <div className='sticky top-0 h-20 w-full bg-white shadow'>
+    <div className='sticky top-0 h-20 w-full z-50 bg-white shadow'>
       <div className='container mx-auto flex h-full items-center justify-between px-20'>
         <div className='flex items-center gap-4'>
           <Logo />
