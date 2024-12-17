@@ -77,7 +77,7 @@ export async function unApprovePost(postId: string) {
     throw new Error(`Failed to unapprove post: ${errorData.detail || response.statusText}`);
   }
 
-  const data = await response;
+  const data = await response.json();
   console.log('Post unapproved successfully:', data);
 
   return data; // Return the unapproved post data or any success response

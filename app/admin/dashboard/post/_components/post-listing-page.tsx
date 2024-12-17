@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import PageContainer from '@/components-admin/layout/page-container';
 import { buttonVariants } from '@/components/ui/button';
 import { Heading } from '@/components-admin/ui/heading';
@@ -12,23 +12,47 @@ import { useEffect, useState } from 'react';
 
 export default function PostListingPage() {
   const [posts, setPosts] = useState([]);
+  const [filteredPosts, setFilteredPosts] = useState([]);
   const [totalPosts, setTotalPosts] = useState(0);
   const [loading, setLoading] = useState(true);
 
-  // Fetch data function
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterTag, setFilterTag] = useState('');
+
   const fetchData = async () => {
     setLoading(true);
     try {
       const { totalPosts: total, posts: postList } = await fetchUnapprovedPosts();
-      console.log('Processed Data:', { total, postList });
       setTotalPosts(total);
       setPosts(postList);
+      setFilteredPosts(postList);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    let filtered = posts;
+
+    if (filterTag) {
+      filtered = filtered.filter((post) => post.tag.toLowerCase() === filterTag.toLowerCase());
+    }
+
+    if (searchQuery) {
+      const lowerQuery = searchQuery.toLowerCase();
+      filtered = filtered.filter(
+        (post) =>
+          post.title.toLowerCase().includes(lowerQuery) ||
+          post.description.toLowerCase().includes(lowerQuery) ||
+          post.userNickName.toLowerCase().includes(lowerQuery) ||
+          post.tag.toLowerCase().includes(lowerQuery)
+      );
+    }
+
+    setFilteredPosts(filtered);
+  }, [searchQuery, filterTag, posts]);
 
   useEffect(() => {
     fetchData();
@@ -38,23 +62,38 @@ export default function PostListingPage() {
     <PageContainer scrollable>
       <div className="space-y-4">
         <div className="flex items-start justify-between">
-          <Heading
-            title={`Posts (${totalPosts})`}
-            description="Manage posts (Server side table functionalities.)"
-          />
-
-          <Link
-            href={'/dashboard/post/new'}
-            className={cn(buttonVariants({ variant: 'default' }))}
-          >
+          <Heading title={`Posts (${filteredPosts.length})`} description="Manage posts" />
+          <Link href={'/dashboard/post/new'} className={cn(buttonVariants({ variant: 'default' }))}>
             <Plus className="mr-2 h-4 w-4" /> Add New
           </Link>
         </div>
+
+        <div className="flex items-center gap-4">
+          <input
+            type="text"
+            placeholder="Search posts..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border p-2 rounded-md"
+          />
+          <select
+            value={filterTag}
+            onChange={(e) => setFilterTag(e.target.value)}
+            className="border p-2 rounded-md"
+          >
+            <option value="">All Tags</option>
+            <option value="guides">Guides</option>
+            <option value="diseases">Diseases</option>
+            <option value="flowers">Flowers</option>
+          </select>
+        </div>
+
         <Separator />
+
         {loading ? (
           <p>Loading...</p>
         ) : (
-          <PostTable data={posts} totalData={totalPosts} fetchData={fetchData} />
+          <PostTable data={filteredPosts} totalData={filteredPosts.length} fetchData={fetchData} />
         )}
       </div>
     </PageContainer>
