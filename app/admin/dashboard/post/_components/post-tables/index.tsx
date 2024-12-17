@@ -4,20 +4,17 @@ import { DataTable } from '@/components-admin/ui/table/data-table';
 import { DataTableFilterBox } from '@/components-admin/ui/table/data-table-filter-box';
 import { DataTableResetFilter } from '@/components-admin/ui/table/data-table-reset-filter';
 import { DataTableSearch } from '@/components-admin/ui/table/data-table-search';
-import { Post } from '@/constants/data'; // Ensure this type is defined
-import { postColumns } from './post-columns'; // Post-specific column definitions
-import {
-// Define categories for filtering if applicable
-  usePostTableFilters, // Post-specific filter hook
-} from './use-post-table-filters';
+import { Post } from '@/constants/data'; // Ensure Post type is defined
+import { getPostColumns } from './post-columns'; // Post-specific column definitions
+import { usePostTableFilters } from './use-post-table-filters';
 
-export default function PostTable({
-  data,
-  totalData,
-}: {
+interface PostTableProps {
   data: Post[];
   totalData: number;
-}) {
+  fetchData: () => void; // Function to fetch or refresh the data
+}
+
+export default function PostTable({ data, totalData, fetchData }: PostTableProps) {
   const {
     categoryFilter,
     setCategoryFilter,
@@ -44,7 +41,7 @@ export default function PostTable({
         {/* <DataTableFilterBox
           filterKey="category"
           title="Category"
-          options={CATEGORY_OPTIONS} // Dynamic category options
+          options={[{ label: 'All', value: '' }, { label: 'Tag 1', value: 'tag1' }]} // Example options
           setFilterValue={setCategoryFilter}
           filterValue={categoryFilter}
         /> */}
@@ -58,7 +55,7 @@ export default function PostTable({
 
       {/* Table Component */}
       <DataTable
-        columns={postColumns}
+        columns={getPostColumns(fetchData)} // Pass fetchData to refresh data
         data={data}
         totalItems={totalData}
       />

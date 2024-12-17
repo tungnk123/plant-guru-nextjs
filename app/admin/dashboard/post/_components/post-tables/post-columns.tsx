@@ -6,7 +6,8 @@ import { CellAction } from './cell-action';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip } from '@/components/ui/tooltip';
 
-export const postColumns: ColumnDef<Post>[] = [
+// Define a function to dynamically generate columns with onUpdate
+export const getPostColumns = (onUpdate: () => void): ColumnDef<Post>[] => [
   {
     id: 'select',
     header: ({ table }) => (
@@ -55,7 +56,7 @@ export const postColumns: ColumnDef<Post>[] = [
     header: 'Image',
     cell: ({ row }) => (
       <img
-        src={row.original.imageUrl || 'img_default_post.png'}
+        src={row.original.imageUrl || '/images/img_default_post.png'}
         alt={row.original.title || 'Post image'}
         style={{
           width: '50px',
@@ -77,7 +78,7 @@ export const postColumns: ColumnDef<Post>[] = [
     header: 'Background',
     cell: ({ row }) => (
       <img
-        src={'/images/img_default_post.png'}
+        src={row.original.background || '/images/img_default_post.png'}
         alt="Background"
         style={{
           width: '50px',
@@ -95,31 +96,31 @@ export const postColumns: ColumnDef<Post>[] = [
     cell: ({ row }) =>
       row.original.createdAt === '0001-01-01T00:00:00'
         ? 'Not Available'
-        : new Date(row.original.createdAt).toLocaleDateString(),
+        : new Date(row.original.createdAt).toString(),
     enableSorting: true,
   },
   {
     accessorKey: 'postUpvotes',
     header: 'Upvotes',
-    cell: ({ row }) => row.original.postUpvotes.length,
+    cell: ({ row }) => row.original.postUpvotes,
     enableSorting: false,
   },
   {
     accessorKey: 'postDevotes',
     header: 'Downvotes',
-    cell: ({ row }) => row.original.postDevotes.length,
+    cell: ({ row }) => row.original.postDevotes,
     enableSorting: false,
   },
   {
     accessorKey: 'postComments',
     header: 'Comments',
-    cell: ({ row }) => row.original.postComments.length,
+    cell: ({ row }) => row.original.postComments,
     enableSorting: false,
   },
   {
     accessorKey: 'postShares',
     header: 'Shares',
-    cell: ({ row }) => row.original.postShares.length,
+    cell: ({ row }) => row.original.postShares,
     enableSorting: false,
   },
   {
@@ -127,7 +128,7 @@ export const postColumns: ColumnDef<Post>[] = [
     header: 'Actions',
     cell: ({ row }) => (
       <Tooltip>
-        <CellAction data={row.original} />
+        <CellAction data={row.original} onUpdate={onUpdate} />
       </Tooltip>
     ),
     enableSorting: false,

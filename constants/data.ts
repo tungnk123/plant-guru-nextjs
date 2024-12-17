@@ -1,20 +1,21 @@
 import { NavItem } from '@/types';
 export type Post = {
-  id: string; // Unique identifier for the post
-  userId: string; // ID of the user who created the post
-  user: string | null; // Optional user object or null if not available
-  title: string; // Title of the post
-  description: string; // Description of the post
-  imageUrl: string; // URL of the post's image
-  tag: string; // Tag or category for the post
-  background: string; // URL of the background image for the post
-  postUpvotes: any[]; // Array of upvotes (can be refined further)
-  postDevotes: any[]; // Array of downvotes (can be refined further)
-  postComments: any[]; // Array of comments (can be refined further)
-  postShares: any[]; // Array of shares (can be refined further)
-  createdAt: string; // Creation date of the post in ISO format
-  lastModifiedAt: string | null; // Last modification date or null if not modified
+  id: string; // Post ID
+  userId: string; // User ID
+  userNickName: string; // User's nickname
+  userAvatar: string; // User's avatar URL
+  title: string; // Post title
+  description: string; // Post description
+  imageUrl: string; // Post image URL
+  tag: string; // Post tag
+  background: string; // Post background image URL
+  postUpvotes: number; // Number of upvotes
+  postDevotes: number; // Number of downvotes
+  postComments: number; // Number of comments
+  postShares: number; // Number of shares
+  createdAt: string; // Post creation date
 };
+
 
 export interface User {
   userId: string;
