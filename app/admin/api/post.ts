@@ -1,4 +1,5 @@
 import { Post } from "@/constants/data";
+import { da } from "@faker-js/faker";
 
 // Fetch all posts
 export async function fetchPosts({ page, limit }: { page: number; limit: number }) {
@@ -38,7 +39,7 @@ export async function approvePost(postId: string) {
         'Accept': '*/*',
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ postId }), // Payload with the postId
+      body: JSON.stringify({ postId }),
     }
   );
 
@@ -48,13 +49,10 @@ export async function approvePost(postId: string) {
     throw new Error(`Failed to approve post: ${errorData.detail || response.statusText}`);
   }
 
-  const data = await response.json();
+  const data = await response;
   console.log('Post approved successfully:', data);
 
-  return {
-    totalPosts: data.length,
-    posts: data,
-  };
+  return data;
 }
 
 // Unapprove a specific post
@@ -79,7 +77,7 @@ export async function unApprovePost(postId: string) {
     throw new Error(`Failed to unapprove post: ${errorData.detail || response.statusText}`);
   }
 
-  const data = await response.json();
+  const data = await response;
   console.log('Post unapproved successfully:', data);
 
   return data; // Return the unapproved post data or any success response

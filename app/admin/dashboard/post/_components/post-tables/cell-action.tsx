@@ -19,7 +19,7 @@ export const CellAction: React.FC<CellActionProps> = ({ data, onUpdate }) => {
     try {
       await approvePost(data.id);
       console.log(`Post approved: ${data.id}`);
-      onUpdate(); // Trigger a refresh
+      onUpdate(); 
     } catch (error) {
       console.error('Error approving post:', error.message);
     } finally {
