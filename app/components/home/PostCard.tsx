@@ -31,7 +31,7 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
     postId: postDat.postId,
     userId: postDat.userId,
     userAvatar: "https://www.gravatar.com/avatar",
-    imageUrl: "https://www.gravatar.com/avatar",
+    imageUrl: postDat.imageUrl,
     description: postDat.description,
     title: postDat.title,
     userNickName: postDat.userNickName,
@@ -39,6 +39,8 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
     numberOfComment: postDat.numberOfComment,
     numberOfShare: postDat.numberOfShare
   }
+
+  
 
   return (
     <div className='w-full rounded-3xl border bg-white p-4 shadow-md'>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { fetchComments } from "@/app/api/postService"; 
-import { upvotePost, downvotePost } from "@/app/api/postService";
+import { fetchComments, postComment, upvoteComment, downvoteComment } from "@/app/api/commentService"; 
 
 interface CommentData {
   commentId: string;
@@ -13,6 +12,7 @@ interface CommentData {
   numberOfDevote: number;
   hasUpvoted: boolean;
   hasDevoted: boolean;
+  replies?: CommentData[];
 }
 
 interface CommentSectionProps {
@@ -24,7 +24,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const [newComment, setNewComment] = useState("");
   const [replyBoxes, setReplyBoxes] = useState<{ [key: string]: boolean }>({});
 
-  // Fetch comments on component mount
   useEffect(() => {
     const loadComments = async () => {
       try {
@@ -38,99 +37,66 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     loadComments();
   }, [postId]);
 
-  // Handle adding a new comment
-  const handleAddComment = () => {
+  const handleAddComment = async () => {
     if (newComment.trim()) {
-      // Add the comment here (API call can be added if necessary)
-      console.log("Add comment:", newComment);
-      setNewComment(""); // Clear the input field
+      try {
+        const addedComment = await postComment(postId, newComment);
+        setComments((prevComments) => [...prevComments, addedComment]);
+        setNewComment("");
+      } catch (error) {
+        console.error("Error adding comment:", error);
+      }
     }
   };
 
-  // Handle reply toggle
-  const toggleReplyBox = (commentId: string) => {
+  const handleReplyToggle = (commentId: string) => {
     setReplyBoxes((prev) => ({ ...prev, [commentId]: !prev[commentId] }));
   };
 
-  // Handle upvote and downvote
   const handleUpvote = async (commentId: string) => {
     try {
-      const comment = comments.find((c) => c.commentId === commentId);
-      if (!comment) return;
-  
-      let updatedVotes: any;
-      if (comment.hasUpvoted) {
-        // If already upvoted, remove upvote
-        updatedVotes = await downvotePost(commentId); // Assuming downvote removes upvote when it's already upvoted
-        setComments((prev) =>
-          prev.map((c) =>
-            c.commentId === commentId
-              ? { ...c, numberOfUpvote: updatedVotes.numberOfUpvotes, hasUpvoted: false }
-              : c
-          )
-        );
-      } else {
-        // Add upvote
-        updatedVotes = await upvotePost(commentId);
-        setComments((prev) =>
-          prev.map((c) =>
-            c.commentId === commentId
-              ? {
-                  ...c,
-                  numberOfUpvote: updatedVotes.numberOfUpvotes,
-                  hasUpvoted: true,
-                  hasDevoted: false, // Remove devoted if toggling to upvote
-                }
-              : c
-          )
-        );
-      }
+      const { numberOfUpvotes, numberOfDevotes } = await upvoteComment(commentId);
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.commentId === commentId
+            ? {
+                ...comment,
+                numberOfUpvote: numberOfUpvotes,
+                numberOfDevote: numberOfDevotes,
+                hasUpvoted: !comment.hasUpvoted,
+                hasDevoted: false,
+              }
+            : comment
+        )
+      );
     } catch (error) {
-      console.error("Error toggling upvote:", error);
+      console.error("Error upvoting comment:", error);
     }
   };
-  
+
   const handleDownvote = async (commentId: string) => {
     try {
-      const comment = comments.find((c) => c.commentId === commentId);
-      if (!comment) return;
-  
-      let updatedVotes: any;
-      if (comment.hasDevoted) {
-        // If already downvoted, remove downvote
-        updatedVotes = await upvotePost(commentId); // Assuming upvote removes downvote when it's already downvoted
-        setComments((prev) =>
-          prev.map((c) =>
-            c.commentId === commentId
-              ? { ...c, numberOfUpvote: updatedVotes.numberOfUpvotes, hasDevoted: false }
-              : c
-          )
-        );
-      } else {
-        // Add downvote
-        updatedVotes = await downvotePost(commentId);
-        setComments((prev) =>
-          prev.map((c) =>
-            c.commentId === commentId
-              ? {
-                  ...c,
-                  numberOfUpvote: updatedVotes.numberOfUpvotes,
-                  hasDevoted: true,
-                  hasUpvoted: false, // Remove upvoted if toggling to downvote
-                }
-              : c
-          )
-        );
-      }
+      const { numberOfUpvotes, numberOfDevotes } = await downvoteComment(commentId);
+      setComments((prevComments) =>
+        prevComments.map((comment) =>
+          comment.commentId === commentId
+            ? {
+                ...comment,
+                numberOfUpvote: numberOfUpvotes,
+                numberOfDevote: numberOfDevotes,
+                hasDevoted: !comment.hasDevoted,
+                hasUpvoted: false,
+              }
+            : comment
+        )
+      );
     } catch (error) {
-      console.error("Error toggling downvote:", error);
+      console.error("Error downvoting comment:", error);
     }
   };
-  
 
   return (
     <div className="mt-4">
-      {/* Add Comment Box */}
       <div className="flex items-center space-x-3 mb-4">
         <img
           src="/default-avatar.png"
@@ -152,7 +118,6 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
         </button>
       </div>
 
-      {/* Comments Section */}
       <div className="space-y-4">
         {comments.map((comment) => (
           <div key={comment.commentId} className="flex space-x-3">
@@ -169,30 +134,24 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
               <p className="text-sm text-gray-700">{comment.message}</p>
               <div className="mt-2 flex space-x-3 text-sm text-gray-500">
                 <button
-                  onClick={() => toggleReplyBox(comment.commentId)}
+                  onClick={() => handleUpvote(comment.commentId)}
+                  className={`hover:text-blue-500 ${comment.hasUpvoted ? "text-blue-500 font-bold" : ""}`}
+                >
+                  ▲
+                </button>
+                <span>{comment.numberOfUpvote}</span>
+                <button
+                  onClick={() => handleDownvote(comment.commentId)}
+                  className={`hover:text-red-500 ${comment.hasDevoted ? "text-red-500 font-bold" : ""}`}
+                >
+                  ▼
+                </button>
+                <button
+                  onClick={() => handleReplyToggle(comment.commentId)}
                   className="hover:text-blue-500"
                 >
                   Reply
                 </button>
-                <div className="flex items-center space-x-2">
-                  <button
-                    onClick={() => handleUpvote(comment.commentId)}
-                    className={`hover:text-blue-500 ${
-                      comment.hasUpvoted ? "text-blue-500 font-bold" : ""
-                    }`}
-                  >
-                    ▲
-                  </button>
-                  <span>{comment.numberOfUpvote}</span>
-                  <button
-                    onClick={() => handleDownvote(comment.commentId)}
-                    className={`hover:text-red-500 ${
-                      comment.hasDevoted ? "text-red-500 font-bold" : ""
-                    }`}
-                  >
-                    ▼
-                  </button>
-                </div>
               </div>
               {replyBoxes[comment.commentId] && (
                 <div className="ml-8 mt-2">
@@ -206,6 +165,22 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                   </button>
                 </div>
               )}
+              {comment.replies && comment.replies.map((reply) => (
+                <div key={reply.commentId} className="ml-8 mt-2 flex space-x-3">
+                  <img
+                    src={reply.avatar}
+                    alt={`${reply.name} avatar`}
+                    className="h-8 w-8 rounded-full"
+                  />
+                  <div className="flex-1">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-semibold">{reply.name}</h4>
+                      <span className="text-gray-500 text-sm">{reply.createdAt}</span>
+                    </div>
+                    <p className="text-sm text-gray-700">{reply.message}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))}

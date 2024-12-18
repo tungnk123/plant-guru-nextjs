@@ -50,7 +50,7 @@ const CreatePost = () => {
     e.preventDefault();
     setLoading(true);
 
-    const userId = "4da5937d-9cba-4960-8009-2a1d6f836944";
+    const userId = "b097284d-8ae1-445f-922d-5eb51ebe2326";
     const imageUrl =
       "https://th.bing.com/th/id/R.bb456ae8d4b3b3c5e31eb3886aeb8fd2?rik=WcqO9ZNLQpZOmw&pid=ImgRaw&r=0";
 

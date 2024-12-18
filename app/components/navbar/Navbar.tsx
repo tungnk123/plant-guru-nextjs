@@ -69,8 +69,8 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
             </Link>
           </li>
           <li>
-            <Link href='/plant-guides' className='inter-medium text-1xl'>
-              <p>Plant Guides</p>
+            <Link href='/products' className='inter-medium text-1xl'>
+              <p>Products</p>
             </Link>
           </li>
         </ul>
