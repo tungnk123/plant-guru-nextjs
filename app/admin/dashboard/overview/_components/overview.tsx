@@ -1,164 +1,235 @@
-import { AreaGraph } from './area-graph';
-import { BarGraph } from './bar-graph';
-import { PieGraph } from './pie-graph';
-import { CalendarDateRangePicker } from '@/components-admin/date-range-picker';
-import PageContainer from '@/components-admin/layout/page-container';
-import { RecentSales } from './recent-sales';
-import { Button } from '@/components/ui/button';
+'use client';
+import { useEffect, useState } from "react";
+import { fetchUnapprovedPosts, approvePost } from "@/app/admin/api/post";
+import { fetchUsers, removePremium } from "@/app/admin/api/user";
+import { AreaGraph } from "./area-graph";
+import { BarGraph } from "./bar-graph";
+import { PieGraph } from "./pie-graph";
+import { CalendarDateRangePicker } from "@/components-admin/date-range-picker";
+import PageContainer from "@/components-admin/layout/page-container";
+import { RecentSales } from "./recent-sales";
+import { Button } from "@/components/ui/button";
+import { useToast } from '@/hooks/use-toast';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
-  CardTitle
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+  CardTitle,
+} from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { BarChart3, Check, FileText, User } from "lucide-react";
 
 export default function OverViewPage() {
+  const [postStats, setPostStats] = useState({ totalPosts: 0, posts: [] });
+  const [userStats, setUserStats] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        setLoading(true);
+
+        const [postsResponse, usersResponse] = await Promise.all([
+          fetchUnapprovedPosts(),
+          fetchUsers(),
+        ]);
+
+        setPostStats(postsResponse);
+        setUserStats(usersResponse);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchData();
+  }, []);
+  const handleApprovePost = async (postId) => {
+    try {
+      await approvePost(postId);
+  
+      setPostStats((prevStats) => {
+        const updatedPosts = prevStats.posts.filter((post) => post.id !== postId);
+        return {
+          ...prevStats,
+          posts: updatedPosts,
+          totalPosts: prevStats.totalPosts - 1,
+        };
+      });
+  
+      toast({
+        title: "Post Approved ✅",
+        description: "The post has been successfully approved.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Error approving post:", error);
+  
+      toast({
+        title: "Approval Failed ❌",
+        description: "There was an error approving the post. Try again.",
+        variant: "destructive",
+        duration: 3000,
+      });
+    }
+  };
+  
+
+  const handleRemovePremium = async (userId) => {
+    try {
+      await removePremium(userId);
+      alert("Premium removed from user successfully!");
+    } catch (error) {
+      console.error("Error removing premium:", error);
+    }
+  };
+
   return (
     <PageContainer scrollable>
-      <div className="space-y-2">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight">
+      <div className="space-y-6">
+        {/* Welcome Header */}
+        <div className="flex items-center justify-between">
+          <h2 className="text-3xl font-semibold tracking-tight">
             Hi, Welcome back 👋
           </h2>
-          <div className="hidden items-center space-x-2 md:flex">
+          <div className="hidden items-center space-x-3 md:flex">
             <CalendarDateRangePicker />
-            <Button>Download</Button>
+            <Button variant="outline">Download Report</Button>
           </div>
         </div>
-        <Tabs defaultValue="overview" className="space-y-4">
+
+        {/* Tabs */}
+        <Tabs defaultValue="overview" className="space-y-6">
           <TabsList>
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="analytics" disabled>
               Analytics
             </TabsTrigger>
           </TabsList>
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Revenue
+          <TabsContent value="overview" className="space-y-6">
+            {/* Overview Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 justify-center">
+              <Card className="text-center">
+                <CardHeader className="flex flex-col items-center">
+                  <FileText className="h-6 w-6 text-blue-500" />
+                  <CardTitle className="text-sm font-medium mt-2">
+                    Total Posts
                   </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">$45,231.89</div>
-                  <p className="text-xs text-muted-foreground">
-                    +20.1% from last month
-                  </p>
+                  {loading ? (
+                    <Skeleton className="h-6 w-24 mx-auto" />
+                  ) : (
+                    <div className="text-2xl font-bold text-blue-600">
+                      {postStats.totalPosts}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Subscriptions
+              <Card className="text-center">
+                <CardHeader className="flex flex-col items-center">
+                  <User className="h-6 w-6 text-green-500" />
+                  <CardTitle className="text-sm font-medium mt-2">
+                    Total Users
                   </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+2350</div>
-                  <p className="text-xs text-muted-foreground">
-                    +180.1% from last month
-                  </p>
+                  {loading ? (
+                    <Skeleton className="h-6 w-24 mx-auto" />
+                  ) : (
+                    <div className="text-2xl font-bold text-green-600">
+                      {userStats.length}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <rect width="20" height="14" x="2" y="5" rx="2" />
-                    <path d="M2 10h20" />
-                  </svg>
+              <Card className="text-center">
+                <CardHeader className="flex flex-col items-center">
+                  <Check className="h-6 w-6 text-purple-500" />
+                  <CardTitle className="text-sm font-medium mt-2">
+                    Active Users
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+12,234</div>
-                  <p className="text-xs text-muted-foreground">
-                    +19% from last month
-                  </p>
+                  {loading ? (
+                    <Skeleton className="h-6 w-24 mx-auto" />
+                  ) : (
+                    <div className="text-2xl font-bold text-purple-600">
+                      {userStats.filter((user) => user.isHavePremium).length}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Active Now
+              <Card className="text-center">
+                <CardHeader className="flex flex-col items-center">
+                  <BarChart3 className="h-6 w-6 text-red-500" />
+                  <CardTitle className="text-sm font-medium mt-2">
+                    Unapproved Posts
                   </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                  </svg>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-2xl font-bold">+573</div>
-                  <p className="text-xs text-muted-foreground">
-                    +201 since last hour
-                  </p>
+                  {loading ? (
+                    <Skeleton className="h-6 w-24 mx-auto" />
+                  ) : (
+                    <div className="text-2xl font-bold text-red-600">
+                      {postStats.posts.length}
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
+
+            {/* Graphs */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
               <div className="col-span-4">
                 <BarGraph />
               </div>
-              <Card className="col-span-4 md:col-span-3">
+              <Card className="col-span-3">
                 <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
+                  <CardTitle>Recent Posts</CardTitle>
                   <CardDescription>
-                    You made 265 sales this month.
+                    Latest unapproved posts requiring attention.
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <RecentSales />
+                  {loading ? (
+                    <Skeleton className="h-12 w-full" />
+                  ) : (
+                    <ul className="space-y-4">
+                      {postStats.posts.slice(0, 5).map((post) => (
+                        <li
+                          key={post.id}
+                          className="flex items-center justify-between border-b pb-2"
+                        >
+                          <span className="text-sm">{post.title}</span>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleApprovePost(post.id)}
+                          >
+                            Approve
+                          </Button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </CardContent>
               </Card>
+            </div>
+
+            {/* Additional Graphs */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
               <div className="col-span-4">
                 <AreaGraph />
               </div>
-              <div className="col-span-4 md:col-span-3">
+              <Card className="col-span-3">
                 <PieGraph />
-              </div>
+              </Card>
             </div>
           </TabsContent>
         </Tabs>
