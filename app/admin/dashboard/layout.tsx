@@ -7,6 +7,7 @@ import Header from '@/components-admin/layout/header';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
 import { cookies } from 'next/headers';
 import { useState } from 'react';
+import { Toaster } from '@/components/ui/toaster'
 
 export default function DashboardLayout({
   children,
@@ -37,6 +38,7 @@ export default function DashboardLayout({
           {renderContent()}
         </SidebarInset>
       </SidebarProvider>
+      <Toaster />
     </KBar>
   );
 }

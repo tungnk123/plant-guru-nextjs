@@ -4,19 +4,21 @@ import { da } from "@faker-js/faker";
 // Fetch all posts
 export async function fetchPosts({ page, limit }: { page: number; limit: number }) {
   console.log('Start call API:');
-  const response = await fetch(
-    `https://un-silent-backend-develop.azurewebsites.net/api/posts/test/get-all`,
-    {
-      method: 'GET',
-      headers: {
-        Accept: '*/*',
-      },
-    }
-  );
-
+  const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/posts/test/get-all`, {
+    method: 'GET',
+    headers: {
+      Accept: '*/*',
+    },
+  });
+  
+  console.log('Response status:', response.status);
+  console.log('Response headers:', response.headers);
+  
   if (!response.ok) {
-    throw new Error(`Failed to fetch posts: ${response.statusText}`);
+    const errorText = await response.text(); // Capture server error details
+    throw new Error(`Failed to fetch posts: ${response.statusText} - ${errorText}`);
   }
+  
 
   const data = await response.json();
   console.log('API Response:', data);
