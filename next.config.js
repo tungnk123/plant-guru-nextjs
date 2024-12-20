@@ -1,14 +1,13 @@
 // next.config.js
 module.exports = {
     images: {
-      domains: ['www.gravatar.com', 'i.pinimg.com'], // Add the hostname here
+      domains: [],
       remotePatterns: [
         {
           protocol: 'https',
-          hostname: 'i.pinimg.com',
+          hostname: '**', 
           port: '',
-          pathname: '',
-          search: '',
+          pathname: '**', 
         },
       ],},
   };

@@ -15,8 +15,11 @@ import {
 } from '@/components/ui/navigation-menu'
 import PrimaryButton from '@/app/components/PrimaryButton'
 import { Plus } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 
 const Navbar = ({ toggle }: { toggle: () => void }) => {
+  const pathname = usePathname();
+
   return (
     <div className='sticky top-0 h-20 w-full z-50 bg-white shadow'>
       <div className='container mx-auto flex h-full items-center justify-between px-20'>
@@ -76,8 +79,8 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
         </ul>
 
         <div className='hidden items-center gap-4 md:flex'>
-          <Link href='/create-post' className='inter-medium text-1xl'>
-            <PrimaryButton text='Create Post' icon={<Plus />} />
+          <Link href={pathname.startsWith('/products') ? '/create-product' : '/create-post'} className='inter-medium text-1xl'>
+            <PrimaryButton text={pathname.startsWith('/products') ? 'Create New Product' : 'Create Post'} icon={<Plus />} />
           </Link>
 
           <button>
