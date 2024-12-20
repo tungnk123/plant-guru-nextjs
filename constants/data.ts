@@ -1,111 +1,29 @@
 import { NavItem } from '@/types';
 export type Post = {
-  id: string; // Unique identifier for the post
-  userId: string; // ID of the user who created the post
-  user: string | null; // Optional user object or null if not available
-  title: string; // Title of the post
-  description: string; // Description of the post
-  imageUrl: string; // URL of the post's image
-  tag: string; // Tag or category for the post
-  background: string; // URL of the background image for the post
-  postUpvotes: any[]; // Array of upvotes (can be refined further)
-  postDevotes: any[]; // Array of downvotes (can be refined further)
-  postComments: any[]; // Array of comments (can be refined further)
-  postShares: any[]; // Array of shares (can be refined further)
-  createdAt: string; // Creation date of the post in ISO format
-  lastModifiedAt: string | null; // Last modification date or null if not modified
+  id: string; // Post ID
+  userId: string; // User ID
+  userNickName: string; // User's nickname
+  userAvatar: string; // User's avatar URL
+  title: string; // Post title
+  description: string; // Post description
+  imageUrl: string; // Post image URL
+  tag: string; // Post tag
+  background: string; // Post background image URL
+  postUpvotes: number; // Number of upvotes
+  postDevotes: number; // Number of downvotes
+  postComments: number; // Number of comments
+  postShares: number; // Number of shares
+  createdAt: string; // Post creation date
 };
 
-export type User = {
-  id: number;
+
+export interface User {
+  userId: string;
   name: string;
-  company: string;
-  role: string;
-  verified: boolean;
-  status: string;
-};
-export const users: User[] = [
-  {
-    id: 1,
-    name: 'Candice Schiner',
-    company: 'Dell',
-    role: 'Frontend Developer',
-    verified: false,
-    status: 'Active'
-  },
-  {
-    id: 2,
-    name: 'John Doe',
-    company: 'TechCorp',
-    role: 'Backend Developer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 3,
-    name: 'Alice Johnson',
-    company: 'WebTech',
-    role: 'UI Designer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 4,
-    name: 'David Smith',
-    company: 'Innovate Inc.',
-    role: 'Fullstack Developer',
-    verified: false,
-    status: 'Inactive'
-  },
-  {
-    id: 5,
-    name: 'Emma Wilson',
-    company: 'TechGuru',
-    role: 'Product Manager',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 6,
-    name: 'James Brown',
-    company: 'CodeGenius',
-    role: 'QA Engineer',
-    verified: false,
-    status: 'Active'
-  },
-  {
-    id: 7,
-    name: 'Laura White',
-    company: 'SoftWorks',
-    role: 'UX Designer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 8,
-    name: 'Michael Lee',
-    company: 'DevCraft',
-    role: 'DevOps Engineer',
-    verified: false,
-    status: 'Active'
-  },
-  {
-    id: 9,
-    name: 'Olivia Green',
-    company: 'WebSolutions',
-    role: 'Frontend Developer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 10,
-    name: 'Robert Taylor',
-    company: 'DataTech',
-    role: 'Data Analyst',
-    verified: false,
-    status: 'Active'
-  }
-];
+  avatar: string;
+  email: string;
+  isHavePremium: boolean;
+}
 
 export type Employee = {
   id: number;
@@ -174,6 +92,14 @@ export const navItems: NavItem[] = [
     title: 'Plant Guide',
     url: '/admin/dashboard/guide',
     icon: 'kanban',
+    shortcut: ['k', 'k'],
+    isActive: false,
+    items: [] // No child items
+  },
+  {
+    title: 'User',
+    url: '/admin/dashboard/user',
+    icon: 'user',
     shortcut: ['k', 'k'],
     isActive: false,
     items: [] // No child items
