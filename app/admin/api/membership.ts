@@ -1,7 +1,7 @@
 const BASE_URL = 'https://un-silent-backend-develop.azurewebsites.net/api/membership';
 
 // Type definitions for Membership
-interface Membership {
+export interface Membership {
   id?: string;
   name: string;
   description: string;
@@ -24,6 +24,28 @@ class MembershipService {
 
       if (!response.ok) {
         throw new Error(`Failed to fetch memberships: ${response.statusText}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  // Fetch a specific membership by ID
+  static async getMembershipById(id: string): Promise<Membership> {
+    try {
+      const url = `${BASE_URL}/${id}`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          'Accept': '*/*',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch membership with ID ${id}: ${response.statusText}`);
       }
 
       return await response.json();
