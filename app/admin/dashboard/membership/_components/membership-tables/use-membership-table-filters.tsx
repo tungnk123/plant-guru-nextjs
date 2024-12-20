@@ -2,64 +2,56 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 
-// Example gender options
-export const GENDER_OPTIONS = [
-  { value: 'male', label: 'Male' },
-  { value: 'female', label: 'Female' }
-];
-
-export function useEmployeeTableFilters() {
-  const [searchQuery, setSearchQuery] = useState<string>('');
-  const [genderFilter, setGenderFilter] = useState<string>('');
+export function useMembershipTableFilters() {
+  const [searchQuery, setSearchQuery] = useState<string>(''); // Filter by name or description
+  const [priceRangeFilter, setPriceRangeFilter] = useState<[number, number] | null>(null); // Filter by price range
   const [page, setPage] = useState<number>(1);
 
-  // State for debouncing the search input
+  // Debounce search query for performance
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState<string>(searchQuery);
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
-    }, 500); // 500ms debounce
+    }, 500);
 
-    return () => {
-      clearTimeout(timer); // Cleanup timeout on unmount or query change
-    };
+    return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Load filters from URL parameters on component mount
   useEffect(() => {
-    // On mount, read the URL parameters
     const urlParams = new URLSearchParams(window.location.search);
     setSearchQuery(urlParams.get('q') || '');
-    setGenderFilter(urlParams.get('gender') || '');
+    const priceRange = urlParams.get('price');
+    setPriceRangeFilter(priceRange ? priceRange.split(',').map(Number) as [number, number] : null);
     setPage(parseInt(urlParams.get('page') || '1', 10));
   }, []);
 
-  // Update URL without reloading page
+  // Update URL parameters when filters change
   useEffect(() => {
     const params = new URLSearchParams();
     if (debouncedSearchQuery) params.set('q', debouncedSearchQuery);
-    if (genderFilter) params.set('gender', genderFilter);
+    if (priceRangeFilter) params.set('price', priceRangeFilter.join(','));
     if (page) params.set('page', String(page));
 
-    // Update the URL with the new query parameters
     window.history.pushState({}, '', '?' + params.toString());
-  }, [debouncedSearchQuery, genderFilter, page]);
+  }, [debouncedSearchQuery, priceRangeFilter, page]);
 
   const resetFilters = useCallback(() => {
     setSearchQuery('');
-    setGenderFilter('');
+    setPriceRangeFilter(null);
     setPage(1);
   }, []);
 
   const isAnyFilterActive = useMemo(() => {
-    return !!searchQuery || !!genderFilter || !!page;
-  }, [searchQuery, genderFilter, page]);
+    return !!searchQuery || (priceRangeFilter !== null) || page > 1;
+  }, [searchQuery, priceRangeFilter, page]);
 
   return {
     searchQuery,
     setSearchQuery,
-    genderFilter,
-    setGenderFilter,
+    priceRangeFilter,
+    setPriceRangeFilter,
     page,
     setPage,
     resetFilters,
