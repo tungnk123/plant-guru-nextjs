@@ -73,6 +73,11 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
               <p>Plant Guides</p>
             </Link>
           </li>
+          <li>
+            <Link href='/pricing' className='inter-medium text-1xl'>
+              <p>Pricing</p>
+            </Link>
+          </li>
         </ul>
 
         <div className='hidden items-center gap-4 md:flex'>

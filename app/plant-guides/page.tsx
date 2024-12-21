@@ -8,10 +8,11 @@ const Page = () => {
   const toggleMenu = () => {
     setIsMenuOpen(prevState => !prevState)
   }
+
   return (
     <div className='w-full'>
+      <Navbar toggle={toggleMenu} />
       <section className='w-full'>
-        <Navbar toggle={toggleMenu} />
         <p>Plant guides</p>
       </section>
     </div>
