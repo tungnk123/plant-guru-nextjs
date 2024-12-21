@@ -49,4 +49,26 @@ export const fetchProductById = async (id: string): Promise<ProductData> => {
     console.error('Error fetching product:', error);
     throw error;
   }
+};
+
+export const createProduct = async (productData: Omit<ProductData, 'id' | 'wikiId'>): Promise<ProductData> => {
+  try {
+    const response = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(productData),
+    });
+    console.log(JSON.stringify(productData));
+    if (!response.ok) {
+      throw new Error(`Failed to create product: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating product:', error);
+    throw error;
+  }
 }; 
