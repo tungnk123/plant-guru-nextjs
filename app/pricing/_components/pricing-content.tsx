@@ -1,5 +1,4 @@
 "use client";
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Check, Sparkles, Star, Zap, Crown } from 'lucide-react';
 import { useEffect, useState } from 'react';
@@ -49,6 +48,42 @@ export default function PricingContent() {
 
     fetchPlans();
   }, []);
+
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = `https://www.paypal.com/sdk/js?client-id=${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}`;
+    script.async = true;
+    document.body.appendChild(script);
+
+    script.onload = () => {
+      if (window.paypal) {
+        plans.forEach((plan, index) => {
+          window.paypal.Buttons({
+            createOrder: (data, actions) => {
+              return actions.order.create({
+                purchase_units: [{
+                  amount: {
+                    value: plan.price.toString() // Use the actual price from the plan
+                  }
+                }]
+              });
+            },
+            onApprove: (data, actions) => {
+              return actions.order.capture().then(details => {
+                alert('Transaction completed by ' + details.payer.name.given_name);
+              });
+            }
+          }).render(`#paypal-button-container-${index}`);
+        });
+      }
+    };
+
+    return () => {
+      if (script.parentNode) {
+        script.parentNode.removeChild(script);
+      }
+    };
+  }, [plans]);
 
   if (loading) return (
     <div className="flex justify-center items-center min-h-[60vh]">
@@ -122,14 +157,8 @@ export default function PricingContent() {
                   ))}
                 </div>
               </CardContent>
-              <CardFooter>
-                <Button 
-                  className="w-full group relative overflow-hidden"
-                  variant={index === 1 ? "default" : "outline"}
-                >
-                  <span className="relative z-10">Get Started</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity" />
-                </Button>
+              <CardFooter className="flex justify-center">
+                <div id={`paypal-button-container-${index}`}></div>
               </CardFooter>
             </Card>
           </motion.div>
