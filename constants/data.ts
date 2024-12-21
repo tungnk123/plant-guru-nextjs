@@ -62,7 +62,7 @@ export const navItems: NavItem[] = [
     icon: 'dashboard',
     isActive: true,
     shortcut: ['d', 'd'],
-    items: [] // Empty array as there are no child items for Dashboard
+    items: []
   },
   {
     title: 'Post',
@@ -70,15 +70,7 @@ export const navItems: NavItem[] = [
     icon: 'post',
     shortcut: ['e', 'e'],
     isActive: false,
-    items: [] // No child items
-  },
-  {
-    title: 'Category',
-    url: '/admin/dashboard/category',
-    icon: 'product',
-    shortcut: ['p', 'p'],
-    isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Plant Encyclopedia',
@@ -86,7 +78,7 @@ export const navItems: NavItem[] = [
     icon: 'post',
     shortcut: ['p', 'p'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Plant Guide',
@@ -94,7 +86,7 @@ export const navItems: NavItem[] = [
     icon: 'kanban',
     shortcut: ['k', 'k'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'User',
@@ -102,15 +94,15 @@ export const navItems: NavItem[] = [
     icon: 'user',
     shortcut: ['k', 'k'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Membership',
     url: '/admin/dashboard/membership',
-    icon: 'user',
+    icon: 'userPen',
     shortcut: ['k', 'k'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Sales',
@@ -118,7 +110,7 @@ export const navItems: NavItem[] = [
     icon: 'billing',
     shortcut: ['k', 'k'],
     isActive: false,
-    items: [] // No child items
+    items: []
   },
   {
     title: 'Report',
@@ -126,6 +118,6 @@ export const navItems: NavItem[] = [
     icon: 'kanban',
     shortcut: ['k', 'k'],
     isActive: false,
-    items: [] // No child items
+    items: []
   }
 ];
