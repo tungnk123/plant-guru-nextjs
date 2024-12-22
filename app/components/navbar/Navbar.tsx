@@ -2,7 +2,7 @@
 import React from 'react'
 import Link from 'next/link'
 import Logo from './Logo'
-import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -16,7 +16,17 @@ import {
 import PrimaryButton from '@/app/components/PrimaryButton'
 import { Plus } from 'lucide-react'
 
-const Navbar = ({ toggle }: { toggle: () => void }) => {
+interface NavbarProps {
+  toggle?: () => void;
+}
+
+export default function Navbar({ toggle }: NavbarProps) {
+  const router = useRouter();
+
+  const handleUserIconClick = () => {
+    router.push('/login');
+  };
+
   return (
     <div className='sticky top-0 h-20 w-full z-50 bg-white shadow'>
       <div className='container mx-auto flex h-full items-center justify-between px-20'>
@@ -85,7 +95,7 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
             <PrimaryButton text='Create Post' icon={<Plus />} />
           </Link>
 
-          <button>
+          <button onClick={handleUserIconClick}>
             <img
               src='/images/ic_user.svg'
               alt='User Icon'
@@ -97,5 +107,3 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
     </div>
   )
 }
-
-export default Navbar

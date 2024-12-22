@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import MembershipService from '@/app/admin/api/membership';
 import { Membership } from '@/app/admin/api/membership';
 import { motion } from 'framer-motion';
+import { goPremium } from '@/app/admin/api/user';
 
 const getPlanIcon = (index: number) => {
   switch (index) {
@@ -32,6 +33,7 @@ export default function PricingContent() {
   const [plans, setPlans] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   useEffect(() => {
     const fetchPlans = async () => {
@@ -59,7 +61,15 @@ export default function PricingContent() {
       if (window.paypal) {
         plans.forEach((plan, index) => {
           window.paypal.Buttons({
+            style: {
+              layout: 'horizontal',
+              color: 'blue',
+              shape: 'rect',
+              label: 'paypal',
+              height: 40,
+            },
             createOrder: (data, actions) => {
+              setPaymentLoading(true);
               return actions.order.create({
                 purchase_units: [{
                   amount: {
@@ -71,7 +81,15 @@ export default function PricingContent() {
             onApprove: (data, actions) => {
               return actions.order.capture().then(details => {
                 alert('Transaction completed by ' + details.payer.name.given_name);
+                handlePostPayment(details);
+              }).finally(() => {
+                setPaymentLoading(false);
               });
+            },
+            onError: (err) => {
+              console.error('PayPal Checkout error:', err);
+              setPaymentLoading(false);
+              alert('There was an error processing your payment. Please try again.');
             }
           }).render(`#paypal-button-container-${index}`);
         });
@@ -84,6 +102,36 @@ export default function PricingContent() {
       }
     };
   }, [plans]);
+
+  const handlePostPayment = async (details) => {
+    try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) throw new Error('User not logged in');
+
+      await goPremium(userId);
+
+      const response = await fetch('/api/payment-success', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          orderId: details.id,
+          payerName: details.payer.name.given_name,
+          payerEmail: details.payer.email_address,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update payment status on the server');
+      }
+
+      window.location.href = '/thank-you';
+    } catch (error) {
+      console.error('Error handling post-payment:', error);
+      alert('There was an error processing your payment. Please contact support.');
+    }
+  };
 
   if (loading) return (
     <div className="flex justify-center items-center min-h-[60vh]">
@@ -158,7 +206,11 @@ export default function PricingContent() {
                 </div>
               </CardContent>
               <CardFooter className="flex justify-center">
-                <div id={`paypal-button-container-${index}`}></div>
+                {paymentLoading ? (
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                ) : (
+                  <div id={`paypal-button-container-${index}`} className="w-full"></div>
+                )}
               </CardFooter>
             </Card>
           </motion.div>
