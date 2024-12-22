@@ -167,35 +167,6 @@ export async function addUser(
   }
 }
 
-// User login
-export async function loginUser(email: string, password: string): Promise<{ token: string }> {
-  try {
-    const response = await fetch(
-      'https://un-silent-backend-develop.azurewebsites.net/api/users/login',
-      {
-        method: 'POST',
-        headers: {
-          Accept: '*/*',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      }
-    );
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to login');
-    }
-
-    const data = await response.json();
-    return data; // { token: string }
-  } catch (error) {
-    console.error('Error logging in user:', error);
-    throw error;
-  }
-}
-
-
 
 
 

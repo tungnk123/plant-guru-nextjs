@@ -1,17 +1,16 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Logo from './Logo'
 import { useRouter } from 'next/navigation'
+import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport
 } from '@/components/ui/navigation-menu'
 import PrimaryButton from '@/app/components/PrimaryButton'
 import { Plus } from 'lucide-react'
@@ -22,9 +21,19 @@ interface NavbarProps {
 
 export default function Navbar({ toggle }: NavbarProps) {
   const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    setIsLoggedIn(!!userId);
+  }, []);
 
   const handleUserIconClick = () => {
-    router.push('/login');
+    if (isLoggedIn) {
+      router.push('/profile');
+    } else {
+      router.push('/login');
+    }
   };
 
   return (
@@ -58,16 +67,14 @@ export default function Navbar({ toggle }: NavbarProps) {
             </Link>
           </li>
           <li>
-            <NavigationMenu className='bg-transparent'>
-              <NavigationMenuList className='bg-transparent'>
-                <NavigationMenuItem className='bg-transparent'>
-                  <NavigationMenuTrigger className='inter-medium text-1xl bg-transparent'>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className='inter-medium text-1xl'>
                     Plant Encyclopedia
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className='bg-transparent'>
-                    <NavigationMenuLink className='bg-red-700'>
-                      Link
-                    </NavigationMenuLink>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>Link</NavigationMenuLink>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -95,13 +102,24 @@ export default function Navbar({ toggle }: NavbarProps) {
             <PrimaryButton text='Create Post' icon={<Plus />} />
           </Link>
 
-          <button onClick={handleUserIconClick}>
-            <img
-              src='/images/ic_user.svg'
-              alt='User Icon'
-              className='h-8 w-8 rounded-full'
-            />
-          </button>
+          {isLoggedIn ? (
+            <button onClick={handleUserIconClick}>
+              <img
+                src='/images/ic_user.svg'
+                alt='User Icon'
+                className='h-8 w-8 rounded-full'
+              />
+            </button>
+          ) : (
+            <Button 
+              onClick={handleUserIconClick}
+              className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-2 rounded-full 
+                hover:from-green-500 hover:to-green-600 transform hover:scale-105 transition-all duration-300
+                font-medium text-sm shadow-md hover:shadow-lg"
+            >
+              Login
+            </Button>
+          )}
         </div>
       </div>
     </div>

@@ -1,34 +1,42 @@
 "use client";
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { FaStar, FaRocket, FaCogs } from 'react-icons/fa';
+import { FaStar, FaRocket, FaCogs, FaEye, FaEyeSlash } from 'react-icons/fa';
 import LottieAnimation from '@/app/components/LottieAnimation';
 import LogoWithBlackText from '@/app/components/navbar/LogoWithBlackText';
 import animationData from '@/public/animations/lottie_login.json';
+import { toast } from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
+import { loginUser } from '@/app/actions/loginUser';
 
 const LoginPage = () => {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError('');
+
     try {
-      const response = await fetch('/api/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed');
+      const data = await loginUser(email, password);
+      
+      if (data?.userId) {
+        localStorage.setItem('userId', data.userId);
+        toast.success('Login successful!');
+        router.push('/home');
+      } else {
+        setError('Invalid email or password');
+        setPassword('');
       }
-
-      const data = await response.json();
-      localStorage.setItem('userId', data.userId);
-    } catch (error) {
-      console.error('Error logging in:', error);
+    } catch (error: any) {
+      setError('An unexpected error occurred');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -41,6 +49,11 @@ const LoginPage = () => {
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
           Welcome back!
         </h1>
+        {error && (
+          <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
+            {error}
+          </div>
+        )}
         <form onSubmit={handleLogin} className="space-y-6">
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Email</label>
@@ -49,24 +62,43 @@ const LoginPage = () => {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30"
+              className={`w-full p-4 border ${error ? 'border-red-300' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30`}
               required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30"
-              required
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className={`w-full p-4 border ${error ? 'border-red-300' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30 pr-12`}
+                required
+                disabled={isLoading}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors duration-300"
+              >
+                {showPassword ? (
+                  <FaEyeSlash className="w-5 h-5" />
+                ) : (
+                  <FaEye className="w-5 h-5" />
+                )}
+              </button>
+            </div>
           </div>
           <div className="flex items-center justify-between">
             <label className="flex items-center space-x-2 cursor-pointer group">
-              <input type="checkbox" className="form-checkbox text-blue-500 rounded border-gray-300" />
+              <input 
+                type="checkbox" 
+                className="form-checkbox text-blue-500 rounded border-gray-300"
+                disabled={isLoading}
+              />
               <span className="text-sm text-gray-600 group-hover:text-blue-500 transition-colors duration-300">
                 Remember me
               </span>
@@ -77,9 +109,18 @@ const LoginPage = () => {
           </div>
           <Button 
             type="submit" 
-            className="w-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg"
+            className="w-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={isLoading}
           >
-            Login
+            {isLoading ? (
+              <div className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Logging in...
+              </div>
+            ) : 'Login'}
           </Button>
         </form>
         <div className="mt-8 text-center">
