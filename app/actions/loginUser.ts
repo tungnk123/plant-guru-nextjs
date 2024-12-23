@@ -19,18 +19,33 @@ export const loginUser = async (email: string, password: string): Promise<LoginR
     });
 
     const data = await response.json();
+    console.log('Login API Response:', data);
 
     if (response.status === 200 && data.userId) {
+      // Clear any old data first
+      localStorage.clear();
+      
+      // Store the new userId
+      localStorage.setItem('userId', data.userId);
+      localStorage.setItem('loginTime', Date.now().toString());
+      console.log('Stored new userId:', data.userId);
+
       toast.success('Login successful!');
+      
+      // Redirect to home page
+      window.location.href = '/home';
+      
       return {
         userId: data.userId
       };
     }
 
+    console.log('Login failed:', response.status, data);
     toast.error('Invalid email or password');
     return null;
 
   } catch (error: any) {
+    console.error('Login error:', error);
     toast.error('Connection error. Please try again later.');
     return null;
   }
