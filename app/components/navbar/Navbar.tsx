@@ -1,22 +1,41 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Logo from './Logo'
-import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
+import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport
 } from '@/components/ui/navigation-menu'
 import PrimaryButton from '@/app/components/PrimaryButton'
 import { Plus } from 'lucide-react'
 
-const Navbar = ({ toggle }: { toggle: () => void }) => {
+interface NavbarProps {
+  toggle?: () => void;
+}
+
+export default function Navbar({ toggle }: NavbarProps) {
+  const router = useRouter();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    setIsLoggedIn(!!userId);
+  }, []);
+
+  const handleUserIconClick = () => {
+    if (isLoggedIn) {
+      router.push('/profile');
+    } else {
+      router.push('/login');
+    }
+  };
+
   return (
     <div className='sticky top-0 h-20 w-full z-50 bg-white shadow'>
       <div className='container mx-auto flex h-full items-center justify-between px-20'>
@@ -48,16 +67,14 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
             </Link>
           </li>
           <li>
-            <NavigationMenu className='bg-transparent'>
-              <NavigationMenuList className='bg-transparent'>
-                <NavigationMenuItem className='bg-transparent'>
-                  <NavigationMenuTrigger className='inter-medium text-1xl bg-transparent'>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className='inter-medium text-1xl'>
                     Plant Encyclopedia
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className='bg-transparent'>
-                    <NavigationMenuLink className='bg-red-700'>
-                      Link
-                    </NavigationMenuLink>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>Link</NavigationMenuLink>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -73,6 +90,11 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
               <p>Plant Guides</p>
             </Link>
           </li>
+          <li>
+            <Link href='/pricing' className='inter-medium text-1xl'>
+              <p>Pricing</p>
+            </Link>
+          </li>
         </ul>
 
         <div className='hidden items-center gap-4 md:flex'>
@@ -80,17 +102,26 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
             <PrimaryButton text='Create Post' icon={<Plus />} />
           </Link>
 
-          <button>
-            <img
-              src='/images/ic_user.svg'
-              alt='User Icon'
-              className='h-8 w-8 rounded-full'
-            />
-          </button>
+          {isLoggedIn ? (
+            <button onClick={handleUserIconClick}>
+              <img
+                src='/images/ic_user.svg'
+                alt='User Icon'
+                className='h-8 w-8 rounded-full'
+              />
+            </button>
+          ) : (
+            <Button 
+              onClick={handleUserIconClick}
+              className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-2 rounded-full 
+                hover:from-green-500 hover:to-green-600 transform hover:scale-105 transition-all duration-300
+                font-medium text-sm shadow-md hover:shadow-lg"
+            >
+              Login
+            </Button>
+          )}
         </div>
       </div>
     </div>
   )
 }
-
-export default Navbar

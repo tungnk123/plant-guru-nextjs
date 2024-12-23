@@ -82,7 +82,7 @@ export const fetchPosts = async (
   filter: string
 ): Promise<FetchPostsResponse> => {
   try {
-    localStorage.setItem('userId', '59a840af-a96e-48a8-81bd-03e6ff3567ab');
+    // localStorage.setItem('userId', '59a840af-a96e-48a8-81bd-03e6ff3567ab');
     const userId = localStorage.getItem('userId')
     var userIdString = ""
     if (userId != null) {

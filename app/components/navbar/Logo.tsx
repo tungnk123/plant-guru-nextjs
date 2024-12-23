@@ -36,7 +36,7 @@ const Logo = () => {
   }, []);
 
   return (
-    <div className="flex items-center space-x-1">
+    <div className="flex items-center space-x-2">
       <Link href="/" style={{ display: showButton ? "none" : "block" }}>
         <Image
           src="/images/ic_logo.svg"
@@ -46,7 +46,7 @@ const Logo = () => {
           className="relative"
         />
       </Link>
-      <p className="text-2xl text-green-500 font-bold">PLANTGURU</p>
+      <p className="text-2xl text-green-500 font-bold">Plant Guru</p>
     </div>
   );
   
