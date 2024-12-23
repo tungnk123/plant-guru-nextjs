@@ -6,6 +6,7 @@ import MembershipService from '@/app/admin/api/membership';
 import { Membership } from '@/app/admin/api/membership';
 import { motion } from 'framer-motion';
 import { goPremium } from '@/app/admin/api/user';
+import { toast } from "react-hot-toast";
 
 const getPlanIcon = (index: number) => {
   switch (index) {
@@ -110,23 +111,7 @@ export default function PricingContent() {
 
       await goPremium(userId);
 
-      const response = await fetch('/api/payment-success', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          orderId: details.id,
-          payerName: details.payer.name.given_name,
-          payerEmail: details.payer.email_address,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to update payment status on the server');
-      }
-
-      window.location.href = '/thank-you';
+      toast.success('Successfully upgraded to Premium!');
     } catch (error) {
       console.error('Error handling post-payment:', error);
       alert('There was an error processing your payment. Please contact support.');
