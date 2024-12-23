@@ -141,3 +141,54 @@ export const downvoteComment = async (commentId: string): Promise<CommentVoteRes
     throw error;
   }
 }; 
+
+export const postReply = async (parentCommentId: string, message: string): Promise<void> => {
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    throw new Error('User ID not found in localStorage');
+  }
+
+  try {
+    const response = await fetch('https://un-silent-backend-develop.azurewebsites.net/api/posts/comments/reply', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': '*/*',
+      },
+      body: JSON.stringify({ parentCommentId, userId, message }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to post reply: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error posting reply:', error);
+    throw error;
+  }
+};
+
+export const fetchReplies = async (postId: string, parentCommentId: string): Promise<CommentData[]> => {
+  const userId = localStorage.getItem('userId');
+  if (!userId) {
+    throw new Error('User ID not found in localStorage');
+  }
+
+  try {
+    const response = await fetch(`${BASE_URL}/posts/${postId}/comments?userId=${userId}&parentCommentId=${parentCommentId}`, {
+      method: 'GET',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch replies: ${response.statusText}`);
+    }
+
+    const data: CommentData[] = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching replies:', error);
+    throw error;
+  }
+};
