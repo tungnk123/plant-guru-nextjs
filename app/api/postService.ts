@@ -80,8 +80,7 @@ export const createPost = async (postData: PostData): Promise<any> => {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create post');
+      throw new Error(`Failed to create posts: ${response.statusText}`);
     }
 
     const data = await response.json();
