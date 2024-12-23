@@ -18,7 +18,7 @@ class MembershipService {
       const response = await fetch(BASE_URL, {
         method: 'GET',
         headers: {
-          'Accept': '*/*',
+          'Accept': 'application/json',
         },
       });
 
@@ -26,9 +26,11 @@ class MembershipService {
         throw new Error(`Failed to fetch memberships: ${response.statusText}`);
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('API Response:', data);
+      return data;
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching memberships:', error);
       throw error;
     }
   }

@@ -99,9 +99,6 @@ export const fetchPosts = async (
   filter: string
 ): Promise<FetchPostsResponse> => {
   try {
-    localStorage.setItem('userId', 'b097284d-8ae1-445f-922d-5eb51ebe2326');
-    const userId = localStorage.getItem('userId');
-    let userIdString = userId ? `userId=${userId}` : '';
 
     // Map the tag and filter using the defined mappings
     const mappedTag = tagMap[tag.toLowerCase()];
@@ -112,6 +109,12 @@ export const fetchPosts = async (
     let filterString = mappedFilter && mappedFilter !== 'all' ? `&filter=${mappedFilter}` : '';
 
     const response = await fetch(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}${tagString}${filterString}`);
+    // localStorage.setItem('userId', '59a840af-a96e-48a8-81bd-03e6ff3567ab');
+    const userId = localStorage.getItem('userId')
+    var userIdString = ""
+    if (userId != null) {
+     userIdString = `userId=${userId}`
+    }
     if (!response.ok) {
       throw new Error(`Failed to fetch posts: ${response.statusText}`);
     }
