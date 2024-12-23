@@ -1,5 +1,7 @@
 // postService.ts
 
+import postParams from './get_post_param.json';
+
 export interface PostData {
   title: string;
   description: string;
@@ -48,6 +50,21 @@ export interface Comment {
 
 const BASE_URL = 'https://un-silent-backend-develop.azurewebsites.net/api/posts'
 
+const tagMap = {
+  'plants': 'plants',
+  'flowers': 'flowers',
+  'guides & tips': 'guides',
+  'diseases': 'diseases',
+  'q&a': 'qna',
+  'diy projects': 'diy',
+};
+
+const filterMap = {
+  trending: 'trending',
+  upvote: 'upvote',
+  latest: 'time',
+};
+
 export const createPost = async (postData: PostData): Promise<any> => {
   try {
     const response = await fetch(
@@ -63,8 +80,7 @@ export const createPost = async (postData: PostData): Promise<any> => {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create post');
+      throw new Error(`Failed to create posts: ${response.statusText}`);
     }
 
     const data = await response.json();
@@ -82,13 +98,22 @@ export const fetchPosts = async (
   filter: string
 ): Promise<FetchPostsResponse> => {
   try {
+
+    // Map the tag and filter using the defined mappings
+    const mappedTag = tagMap[tag.toLowerCase()];
+    const mappedFilter = filterMap[filter.toLowerCase()];
+
+    // Construct the URL parameters
+    let tagString = mappedTag && mappedTag !== 'all' ? `&tag=${mappedTag}` : '';
+    let filterString = mappedFilter && mappedFilter !== 'all' ? `&filter=${mappedFilter}` : '';
+
+    const response = await fetch(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}${tagString}${filterString}`);
     // localStorage.setItem('userId', '59a840af-a96e-48a8-81bd-03e6ff3567ab');
     const userId = localStorage.getItem('userId')
     var userIdString = ""
     if (userId != null) {
      userIdString = `userId=${userId}`
     }
-    const response = await fetch(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}&tag=${tag}&filter=${filter}`);
     if (!response.ok) {
       throw new Error(`Failed to fetch posts: ${response.statusText}`);
     }
@@ -99,7 +124,7 @@ export const fetchPosts = async (
         totalPages: 0,
       };
     }
-    console.log(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}&tag=${tag}&filter=${filter}`)
+    console.log(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}${tagString}${filterString}`);
     return {
       posts: data.plantPostDtos,
       totalPages: data.numberOfPage,

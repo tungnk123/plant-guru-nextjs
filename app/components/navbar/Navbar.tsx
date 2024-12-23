@@ -14,6 +14,8 @@ import {
 } from '@/components/ui/navigation-menu'
 import PrimaryButton from '@/app/components/PrimaryButton'
 import { Plus } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+
 
 interface NavbarProps {
   toggle?: () => void;
@@ -22,6 +24,7 @@ interface NavbarProps {
 export default function Navbar({ toggle }: NavbarProps) {
   const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const pathname = usePathname();
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
@@ -86,8 +89,8 @@ export default function Navbar({ toggle }: NavbarProps) {
             </Link>
           </li>
           <li>
-            <Link href='/plant-guides' className='inter-medium text-1xl'>
-              <p>Plant Guides</p>
+            <Link href='/products' className='inter-medium text-1xl'>
+              <p>Products</p>
             </Link>
           </li>
           <li>
@@ -98,8 +101,8 @@ export default function Navbar({ toggle }: NavbarProps) {
         </ul>
 
         <div className='hidden items-center gap-4 md:flex'>
-          <Link href='/create-post' className='inter-medium text-1xl'>
-            <PrimaryButton text='Create Post' icon={<Plus />} />
+          <Link href={pathname.startsWith('/products') ? '/create-product' : '/create-post'} className='inter-medium text-1xl'>
+            <PrimaryButton text={pathname.startsWith('/products') ? 'Create New Product' : 'Create Post'} icon={<Plus />} />
           </Link>
 
           {isLoggedIn ? (
