@@ -71,4 +71,25 @@ export const createProduct = async (productData: Omit<ProductData, 'id' | 'wikiI
     console.error('Error creating product:', error);
     throw error;
   }
-}; 
+};
+
+export async function fetchProductsByUser(userId: string): Promise<ProductData[]> {
+  try {
+    const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/products/shop/${userId}`, {
+      method: 'GET',
+      headers: {
+        Accept: '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch products by user: ${response.statusText}`);
+    }
+
+    const data: ProductData[] = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching products by user:', error);
+    throw error;
+  }
+} 
