@@ -4,18 +4,19 @@ import { useState, useRef, useEffect } from 'react';
 import * as signalR from '@microsoft/signalr';
 
 const Page = () => {
-  const myId = '3d43f500-14c9-4a54-9106-cf02800a2467';
+  const myId = '5236a821-379e-466c-97a7-31eda6a4101a';
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [searchInput, setSearchInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const prevMessageCountRef = useRef<number>(0);
 
   useEffect(() => {
     const fetchChatRooms = async () => {
       try {
-        const response = await fetch(`https://localhost:7282/api/chat/users/${myId}/chatRooms`);
+        const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/chat/users/${myId}/chatRooms`);
         if (!response.ok) {
           throw new Error('Network response was not ok');
         }
@@ -36,7 +37,7 @@ const Page = () => {
   useEffect(() => {
     // Set up SignalR connection
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl('https://localhost:7282/chatHub')
+      .withUrl('https://un-silent-backend-develop.azurewebsites.net/chatHub', {withCredentials: false})
       .withAutomaticReconnect()
       .build();
 
@@ -58,7 +59,7 @@ const Page = () => {
 
   const fetchMessages = async (chatRoomId) => {
     try {
-      const response = await fetch(`https://localhost:7282/api/chat/${chatRoomId}`);
+      const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/chat/${chatRoomId}`);
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -79,7 +80,7 @@ const Page = () => {
     };
 
     try {
-      const response = await fetch('https://localhost:7282/api/chat/sendText', {
+      const response = await fetch('https://un-silent-backend-develop.azurewebsites.net/api/chat/sendText', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -110,6 +111,11 @@ const Page = () => {
     prevMessageCountRef.current = messages.length;
   }, [messages]);
 
+  // Filter chat rooms based on search input
+  const filteredChatRooms = chatRooms.filter(chatRoom =>
+    chatRoom.name.toLowerCase().includes(searchInput.toLowerCase())
+  );
+
   return (
     <div className='w-full h-screen bg-blue-600 flex'>
       <div className='w-1/3 bg-white p-4 overflow-y-auto'>
@@ -118,8 +124,10 @@ const Page = () => {
           type='text'
           placeholder='Search...'
           className='w-full p-2 mb-4 border rounded bg-yellow-100'
+          value={searchInput}
+          onChange={(e) => setSearchInput(e.target.value)}
         />
-        {chatRooms.map((chatRoom) => (
+        {filteredChatRooms.map((chatRoom) => (
           <ChatRoomItem
             key={chatRoom.chatRoomId}
             friendAvatarLink={chatRoom.avatar}
