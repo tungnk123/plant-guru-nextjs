@@ -172,7 +172,6 @@ export default function PricingContent() {
                   )}
                 </div>
                 <CardTitle className="text-2xl font-bold">{plan.name}</CardTitle>
-                <CardDescription className="mt-2 min-h-[60px]">{plan.description}</CardDescription>
               </CardHeader>
               <CardContent className="flex-grow">
                 <div className="mb-6">
@@ -180,7 +179,7 @@ export default function PricingContent() {
                   <span className="text-gray-500 ml-2">/month</span>
                 </div>
                 <div className="space-y-4">
-                  {plan.description.split(';').map((feature, i) => (
+                  {plan.description.split('\n').map((feature, i) => (
                     feature.trim() && (
                       <div key={i} className="flex items-center space-x-3">
                         <Check className="h-5 w-5 text-green-500 flex-shrink-0" />
