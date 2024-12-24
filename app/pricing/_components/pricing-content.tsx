@@ -110,7 +110,7 @@ export default function PricingContent() {
       if (!userId) throw new Error('User not logged in');
 
       await goPremium(userId);
-
+      
       toast.success('Successfully upgraded to Premium!');
     } catch (error) {
       console.error('Error handling post-payment:', error);
