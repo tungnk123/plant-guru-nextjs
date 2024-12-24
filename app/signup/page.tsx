@@ -7,34 +7,49 @@ import LogoWithBlackText from '@/app/components/navbar/LogoWithBlackText';
 import animationData from '@/public/animations/lottie_login.json';
 import { toast } from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
-import { loginUser } from '@/app/actions/loginUser';
+import { addUser } from '@/app/admin/api/user';
 
-const LoginPage = () => {
+const SignUpPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
 
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      const data = await loginUser(email, password);
-      
-      if (data?.userId) {
-        localStorage.setItem('userId', data.userId);
-        toast.success('Login successful!');
-        router.push('/home');
+      const response = await addUser(
+        formData.email,
+        formData.password,
+        formData.name,
+        "default-avatar.png"
+      );
+
+      if (response) {
+        toast.success('Registration successful!');
+        router.push('/login');
       } else {
-        setError('Invalid email or password');
-        setPassword('');
+        throw new Error('Registration failed');
       }
     } catch (error: any) {
-      setError('An unexpected error occurred');
+      console.error('Registration error:', error);
+      setError(error.message || 'An unexpected error occurred');
+      toast.error('Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -47,22 +62,34 @@ const LoginPage = () => {
           <LogoWithBlackText />
         </div>
         <h1 className="text-4xl font-bold mb-8 text-center bg-gradient-to-r from-blue-600 to-purple-600 text-transparent bg-clip-text">
-          Welcome back!
+          Create Account
         </h1>
         {error && (
           <div className="mb-4 p-4 bg-red-50 border border-red-200 text-red-600 rounded-lg text-sm">
             {error}
           </div>
         )}
-        <form onSubmit={handleLogin} className="space-y-6">
+        <form onSubmit={handleSignUp} className="space-y-6">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Name</label>
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={formData.name}
+              onChange={(e) => setFormData({...formData, name: e.target.value})}
+              className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30"
+              required
+              disabled={isLoading}
+            />
+          </div>
           <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">Email</label>
             <input
               type="email"
               placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={`w-full p-4 border ${error ? 'border-red-300' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30`}
+              value={formData.email}
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+              className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30"
               required
               disabled={isLoading}
             />
@@ -73,43 +100,39 @@ const LoginPage = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className={`w-full p-4 border ${error ? 'border-red-300' : 'border-gray-200'} rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30 pr-12`}
+                value={formData.password}
+                onChange={(e) => setFormData({...formData, password: e.target.value})}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30 pr-12"
                 required
                 disabled={isLoading}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none transition-colors duration-300"
+                className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                {showPassword ? (
-                  <FaEyeSlash className="w-5 h-5" />
-                ) : (
-                  <FaEye className="w-5 h-5" />
-                )}
+                {showPassword ? <FaEyeSlash className="w-5 h-5" /> : <FaEye className="w-5 h-5" />}
               </button>
             </div>
           </div>
-          <div className="flex items-center justify-between">
-            <label className="flex items-center space-x-2 cursor-pointer group">
-              <input 
-                type="checkbox" 
-                className="form-checkbox text-blue-500 rounded border-gray-300"
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-gray-700">Confirm Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm your password"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+                className="w-full p-4 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/40 transition-all duration-300 hover:border-blue-500/30 pr-12"
+                required
                 disabled={isLoading}
               />
-              <span className="text-sm text-gray-600 group-hover:text-blue-500 transition-colors duration-300">
-                Remember me
-              </span>
-            </label>
-            <a href="#" className="text-sm text-blue-500 hover:text-blue-700 transition-colors duration-300">
-              Forgot password?
-            </a>
+            </div>
           </div>
+
           <Button 
             type="submit" 
-            className="w-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-xl text-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] hover:shadow-lg disabled:opacity-50"
             disabled={isLoading}
           >
             {isLoading ? (
@@ -118,16 +141,19 @@ const LoginPage = () => {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Logging in...
+                Creating account...
               </div>
-            ) : 'Login'}
+            ) : 'Sign Up'}
           </Button>
         </form>
         <div className="mt-8 text-center">
           <p className="text-gray-600">
-            Don't have an account?{' '}
-            <a href="/signup" className="text-blue-500 hover:text-blue-700 font-medium transition-colors duration-300">
-              Sign up
+            Already have an account?{' '}
+            <a 
+              href="/login" 
+              className="text-blue-500 hover:text-blue-700 font-medium transition-colors duration-300"
+            >
+              Login
             </a>
           </p>
         </div>
@@ -138,15 +164,15 @@ const LoginPage = () => {
           <FaRocket size={40} className="animate-bounce text-blue-300" />
           <FaCogs size={40} className="animate-spin-slow text-purple-300" />
         </div>
-        <div className="flex justify-center items-center w-full max-w-md transform hover:scale-105 transition-transform duration-500">
+        <div className="flex justify-center items-center w-full max-w-md">
           <LottieAnimation animationData={animationData} />
         </div>
         <p className="mt-8 text-center max-w-md text-lg font-light leading-relaxed text-blue-100">
-          Experience the best features and performance with our app. Join us and explore the possibilities!
+          Join our community today and start your journey with us!
         </p>
       </div>
     </div>
   );
 };
 
-export default LoginPage;
+export default SignUpPage;
