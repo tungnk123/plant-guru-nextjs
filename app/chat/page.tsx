@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import * as signalR from '@microsoft/signalr';
 
 const Page = () => {
-  const myId = '5236a821-379e-466c-97a7-31eda6a4101a';
+  const myId = '8d28f7d4-43bc-4043-8ace-646e015c67b1';
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState([]);
@@ -102,6 +102,14 @@ const Page = () => {
     }
   };
 
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      console.log('Selected file:', file);
+      // You can add logic here to handle the file upload
+    }
+  };
+
   useEffect(() => {
     if (messages.length > prevMessageCountRef.current) {
       if (messagesEndRef.current) {
@@ -156,9 +164,13 @@ const Page = () => {
                   {msg.userSendId !== myId && (
                     <img src={msg.avatar} alt='Avatar' className='w-8 h-8 bg-gray-300 rounded-full' />
                   )}
-                  <div className={`max-w-xs bg-gray-200 rounded-lg p-2 ${msg.userSendId === myId ? 'bg-blue-200 text-right' : 'bg-gray-200 text-left'}`}>
-                    {msg.message}
-                  </div>
+                  {msg.type === 'Text' ? (
+                    <div className={`max-w-xs bg-gray-200 rounded-lg p-2 ${msg.userSendId === myId ? 'bg-blue-200 text-right' : 'bg-gray-200 text-left'}`}>
+                      {msg.message}
+                    </div>
+                  ) : (
+                    <img src={msg.mediaLink} alt='Media' className='max-w-xs rounded-lg' />
+                  )}
                   {msg.userSendId === myId && (
                     <img src={msg.avatar} alt='Avatar' className='w-8 h-8 bg-gray-300 rounded-full' />
                   )}
@@ -169,10 +181,21 @@ const Page = () => {
           </>
         )}
         <div className='p-4 border-t flex items-center'>
+          <label className='flex items-center cursor-pointer'>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-600 flex items-center justify-center" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M3 3h18v18H3V3zm2 2v14h14V5H5zm3 10l3-4 3 4 4-5 3 4.5H8z"/>
+            </svg>
+            <input
+              type='file'
+              accept='image/*'
+              className='hidden'
+              onChange={handleFileChange}
+            />
+          </label>
           <input
             type='text'
             placeholder='Type a message...'
-            className='flex-1 p-2 border rounded-full'
+            className='flex-1 p-2 border rounded-full ml-2'
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={(e) => {
