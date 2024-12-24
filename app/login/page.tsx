@@ -126,7 +126,7 @@ const LoginPage = () => {
         <div className="mt-8 text-center">
           <p className="text-gray-600">
             Don't have an account?{' '}
-            <a href="#" className="text-blue-500 hover:text-blue-700 font-medium transition-colors duration-300">
+            <a href="/signup" className="text-blue-500 hover:text-blue-700 font-medium transition-colors duration-300">
               Sign up
             </a>
           </p>
