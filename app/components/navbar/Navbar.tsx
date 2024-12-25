@@ -115,6 +115,11 @@ export default function Navbar({ toggle }: NavbarProps) {
             </NavigationMenu>
           </li>
           <li>
+            <Link href='/plant-wiki' className='inter-medium text-1xl'>
+              <p>Plant Wiki</p>
+            </Link>
+          </li>
+          <li>
             <Link href='/identify-plant' className='inter-medium text-1xl'>
               <p>Identify Plant</p>
             </Link>
