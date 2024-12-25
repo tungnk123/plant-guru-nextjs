@@ -32,7 +32,7 @@ const PostSection = () => {
     }
   ]
 
-  const [tag, setTag] = useState('Plants');
+  const [tag, setTag] = useState('');
 
   const handleTagChange = (newTag: string) => {
     setTag(newTag);

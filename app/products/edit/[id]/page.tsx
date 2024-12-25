@@ -1,17 +1,17 @@
 'use client'
-import { useState } from "react";
-import Link from "next/link";
-import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import { fetchProductById } from '@/app/api/productService';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { createProduct, ProductData } from "@/app/api/productService";
 import { useToast } from "@/hooks/use-toast";
 import { uploadImageToImgur } from "@/app/api/imgurService";
-
-const CreateProduct = () => {
+import Link from 'next/link';
+const EditProduct = () => {
+  const { id } = useParams();
   const [productName, setProductName] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
@@ -22,6 +22,28 @@ const CreateProduct = () => {
 
   const { toast } = useToast();
   const router = useRouter();
+
+  useEffect(() => {
+    const loadProduct = async () => {
+      try {
+        const product = await fetchProductById(id as string);
+        setProductName(product.productName);
+        setQuantity(product.quantity);
+        setPrice(product.price);
+        setDescription(product.description);
+        setImagePreviews(product.productImages);
+      } catch (error) {
+        console.error('Failed to load product:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load product data.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    loadProduct();
+  }, [id, toast]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -46,55 +68,32 @@ const CreateProduct = () => {
     e.preventDefault();
     setLoading(true);
 
-    const userId = localStorage.getItem('userId'); // Get the user ID from local storage
-    if (!userId) {
-      toast({
-        title: "Error",
-        description: "User ID not found. Please log in again.",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
-
     try {
       const uploadedImages = await Promise.all(
         selectedImages.map((image) => uploadImageToImgur(image))
       );
 
-      const productData = {
+      const updatedProduct = {
         productName,
         quantity,
         price,
         description,
-        sellerId: userId, // Use the real user ID
-        productImages: uploadedImages,
+        productImages: [...imagePreviews, ...uploadedImages],
       };
 
-      const data = await createProduct(productData);
-      console.log("Product created successfully:", data);
-
+    //   await updateProduct(id as string, updatedProduct);
       toast({
-        title: "Product Created",
-        description: "Your product has been successfully created!",
+        title: "Product Updated",
+        description: "Your product has been successfully updated!",
         variant: "success"
       });
 
-      // Navigate to the profile page after successful creation
       router.push('/profile');
-
-      setProductName("");
-      setQuantity(0);
-      setPrice(0);
-      setDescription("");
-      setSelectedImages([]);
-      setImagePreviews([]);
     } catch (error: any) {
-      console.error("Error in form submission:", error);
-
+      console.error("Error updating product:", error);
       toast({
         title: "Error",
-        description: `Failed to create product: ${error.message}`,
+        description: `Failed to update product: ${error.message}`,
         variant: "destructive",
       });
     } finally {
@@ -104,15 +103,15 @@ const CreateProduct = () => {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-center text-2xl font-bold">Create Product</h1>
+      <h1 className="text-center text-2xl font-bold">Edit Product</h1>
       <p className="mb-8 text-center text-gray-600">
-        Create a new product and add it to your store
+        Update your product details
       </p>
 
       <div className="grid grid-cols-3 gap-8">
         <Card className="col-span-2">
           <CardHeader>
-            <CardTitle>Create Your Product</CardTitle>
+            <CardTitle>Edit Your Product</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -199,7 +198,7 @@ const CreateProduct = () => {
               </div>
 
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Creating..." : "Create Product"}
+                {loading ? "Updating..." : "Update Product"}
               </Button>
             </form>
           </CardContent>
@@ -212,7 +211,7 @@ const CreateProduct = () => {
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-4 text-sm">
-                Create a product and add it to your store.
+                Update your product details here.
               </p>
               <Link href="/create-post">
                 <Button variant="outline">Ask Community</Button>
@@ -228,4 +227,4 @@ const CreateProduct = () => {
   );
 };
 
-export default CreateProduct; 
+export default EditProduct; 
