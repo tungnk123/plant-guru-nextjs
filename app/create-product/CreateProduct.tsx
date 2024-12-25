@@ -80,6 +80,9 @@ const CreateProduct = () => {
         variant: "success"
       });
 
+      // Navigate to the profile page after successful creation
+      router.push('/profile');
+
       setProductName("");
       setQuantity(0);
       setPrice(0);
@@ -211,7 +214,7 @@ const CreateProduct = () => {
               <p className="mb-4 text-sm">
                 Create a product and add it to your store.
               </p>
-              <Link href="/community">
+              <Link href="/create-post">
                 <Button variant="outline">Ask Community</Button>
               </Link>
             </CardContent>

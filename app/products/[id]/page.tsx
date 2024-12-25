@@ -20,6 +20,7 @@ const ProductDetail = () => {
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionLong, setIsDescriptionLong] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isOwner, setIsOwner] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -35,6 +36,12 @@ const ProductDetail = () => {
           // Check if the description is long enough to require "See More"
           if (data.description.split(' ').length > 50) {
             setIsDescriptionLong(true);
+          }
+
+          // Check if the current user is the owner of the product
+          const storedUserId = localStorage.getItem('userId');
+          if (storedUserId === data.sellerId) {
+            setIsOwner(true);
           }
         } catch (error) {
           console.error('Failed to load product or user data:', error);
@@ -128,13 +135,13 @@ const ProductDetail = () => {
             <button
               onClick={() => router.push(`/products/confirmation/${product.id}`)}
               className={`mt-4 px-8 py-3 font-semibold rounded-lg shadow-md transition duration-300 ${
-                product.quantity === 0
+                product.quantity === 0 || isOwner
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                   : 'bg-gradient-to-r from-orange-400 to-orange-600 text-white hover:shadow-lg'
               }`}
-              disabled={product.quantity === 0}
+              disabled={product.quantity === 0 || isOwner}
             >
-              Buy Now
+              {isOwner ? 'Cannot Buy Own Product' : 'Buy Now'}
             </button>
           </div>
         </div>

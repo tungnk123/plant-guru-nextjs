@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Crown, Mail, User, Calendar, Shield, LogOut } from 'lucide-react';
+import { Crown, Mail, User, Calendar, Shield, LogOut, Edit, Trash2, Plus } from 'lucide-react';
 import Navbar from '@/app/components/navbar/Navbar';
 import { fetchUserById } from '@/app/admin/api/user';
 import { fetchProductsByUser, ProductData } from '@/app/api/productService';
@@ -39,6 +39,7 @@ export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [editMode, setEditMode] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -92,6 +93,11 @@ export default function ProfilePage() {
     localStorage.clear();
     router.push('/login');
     toast.success('Signed out successfully');
+  };
+
+  const handleDeleteProduct = (productId: string) => {
+    // Implement product deletion logic here
+    console.log(`Deleting product with ID: ${productId}`);
   };
 
   if (loading) {
@@ -215,26 +221,56 @@ export default function ProfilePage() {
                 {user.isHavePremium && (
                   <>
                     <Separator />
-                    <div className="space-y-4">
+                    <div className="flex justify-between items-center">
                       <h3 className="text-lg font-semibold">Your Shop</h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {products.map((product) => (
-                          <Link href={`/products/${product.id}`} key={product.id}>
-                            <div className="relative block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg hover:border-orange-500 transition-all duration-200 cursor-pointer">
-                              <img
-                                className="w-full h-48 object-cover"
-                                src={product.productImages[0] || '/placeholder.png'}
-                                alt={product.productName}
-                              />
-                              {product.quantity === 0 && <OutOfStockBadge />}
-                              <div className="p-4">
-                                <h3 className="text-lg font-semibold text-gray-800">{product.productName}</h3>
-                                <p className="text-orange-500 font-medium">${product.price.toFixed(2)}</p>
-                              </div>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          onClick={() => setEditMode(!editMode)}
+                          className="flex items-center"
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          {editMode ? 'Cancel' : 'Edit'}
+                        </Button>
+                        <Button
+                          variant="outline"
+                          onClick={() => router.push('/create-product')}
+                          className="flex items-center"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create Product
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {products.map((product) => (
+                        <div key={product.id} className="relative block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg hover:border-orange-500 transition-all duration-200 cursor-pointer">
+                          <Link href={editMode ? `/products/edit/${product.id}` : `/products/${product.id}`}>
+                            <img
+                              className="w-full h-48 object-cover"
+                              src={product.productImages[0] || '/placeholder.png'}
+                              alt={product.productName}
+                            />
+                            {product.quantity === 0 && <OutOfStockBadge />}
+                            <div className="p-4">
+                              <h3 className="text-lg font-semibold text-gray-800">{product.productName}</h3>
+                              <p className="text-orange-500 font-medium">${product.price.toFixed(2)}</p>
+                              <p className="text-sm text-gray-600">Stock: {product.quantity}</p>
                             </div>
                           </Link>
-                        ))}
-                      </div>
+                          {editMode && (
+                            <div className="absolute top-2 right-2">
+                              <Button
+                                variant="destructive"
+                                size="sm"
+                                onClick={() => handleDeleteProduct(product.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </>
                 )}
