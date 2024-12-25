@@ -4,6 +4,10 @@ import Link from 'next/link'
 import Logo from './Logo'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
+import PrimaryButton from '@/app/components/PrimaryButton'
+import { Plus } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { fetchUserById, User } from '@/app/admin/api/user'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -12,10 +16,7 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from '@/components/ui/navigation-menu'
-import PrimaryButton from '@/app/components/PrimaryButton'
-import { Plus } from 'lucide-react'
-import { usePathname } from 'next/navigation'
-
+import { useToast } from "@/hooks/use-toast";
 
 interface NavbarProps {
   toggle?: () => void;
@@ -23,19 +24,49 @@ interface NavbarProps {
 
 export default function Navbar({ toggle }: NavbarProps) {
   const router = useRouter();
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
   const pathname = usePathname();
+  const { toast } = useToast();
 
   useEffect(() => {
     const userId = localStorage.getItem('userId');
-    setIsLoggedIn(!!userId);
+    if (userId) {
+      fetchUserById(userId).then(setUser).catch(console.error);
+    }
   }, []);
 
   const handleUserIconClick = () => {
-    if (isLoggedIn) {
+    if (user) {
+      // Navigate to user profile or settings
       router.push('/profile');
     } else {
+      // Navigate to login page
       router.push('/login');
+    }
+  };
+
+  const handleCreateProductClick = () => {
+    if (user && !user.isHavePremium) {
+        toast({
+            title: "Unlock Premium Features!",
+            description: (
+                <div>
+                    <p>You need a premium account to create a product.</p>
+                    <p className="mt-2">Enjoy exclusive benefits and boost your sales!</p>
+                    <Link href="/pricing">
+                        <Button className="mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full 
+                            hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300
+                            font-medium text-sm shadow-md hover:shadow-lg">
+                            Upgrade Now
+                        </Button>
+                    </Link>
+                </div>
+            ),
+            variant: "destructive",
+            duration: 8000, // Keep the toast visible for a longer duration
+        });
+    } else {
+        router.push('/create-product');
     }
   };
 
@@ -101,17 +132,25 @@ export default function Navbar({ toggle }: NavbarProps) {
         </ul>
 
         <div className='hidden items-center gap-4 md:flex'>
-          <Link href={pathname.startsWith('/products') ? '/create-product' : '/create-post'} className='inter-medium text-1xl'>
-            <PrimaryButton text={pathname.startsWith('/products') ? 'Create New Product' : 'Create Post'} icon={<Plus />} />
-          </Link>
+          {user && (pathname === '/home' || pathname === '/') && (
+            <Link href="/create-post" className='inter-medium text-1xl'>
+              <PrimaryButton text="Create Post" icon={<Plus />} />
+            </Link>
+          )}
+          {user && pathname.startsWith('/products') && (
+            <button onClick={handleCreateProductClick} className='inter-medium text-1xl'>
+              <PrimaryButton text="Create New Product" icon={<Plus />} />
+            </button>
+          )}
 
-          {isLoggedIn ? (
-            <button onClick={handleUserIconClick}>
+          {user ? (
+            <button onClick={handleUserIconClick} className="flex items-center space-x-2">
               <img
-                src='/images/ic_user.svg'
-                alt='User Icon'
+                src={user.avatar || '/images/ic_user.svg'}
+                alt='User Avatar'
                 className='h-8 w-8 rounded-full'
               />
+              <span className="text-sm font-medium">{user.name}</span>
             </button>
           ) : (
             <Button 

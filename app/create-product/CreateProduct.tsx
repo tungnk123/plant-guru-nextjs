@@ -1,6 +1,7 @@
 'use client'
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -8,33 +9,68 @@ import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
 import { createProduct, ProductData } from "@/app/api/productService";
 import { useToast } from "@/hooks/use-toast";
+import { uploadImageToImgur } from "@/app/api/imgurService";
 
 const CreateProduct = () => {
   const [productName, setProductName] = useState("");
   const [quantity, setQuantity] = useState(0);
   const [price, setPrice] = useState(0);
   const [description, setDescription] = useState("");
-  const [productImages, setProductImages] = useState<string[]>([]);
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
+  const router = useRouter();
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const newFiles = Array.from(e.target.files);
+      const newPreviews = newFiles.map((file) => URL.createObjectURL(file));
+
+      setSelectedImages((prevImages) => [...prevImages, ...newFiles]);
+      setImagePreviews((prevPreviews) => [...prevPreviews, ...newPreviews]);
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    const newImages = [...selectedImages];
+    const newPreviews = [...imagePreviews];
+    newImages.splice(index, 1);
+    newPreviews.splice(index, 1);
+    setSelectedImages(newImages);
+    setImagePreviews(newPreviews);
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
-    const sellerId = "31f34892-2a52-4865-8a0b-dc297026cdbb"; // Example seller ID
-
-    const productData = {
-      productName,
-      quantity,
-      price,
-      description,
-      sellerId,
-      productImages,
-    };
+    const userId = localStorage.getItem('userId'); // Get the user ID from local storage
+    if (!userId) {
+      toast({
+        title: "Error",
+        description: "User ID not found. Please log in again.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
 
     try {
+      const uploadedImages = await Promise.all(
+        selectedImages.map((image) => uploadImageToImgur(image))
+      );
+
+      const productData = {
+        productName,
+        quantity,
+        price,
+        description,
+        sellerId: userId, // Use the real user ID
+        productImages: uploadedImages,
+      };
+
       const data = await createProduct(productData);
       console.log("Product created successfully:", data);
 
@@ -48,7 +84,8 @@ const CreateProduct = () => {
       setQuantity(0);
       setPrice(0);
       setDescription("");
-      setProductImages([]);
+      setSelectedImages([]);
+      setImagePreviews([]);
     } catch (error: any) {
       console.error("Error in form submission:", error);
 
@@ -121,11 +158,40 @@ const CreateProduct = () => {
 
               <div>
                 <label className="mb-2 block font-semibold">Product Images</label>
+                <div className="mb-4 flex space-x-4">
+                  {imagePreviews.map((preview, index) => (
+                    <div key={index} className="relative">
+                      <img
+                        src={preview}
+                        alt={`Preview ${index}`}
+                        className="h-auto w-[300px] rounded object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="absolute right-2 top-2 rounded-full bg-red-500 p-1 text-white"
+                      >
+                        ✖
+                      </button>
+                    </div>
+                  ))}
+
+                  <div
+                    className="flex h-[300px] w-[300px] cursor-pointer items-center justify-center rounded border border-dashed p-4"
+                    onClick={() =>
+                      document.getElementById("imageUpload")?.click()
+                    }
+                  >
+                    <PlusIcon className="text-gray-500" />
+                  </div>
+                </div>
                 <Input
-                  type="text"
-                  value={productImages.join(", ")}
-                  onChange={(e) => setProductImages(e.target.value.split(", "))}
-                  placeholder="Image URLs (comma separated)"
+                  id="imageUpload"
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageChange}
                 />
               </div>
 
@@ -150,6 +216,9 @@ const CreateProduct = () => {
               </Link>
             </CardContent>
           </Card>
+          <Button onClick={() => router.back()} variant="outline" className="w-full">
+            Back
+          </Button>
         </div>
       </div>
     </div>
