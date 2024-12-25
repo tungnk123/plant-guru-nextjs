@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { fetchComments, postComment, upvoteComment, downvoteComment, postReply, fetchReplies } from "@/app/api/commentService"; 
+import { fetchUserById } from "@/app/admin/api/user";
+import { User } from "lucide-react";
 
 interface CommentData {
   commentId: string;
@@ -25,6 +27,23 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const [replyBoxes, setReplyBoxes] = useState<{ [key: string]: boolean }>({});
   const [replyMessages, setReplyMessages] = useState<{ [key: string]: string }>({});
   const [replies, setReplies] = useState<{ [key: string]: CommentData[] }>({});
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          const userData = await fetchUserById(userId);
+          setUserAvatar(userData.avatar);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+        }
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   const loadComments = async () => {
     try {
@@ -162,7 +181,7 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     <div className="mt-4">
       <div className="flex items-center space-x-3 mb-4">
         <img
-          src="/default-avatar.png"
+          src={userAvatar || '/default-avatar.png'}
           alt="User avatar"
           className="h-8 w-8 rounded-full"
         />

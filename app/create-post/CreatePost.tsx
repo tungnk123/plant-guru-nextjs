@@ -1,41 +1,26 @@
-import { useState } from "react";
-import Link from "next/link";
+'use client'
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createPost, PostData } from '@/app/api/postService';
+import { useToast } from '@/hooks/use-toast';
+import { uploadImageToImgur } from '@/app/api/imgurService';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { createPost, PostData } from "@/app/api/postService";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast"
-import { uploadImageToImgur } from "@/app/api/imgurService";
-
-const tagOptions = {
-  allCategory: "All Categories",
-  plants: "Plants",
-  flowers: "Flowers",
-  guides: "Guides & Tips",
-  diseases: "Diseases",
-  qna: "Q&A",
-  diy: "DIY Projects",
-};
 
 const CreatePost = () => {
-  const [backgroundColor, setBackgroundColor] = useState("#FFFF00");
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("allCategory");
+  const [backgroundColor, setBackgroundColor] = useState("#FFFF00");
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -66,13 +51,15 @@ const CreatePost = () => {
         throw new Error('User ID not found in local storage');
       }
 
-      const imageUrl = selectedImages.length > 0 ? await uploadImageToImgur(selectedImages[0]) : '';
+      const images = await Promise.all(
+        selectedImages.map((image) => uploadImageToImgur(image))
+      );
 
       const postData: PostData = {
         title,
         description,
         userId,
-        imageUrl,
+        images,
         tag,
         background: backgroundColor,
       };
@@ -136,13 +123,13 @@ const CreatePost = () => {
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe your plant..."
+                  placeholder="Describe your post..."
                   required
                 />
               </div>
 
               <div>
-                <label className="mb-2 block font-semibold">Plant Images</label>
+                <label className="mb-2 block font-semibold">Images</label>
                 <div className="mb-4 flex space-x-4">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative">
@@ -180,34 +167,8 @@ const CreatePost = () => {
                 />
               </div>
 
-              <div>
-                <label className="mb-2 block font-semibold">Tags</label>
-                <Select value={tag} onValueChange={(value) => setTag(value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a category" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {Object.entries(tagOptions).map(([value, label]) => (
-                      <SelectItem key={value} value={value}>
-                        {label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="mb-2 block font-semibold">Background</label>
-                <Input
-                  type="color"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="h-8 w-full p-1"
-                />
-              </div>
-
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Posting..." : "Post"}
+                {loading ? "Creating..." : "Create Post"}
               </Button>
             </form>
           </CardContent>
@@ -216,51 +177,18 @@ const CreatePost = () => {
         <div className="space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle>Still need help?</CardTitle>
+              <CardTitle>Need Help?</CardTitle>
             </CardHeader>
             <CardContent className="text-center">
               <p className="mb-4 text-sm">
-                Create a plant post and share it with the community.
+                Create a post and share it with the community.
               </p>
-              <Link href="/community">
-                <Button variant="outline">Ask Community</Button>
-              </Link>
+              <Button variant="outline">Ask Community</Button>
             </CardContent>
           </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Common Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center rounded bg-gray-100 p-2">
-                  <span role="img" aria-label="All Categories">
-                    🌍
-                  </span>
-                  <span className="ml-2">All Categories</span>
-                </div>
-                <div className="flex items-center rounded bg-green-100 p-2">
-                  <span role="img" aria-label="Plants">
-                    🌱
-                  </span>
-                  <span className="ml-2">Plants</span>
-                </div>
-                <div className="flex items-center rounded bg-yellow-100 p-2">
-                  <span role="img" aria-label="Flowers">
-                    🌸
-                  </span>
-                  <span className="ml-2">Flowers</span>
-                </div>
-                <div className="flex items-center rounded bg-red-100 p-2">
-                  <span role="img" aria-label="Sell & Trade">
-                    💰
-                  </span>
-                  <span className="ml-2">Sell & Trade</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <Button onClick={() => router.back()} variant="outline" className="w-full">
+            Back
+          </Button>
         </div>
       </div>
     </div>
