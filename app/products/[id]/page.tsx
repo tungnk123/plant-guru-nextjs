@@ -117,14 +117,13 @@ const ProductDetail = () => {
             <p className="text-lg text-gray-700 mb-4">
               Stock: {product.quantity > 0 ? product.quantity : <span className="text-red-500">Out of Stock</span>}
             </p>
-            {product.quantity === 0 && (
-              <div className="bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-full inline-block mb-4">
-                Out of Stock
-              </div>
-            )}
             <button
               onClick={() => router.push(`/products/confirmation/${product.id}`)}
-              className="mt-4 px-8 py-3 bg-gradient-to-r from-orange-400 to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition duration-300"
+              className={`mt-4 px-8 py-3 font-semibold rounded-lg shadow-md transition duration-300 ${
+                product.quantity === 0
+                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-orange-400 to-orange-600 text-white hover:shadow-lg'
+              }`}
               disabled={product.quantity === 0}
             >
               Buy Now

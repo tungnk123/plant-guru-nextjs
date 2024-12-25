@@ -36,14 +36,18 @@ const ConfirmationPage = () => {
     }
   }, [quantity, product]);
 
-  const handleThumbnailClick = (index: number) => {
-    setCurrentImageIndex(index);
+  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = Number(e.target.value);
+    if (product && value <= product.quantity) {
+      setQuantity(value);
+    } else if (product) {
+      setQuantity(product.quantity);
+    }
   };
 
   const handleConfirmPurchase = () => {
-    // Handle purchase confirmation logic here
-    console.log('Purchase confirmed:', { product, quantity, shippingAddress });
-    // Redirect or show a success message
+    // Handle purchase confirmation logic
+    console.log('Purchase confirmed');
   };
 
   if (!product) {
@@ -54,53 +58,43 @@ const ConfirmationPage = () => {
     <div>
       <Navbar toggle={() => {}} />
       <BreadcrumbNavigation productName={product.productName} />
-      <div className="container mx-auto p-10">
-        <h1 className="text-3xl font-bold mb-6">Order Confirmation</h1>
-        <div className="flex flex-col md:flex-row gap-8">
+      <div className="container mx-auto p-10 bg-gradient-to-r from-gray-100 to-white shadow-lg rounded-lg">
+        <div className="flex flex-col md:flex-row items-start gap-8">
           <div className="flex flex-col items-center md:w-1/2">
             <div className="w-full max-w-md h-96 flex items-center justify-center overflow-hidden rounded-lg shadow-xl">
               <img
-                className="object-cover w-full h-full"
+                className="object-cover w-full h-full transition-transform transform hover:scale-105"
                 src={product.productImages[currentImageIndex]}
                 alt={product.productName}
               />
             </div>
-            <div className="flex mt-4 space-x-2 overflow-x-auto h-28">
-              {product.productImages.map((image, index) => (
-                <img
-                  key={index}
-                  className={`w-20 h-20 object-cover rounded-lg cursor-pointer transition-transform transform hover:scale-110 ${index === currentImageIndex ? 'border-2 border-orange-500' : ''}`}
-                  src={image}
-                  alt={`Thumbnail ${index}`}
-                  onClick={() => handleThumbnailClick(index)}
-                />
-              ))}
-            </div>
           </div>
-          <div className="md:w-1/2">
-            <h2 className="text-2xl font-semibold">{product.productName}</h2>
-            <p className="text-lg text-gray-700 mt-2">{product.description}</p>
-            <p className="text-xl text-orange-500 font-semibold mt-2">${product.price}</p>
-            <div className="mb-4 mt-6">
-              <label className="block font-semibold mb-2">Quantity</label>
+          <div className="flex-1 md:w-1/2">
+            <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.productName}</h1>
+            <p className="text-lg text-gray-700 mb-4">Price: ${product.price.toFixed(2)}</p>
+            <p className="text-lg text-gray-700 mb-4">Stock: {product.quantity}</p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700">Quantity</label>
               <input
                 type="number"
                 value={quantity}
-                onChange={(e) => setQuantity(Number(e.target.value))}
-                min="1"
+                onChange={handleQuantityChange}
                 className="w-full p-2 border rounded"
+                min="1"
+                max={product.quantity}
               />
             </div>
             <div className="mb-4">
-              <label className="block font-semibold mb-2">Shipping Address</label>
-              <textarea
+              <label className="block text-sm font-medium text-gray-700">Shipping Address</label>
+              <input
+                type="text"
                 value={shippingAddress}
                 onChange={(e) => setShippingAddress(e.target.value)}
                 className="w-full p-2 border rounded"
                 placeholder="Enter your shipping address"
               />
             </div>
-            <p className="text-lg font-semibold">Total Price: ${totalPrice}</p>
+            <p className="text-lg font-semibold">Total Price: ${totalPrice.toFixed(2)}</p>
             <button
               onClick={handleConfirmPurchase}
               className="mt-6 px-8 py-3 bg-orange-500 text-white font-semibold rounded-lg shadow-md hover:bg-orange-600 transition duration-300"
