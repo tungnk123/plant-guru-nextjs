@@ -3,11 +3,22 @@ import ChatRoomItem from '@/app/chat/component/chatRoomItem';
 import { useState, useRef, useEffect } from 'react';
 import * as signalR from '@microsoft/signalr';
 
+// Define a type for the message objects
+interface Message {
+  chatMessageId: string;
+  userSendId: string;
+  avatar: string;
+  message: string | null;
+  mediaLink: string | null;
+  sendDate: string;
+  type: 'Text' | 'Media';
+}
+
 const Page = () => {
-  const myId = '8d28f7d4-43bc-4043-8ace-646e015c67b1';
+  const myId = 'd9164dca-c996-404f-a5a1-f1f87a6ce875';
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -102,11 +113,65 @@ const Page = () => {
     }
   };
 
-  const handleFileChange = (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      console.log('Selected file:', file);
-      // You can add logic here to handle the file upload
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files as FileList);
+    const imageLinks = [];
+
+    // Upload each image to Imgur
+    for (const file of files) {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      try {
+        const response = await fetch('https://api.imgur.com/3/image', {
+          method: 'POST',
+          headers: {
+            'Authorization': 'Client-ID 546c25a59c58ad7'
+          },
+          body: formData
+        });
+
+        const data = await response.json();
+        if (data.success) {
+          imageLinks.push(data.data.link);
+        } else {
+          console.error('Failed to upload image:', data);
+        }
+      } catch (error) {
+        console.error('Error uploading image:', error);
+      }
+    }
+
+    console.log(imageLinks);
+
+    // Send image links to your server
+    if (imageLinks.length > 0 && selectedChat) {
+      const imageData = {
+        userSendId: myId,
+        userReceiveId: selectedChat.userId,
+        images: imageLinks
+      };
+
+      try {
+        const response = await fetch('https://un-silent-backend-develop.azurewebsites.net/api/chat/sendMedia', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(imageData),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to send images');
+        }
+
+        console.log('send image success');
+
+        // Fetch updated messages
+        fetchMessages(selectedChat.chatRoomId);
+      } catch (error) {
+        console.error('Error sending images:', error);
+      }
     }
   };
 
@@ -125,16 +190,21 @@ const Page = () => {
   );
 
   return (
-    <div className='w-full h-screen bg-blue-600 flex'>
-      <div className='w-1/3 bg-white p-4 overflow-y-auto'>
+    <div className='w-full h-screen  flex'>
+      <div className='w-1/3 bg-yellow-50 p-4 overflow-y-auto'>
         <h1 className='text-xl font-bold mb-4'>CHAT</h1>
-        <input
-          type='text'
-          placeholder='Search...'
-          className='w-full p-2 mb-4 border rounded bg-yellow-100'
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-        />
+        <div className='relative mb-4'>
+          <input
+            type='text'
+            placeholder='Search...'
+            className='w-full p-2 border rounded bg-yellow-100'
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+          />
+          <svg xmlns="http://www.w3.org/2000/svg" className="absolute right-2 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z" />
+          </svg>
+        </div>
         {filteredChatRooms.map((chatRoom) => (
           <ChatRoomItem
             key={chatRoom.chatRoomId}
@@ -190,6 +260,7 @@ const Page = () => {
               accept='image/*'
               className='hidden'
               onChange={handleFileChange}
+              multiple
             />
           </label>
           <input
