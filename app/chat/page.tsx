@@ -197,13 +197,13 @@ const Page = () => {
 
   return (
     <div className='w-full h-screen  flex'>
-      <div className='w-1/3 bg-yellow-50 p-4 overflow-y-auto'>
+      <div className='w-1/3 bg-gray-200 p-4 overflow-y-auto'>
         <h1 className='text-xl font-bold mb-4'>CHAT</h1>
         <div className='relative mb-4'>
           <input
             type='text'
             placeholder='Search...'
-            className='w-full p-2 border rounded bg-yellow-100'
+            className='w-full p-2 border rounded-lg bg-gray-300'
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
           />
@@ -217,6 +217,7 @@ const Page = () => {
             friendAvatarLink={chatRoom.avatar}
             friendName={chatRoom.name}
             lastMessage={chatRoom.lastMessage}
+            selected={selectedChat?.chatRoomId === chatRoom.chatRoomId}
             onClick={() => {
               setSelectedChat(chatRoom);
               fetchMessages(chatRoom.chatRoomId);
