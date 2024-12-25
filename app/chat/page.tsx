@@ -15,7 +15,7 @@ interface Message {
 }
 
 const Page = () => {
-  const myId = 'd9164dca-c996-404f-a5a1-f1f87a6ce875';
+  const myId = 'c0c1191f-d47f-4819-831c-ddf2061ecb2c';
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -52,9 +52,15 @@ const Page = () => {
       .withAutomaticReconnect()
       .build();
 
-    connection.on('NewMessage', () => {
+    connection.on('NewMessage', async () => {
       if (selectedChat) {
         fetchMessages(selectedChat.chatRoomId);
+        const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/chat/users/${myId}/chatRooms`);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        setChatRooms(data);
       }
     });
 
@@ -210,7 +216,7 @@ const Page = () => {
             key={chatRoom.chatRoomId}
             friendAvatarLink={chatRoom.avatar}
             friendName={chatRoom.name}
-            lastMessage={chatRoom.isOnline ? 'Online' : 'Offline'}
+            lastMessage={chatRoom.lastMessage}
             onClick={() => {
               setSelectedChat(chatRoom);
               fetchMessages(chatRoom.chatRoomId);
