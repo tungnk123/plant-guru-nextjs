@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Crown, Mail, User, Calendar, Shield, LogOut } from 'lucide-react';
 import Navbar from '@/app/components/navbar/Navbar';
 import { fetchUserById } from '@/app/admin/api/user';
+import { fetchProductsByUser, ProductData } from '@/app/api/productService';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import {
@@ -21,6 +22,9 @@ import {
 } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import Link from 'next/link';
+import OutOfStockBadge from '@/app/components/OutOfStockBadge';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 interface User {
   userId: string;
@@ -33,6 +37,7 @@ interface User {
 
 export default function ProfilePage() {
   const [user, setUser] = useState<User | null>(null);
+  const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -60,6 +65,12 @@ export default function ProfilePage() {
             ...userData,
             lastUpdated: new Date().toISOString()
           }));
+
+          // Fetch products if the user is premium
+          if (userData.isHavePremium) {
+            const productsData = await fetchProductsByUser(storedUserId);
+            setProducts(productsData);
+          }
         } else {
           console.log('Unexpected user data structure:', userData);
           toast.error('Could not load user profile');
@@ -84,11 +95,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
   if (!user) return null;
@@ -204,6 +211,33 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 </div>
+
+                {user.isHavePremium && (
+                  <>
+                    <Separator />
+                    <div className="space-y-4">
+                      <h3 className="text-lg font-semibold">Your Shop</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {products.map((product) => (
+                          <Link href={`/products/${product.id}`} key={product.id}>
+                            <div className="relative block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg hover:border-orange-500 transition-all duration-200 cursor-pointer">
+                              <img
+                                className="w-full h-48 object-cover"
+                                src={product.productImages[0] || '/placeholder.png'}
+                                alt={product.productName}
+                              />
+                              {product.quantity === 0 && <OutOfStockBadge />}
+                              <div className="p-4">
+                                <h3 className="text-lg font-semibold text-gray-800">{product.productName}</h3>
+                                <p className="text-orange-500 font-medium">${product.price.toFixed(2)}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           </CardContent>

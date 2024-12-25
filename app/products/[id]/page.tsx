@@ -8,6 +8,7 @@ import BreadcrumbNavigation from '@/app/components/navbar/BreadcrumbNavigation';
 import Navbar from '@/app/components/navbar/Navbar';
 import Link from 'next/link';
 import OutOfStockBadge from '@/app/components/OutOfStockBadge';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -18,6 +19,7 @@ const ProductDetail = () => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isDescriptionLong, setIsDescriptionLong] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (id) {
@@ -36,6 +38,8 @@ const ProductDetail = () => {
           }
         } catch (error) {
           console.error('Failed to load product or user data:', error);
+        } finally {
+          setLoading(false);
         }
       };
 
@@ -52,6 +56,10 @@ const ProductDetail = () => {
       return () => clearInterval(interval);
     }
   }, [product]);
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   if (!product || !user) {
     return <div>Loading...</div>;
