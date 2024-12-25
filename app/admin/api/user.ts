@@ -1,6 +1,7 @@
 import { da } from "@faker-js/faker";
 
 export interface User {
+  id: string;
   userId: string;
   name: string;
   avatar: string;
@@ -166,6 +167,7 @@ export async function addUser(
     throw error;
   }
 }
+
 
 
 

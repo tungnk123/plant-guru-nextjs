@@ -14,7 +14,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast"
+import { uploadImageToImgur } from "@/app/api/imgurService";
 
+const tagOptions = {
+  allCategory: "All Categories",
+  plants: "Plants",
+  flowers: "Flowers",
+  guides: "Guides & Tips",
+  diseases: "Diseases",
+  qna: "Q&A",
+  diy: "DIY Projects",
+};
 
 const CreatePost = () => {
   const [backgroundColor, setBackgroundColor] = useState("#FFFF00");
@@ -22,7 +32,7 @@ const CreatePost = () => {
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [tag, setTag] = useState("");
+  const [tag, setTag] = useState("allCategory");
   const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
@@ -50,20 +60,24 @@ const CreatePost = () => {
     e.preventDefault();
     setLoading(true);
 
-    const userId = "4da5937d-9cba-4960-8009-2a1d6f836944";
-    const imageUrl =
-      "https://th.bing.com/th/id/R.bb456ae8d4b3b3c5e31eb3886aeb8fd2?rik=WcqO9ZNLQpZOmw&pid=ImgRaw&r=0";
-
-    const postData: PostData = {
-      title,
-      description,
-      userId,
-      imageUrl,
-      tag,
-      background: backgroundColor,
-    };
-
     try {
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        throw new Error('User ID not found in local storage');
+      }
+
+      const imageUrl = selectedImages.length > 0 ? await uploadImageToImgur(selectedImages[0]) : '';
+
+      const postData: PostData = {
+        title,
+        description,
+        userId,
+        imageUrl,
+        tag,
+        background: backgroundColor,
+      };
+      console.log(postData);
+
       const data = await createPost(postData);
       console.log("Post created successfully:", data);
 
@@ -75,7 +89,7 @@ const CreatePost = () => {
 
       setTitle("");
       setDescription("");
-      setTag("");
+      setTag("allCategory");
       setBackgroundColor("#FFFF00");
       setSelectedImages([]);
       setImagePreviews([]);
@@ -173,10 +187,11 @@ const CreatePost = () => {
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="plants">Plants</SelectItem>
-                    <SelectItem value="flowers">Flowers</SelectItem>
-                    <SelectItem value="sell-trade">Sell & Trade</SelectItem>
+                    {Object.entries(tagOptions).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
               </div>

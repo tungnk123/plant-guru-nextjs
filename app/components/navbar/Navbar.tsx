@@ -1,22 +1,75 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Logo from './Logo'
-import { Button } from '@/components/ui/button'
+import { useRouter } from 'next/navigation'
+import { Button } from "@/components/ui/button"
+import PrimaryButton from '@/app/components/PrimaryButton'
+import { Plus } from 'lucide-react'
+import { usePathname } from 'next/navigation'
+import { fetchUserById, User } from '@/app/admin/api/user'
 import {
   NavigationMenu,
   NavigationMenuContent,
-  NavigationMenuIndicator,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
   NavigationMenuTrigger,
-  NavigationMenuViewport
 } from '@/components/ui/navigation-menu'
-import PrimaryButton from '@/app/components/PrimaryButton'
-import { Plus } from 'lucide-react'
+import { useToast } from "@/hooks/use-toast";
 
-const Navbar = ({ toggle }: { toggle: () => void }) => {
+interface NavbarProps {
+  toggle?: () => void;
+}
+
+export default function Navbar({ toggle }: NavbarProps) {
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const pathname = usePathname();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const userId = localStorage.getItem('userId');
+    if (userId) {
+      fetchUserById(userId).then(setUser).catch(console.error);
+    }
+  }, []);
+
+  const handleUserIconClick = () => {
+    if (user) {
+      // Navigate to user profile or settings
+      router.push('/profile');
+    } else {
+      // Navigate to login page
+      router.push('/login');
+    }
+  };
+
+  const handleCreateProductClick = () => {
+    if (user && !user.isHavePremium) {
+        toast({
+            title: "Unlock Premium Features!",
+            description: (
+                <div>
+                    <p>You need a premium account to create a product.</p>
+                    <p className="mt-2">Enjoy exclusive benefits and boost your sales!</p>
+                    <Link href="/pricing">
+                        <Button className="mt-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-full 
+                            hover:from-blue-600 hover:to-purple-700 transform hover:scale-105 transition-all duration-300
+                            font-medium text-sm shadow-md hover:shadow-lg">
+                            Upgrade Now
+                        </Button>
+                    </Link>
+                </div>
+            ),
+            variant: "destructive",
+            duration: 8000, // Keep the toast visible for a longer duration
+        });
+    } else {
+        router.push('/create-product');
+    }
+  };
+
   return (
     <div className='sticky top-0 h-20 w-full z-50 bg-white shadow'>
       <div className='container mx-auto flex h-full items-center justify-between px-20'>
@@ -48,16 +101,14 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
             </Link>
           </li>
           <li>
-            <NavigationMenu className='bg-transparent'>
-              <NavigationMenuList className='bg-transparent'>
-                <NavigationMenuItem className='bg-transparent'>
-                  <NavigationMenuTrigger className='inter-medium text-1xl bg-transparent'>
+            <NavigationMenu>
+              <NavigationMenuList>
+                <NavigationMenuItem>
+                  <NavigationMenuTrigger className='inter-medium text-1xl'>
                     Plant Encyclopedia
                   </NavigationMenuTrigger>
-                  <NavigationMenuContent className='bg-transparent'>
-                    <NavigationMenuLink className='bg-red-700'>
-                      Link
-                    </NavigationMenuLink>
+                  <NavigationMenuContent>
+                    <NavigationMenuLink>Link</NavigationMenuLink>
                   </NavigationMenuContent>
                 </NavigationMenuItem>
               </NavigationMenuList>
@@ -69,28 +120,50 @@ const Navbar = ({ toggle }: { toggle: () => void }) => {
             </Link>
           </li>
           <li>
-            <Link href='/plant-guides' className='inter-medium text-1xl'>
-              <p>Plant Guides</p>
+            <Link href='/products' className='inter-medium text-1xl'>
+              <p>Products</p>
+            </Link>
+          </li>
+          <li>
+            <Link href='/pricing' className='inter-medium text-1xl'>
+              <p>Pricing</p>
             </Link>
           </li>
         </ul>
 
         <div className='hidden items-center gap-4 md:flex'>
-          <Link href='/create-post' className='inter-medium text-1xl'>
-            <PrimaryButton text='Create Post' icon={<Plus />} />
-          </Link>
+          {user && (pathname === '/home' || pathname === '/') && (
+            <Link href="/create-post" className='inter-medium text-1xl'>
+              <PrimaryButton text="Create Post" icon={<Plus />} />
+            </Link>
+          )}
+          {user && pathname.startsWith('/products') && (
+            <button onClick={handleCreateProductClick} className='inter-medium text-1xl'>
+              <PrimaryButton text="Create New Product" icon={<Plus />} />
+            </button>
+          )}
 
-          <button>
-            <img
-              src='/images/ic_user.svg'
-              alt='User Icon'
-              className='h-8 w-8 rounded-full'
-            />
-          </button>
+          {user ? (
+            <button onClick={handleUserIconClick} className="flex items-center space-x-2">
+              <img
+                src={user.avatar || '/images/ic_user.svg'}
+                alt='User Avatar'
+                className='h-8 w-8 rounded-full'
+              />
+              <span className="text-sm font-medium">{user.name}</span>
+            </button>
+          ) : (
+            <Button 
+              onClick={handleUserIconClick}
+              className="bg-gradient-to-r from-green-400 to-green-500 text-white px-6 py-2 rounded-full 
+                hover:from-green-500 hover:to-green-600 transform hover:scale-105 transition-all duration-300
+                font-medium text-sm shadow-md hover:shadow-lg"
+            >
+              Login
+            </Button>
+          )}
         </div>
       </div>
     </div>
   )
 }
-
-export default Navbar

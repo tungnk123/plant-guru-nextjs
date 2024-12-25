@@ -27,7 +27,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
   const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
 
-  const limit = 3; 
+  const limit = 3;
 
   const fetchPageData = async (page: number, filter: string) => {
     setLoading(true);
@@ -44,7 +44,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
 
   useEffect(() => {
     fetchPageData(currentPage, activeFilter);
-  }, [currentPage, activeFilter, tag]); 
+  }, [currentPage, activeFilter, tag]);
 
   const changePage = (page: number) => {
     if (page > 0 && page <= totalPages) {
@@ -54,7 +54,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
 
   const handleFilterClick = (filter: string) => {
     setActiveFilter(filter);
-    setCurrentPage(1); 
+    setCurrentPage(1);
   };
 
   const getVisiblePageNumbers = () => {
@@ -91,6 +91,11 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
             onClick={() => handleFilterClick("Trending")}
           />
           <FilterButton
+            label="Upvote"
+            isActive={activeFilter === "Upvote"}
+            onClick={() => handleFilterClick("Upvote")}
+          />
+          <FilterButton
             label="Latest"
             isActive={activeFilter === "Latest"}
             onClick={() => handleFilterClick("Latest")}
@@ -117,46 +122,46 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
         )}
       </div>
 
-      {totalPages > 0 && ( 
+      {totalPages > 0 && (
         <div className="mt-6 flex justify-center items-center gap-2">
-        <Button
-          onClick={() => changePage(currentPage - 1)}
-          disabled={currentPage === 1 || loading}
-          className="aspect-square p-0 rounded-sm bg-white text-[#C4CDD5] border-[#DFE3E8] border-[1px] hover:bg-gray-300 disabled:bg-[#919EAB]"
-        >
-          <Image className='h-auto w-auto pointer-events-none select-none'
-            src="/images/img_paging_arrow_left.svg" alt="img_arrow_left" width={60} height={60} />
-        </Button>
+          <Button
+            onClick={() => changePage(currentPage - 1)}
+            disabled={currentPage === 1 || loading}
+            className="aspect-square p-0 rounded-sm bg-white text-[#C4CDD5] border-[#DFE3E8] border-[1px] hover:bg-gray-300 disabled:bg-[#919EAB]"
+          >
+            <Image className='h-auto w-auto pointer-events-none select-none'
+              src="/images/img_paging_arrow_left.svg" alt="img_arrow_left" width={60} height={60} />
+          </Button>
 
-        {getVisiblePageNumbers().map((page, index) =>
-          typeof page === 'number' ? (
-            <Button
-              key={index}
-              onClick={() => changePage(page)}
-              className={`px-3 py-2 rounded-sm ${page === currentPage
-                ? 'aspect-square bg-transparent text-blue1 border border-blue1 hover:bg-gray-100'
-                : 'aspect-square bg-transparent text-black border border-gray3 hover:bg-gray-100'
-                }`}
-              disabled={loading}
-            >
-              {page}
-            </Button>
-          ) : (
-            <span key={index} className="aspect-square text-black pointer-events-none select-none">
-              ...
-            </span>
-          )
-        )}
+          {getVisiblePageNumbers().map((page, index) =>
+            typeof page === 'number' ? (
+              <Button
+                key={index}
+                onClick={() => changePage(page)}
+                className={`px-3 py-2 rounded-sm ${page === currentPage
+                  ? 'aspect-square bg-transparent text-blue1 border border-blue1 hover:bg-gray-100'
+                  : 'aspect-square bg-transparent text-black border border-gray3 hover:bg-gray-100'
+                  }`}
+                disabled={loading}
+              >
+                {page}
+              </Button>
+            ) : (
+              <span key={index} className="aspect-square text-black pointer-events-none select-none">
+                ...
+              </span>
+            )
+          )}
 
-        <Button
-          onClick={() => changePage(currentPage + 1)}
-          disabled={currentPage === totalPages || loading}
-          className="aspect-square p-0 rounded-sm bg-white text-[#C4CDD5] border-[#DFE3E8] border-[1px] hover:bg-gray-300 disabled:bg-[#919EAB]"
-        >
-          <Image className='h-auto w-auto pointer-events-none select-none'
-            src="/images/img_paging_arrow_right.svg" alt="img_arrow_right" width={60} height={60} />
-        </Button>
-      </div>
+          <Button
+            onClick={() => changePage(currentPage + 1)}
+            disabled={currentPage === totalPages || loading}
+            className="aspect-square p-0 rounded-sm bg-white text-[#C4CDD5] border-[#DFE3E8] border-[1px] hover:bg-gray-300 disabled:bg-[#919EAB]"
+          >
+            <Image className='h-auto w-auto pointer-events-none select-none'
+              src="/images/img_paging_arrow_right.svg" alt="img_arrow_right" width={60} height={60} />
+          </Button>
+        </div>
       )}
     </div>
   );
