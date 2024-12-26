@@ -1,5 +1,6 @@
 // Define the type for a WikiCard
 export interface WikiCard {
+    id: string;
     thumbnailImageUrl: string;
     title: string;
     upvotes: number;
