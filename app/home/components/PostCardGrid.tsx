@@ -7,8 +7,9 @@ import Image from 'next/image';
 import FilterButton from './FilterButton';
 import PrimaryButton from '@/app/components/PrimaryButton'
 import { Plus } from 'lucide-react'
-import Link from 'next/link';
 import { fetchPosts, FetchPostsResponse, PostResponse } from '@/app/api/postService';
+import { fetchUserById } from '@/app/admin/api/user';
+import { useToast } from '@/hooks/use-toast';
 
 interface PostCardResponse {
   posts: PostResponse[];
@@ -26,6 +27,7 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
   const [activeFilter, setActiveFilter] = useState('All');
+  const { toast } = useToast();
 
   const limit = 3;
 
@@ -57,6 +59,35 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
     setCurrentPage(1);
   };
 
+  const handleCreatePostClick = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) {
+      showLoginToast();
+      return;
+    }
+
+    try {
+      const user = await fetchUserById(userId);
+      if (!user) {
+        showLoginToast();
+      } else {
+        // Navigate to create post page
+        window.location.href = '/create-post';
+      }
+    } catch (error) {
+      console.error('Error fetching user:', error);
+      showLoginToast();
+    }
+  };
+
+  const showLoginToast = () => {
+    toast({
+      title: "Login Required",
+      description: "Please log in to create a post.",
+      variant: "destructive",
+    });
+  };
+
   const getVisiblePageNumbers = () => {
     const maxVisiblePages = 5;
     const pages: (number | string)[] = [];
@@ -74,7 +105,6 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
     }
     return pages;
   };
-
 
   return (
     <div className='px-40 w-full'>
@@ -101,9 +131,9 @@ const PostCardGrid: React.FC<PostCardGridProps> = ({ fetchPosts, tag }) => {
             onClick={() => handleFilterClick("Latest")}
           />
         </div>
-        <Link href='/create-post' className='inter-medium text-1xl'>
+        <button onClick={handleCreatePostClick} className='inter-medium text-1xl'>
           <PrimaryButton text="Create Post" icon={<Plus />} />
-        </Link>
+        </button>
       </div>
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-1 md:grid-cols-1">
         {loading ? (

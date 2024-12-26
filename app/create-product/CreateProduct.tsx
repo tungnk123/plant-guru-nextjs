@@ -46,19 +46,13 @@ const CreateProduct = () => {
     e.preventDefault();
     setLoading(true);
 
-    const userId = localStorage.getItem('userId'); // Get the user ID from local storage
-    if (!userId) {
-      toast({
-        title: "Error",
-        description: "User ID not found. Please log in again.",
-        variant: "destructive",
-      });
-      setLoading(false);
-      return;
-    }
-
     try {
-      const uploadedImages = await Promise.all(
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        throw new Error('User ID not found in local storage');
+      }
+
+      const images = await Promise.all(
         selectedImages.map((image) => uploadImageToImgur(image))
       );
 
@@ -67,9 +61,10 @@ const CreateProduct = () => {
         quantity,
         price,
         description,
-        sellerId: userId, // Use the real user ID
-        productImages: uploadedImages,
+        sellerId: userId,
+        productImages: images,
       };
+      console.log(productData);
 
       const data = await createProduct(productData);
       console.log("Product created successfully:", data);
@@ -80,22 +75,21 @@ const CreateProduct = () => {
         variant: "success"
       });
 
-      // Navigate to the profile page after successful creation
-      router.push('/profile');
-
       setProductName("");
       setQuantity(0);
       setPrice(0);
       setDescription("");
       setSelectedImages([]);
       setImagePreviews([]);
-    } catch (error: any) {
-      console.error("Error in form submission:", error);
 
+      // Redirect to profile page after successful creation
+      router.push('/profile');
+    } catch (error: any) {
+      console.error("Error creating product:", error);
       toast({
         title: "Error",
-        description: `Failed to create product: ${error.message}`,
-        variant: "destructive",
+        description: error.message || "An error occurred while creating the product.",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -103,26 +97,42 @@ const CreateProduct = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-center text-2xl font-bold">Create Product</h1>
-      <p className="mb-8 text-center text-gray-600">
-        Create a new product and add it to your store
-      </p>
-
-      <div className="grid grid-cols-3 gap-8">
-        <Card className="col-span-2">
+    <div className="container mx-auto py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="md:col-span-2">
+        <Card>
           <CardHeader>
-            <CardTitle>Create Your Product</CardTitle>
+            <CardTitle>Create a New Product</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="mb-2 block font-semibold">Product Name</label>
                 <Input
-                  type="text"
                   value={productName}
                   onChange={(e) => setProductName(e.target.value)}
-                  placeholder="Product Name"
+                  placeholder="Enter product name"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-semibold">Quantity</label>
+                <Input
+                  type="number"
+                  value={quantity}
+                  onChange={(e) => setQuantity(Number(e.target.value))}
+                  placeholder="Enter quantity"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="mb-2 block font-semibold">Price</label>
+                <Input
+                  type="number"
+                  value={price}
+                  onChange={(e) => setPrice(Number(e.target.value))}
+                  placeholder="Enter price"
                   required
                 />
               </div>
@@ -138,36 +148,14 @@ const CreateProduct = () => {
               </div>
 
               <div>
-                <label className="mb-2 block font-semibold">Quantity</label>
-                <Input
-                  type="number"
-                  value={quantity}
-                  onChange={(e) => setQuantity(Number(e.target.value))}
-                  placeholder="Quantity"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block font-semibold">Price</label>
-                <Input
-                  type="number"
-                  value={price}
-                  onChange={(e) => setPrice(Number(e.target.value))}
-                  placeholder="Price"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="mb-2 block font-semibold">Product Images</label>
-                <div className="mb-4 flex space-x-4">
+                <label className="mb-2 block font-semibold">Images</label>
+                <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative">
                       <img
                         src={preview}
                         alt={`Preview ${index}`}
-                        className="h-auto w-[300px] rounded object-cover"
+                        className="h-auto w-full rounded object-cover"
                       />
                       <button
                         type="button"
@@ -180,7 +168,7 @@ const CreateProduct = () => {
                   ))}
 
                   <div
-                    className="flex h-[300px] w-[300px] cursor-pointer items-center justify-center rounded border border-dashed p-4"
+                    className="flex h-[150px] w-full cursor-pointer items-center justify-center rounded border border-dashed p-4"
                     onClick={() =>
                       document.getElementById("imageUpload")?.click()
                     }
@@ -204,28 +192,28 @@ const CreateProduct = () => {
             </form>
           </CardContent>
         </Card>
+      </div>
 
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Need Help?</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="mb-4 text-sm">
-                Create a product and add it to your store.
-              </p>
-              <Link href="/create-post">
-                <Button variant="outline">Ask Community</Button>
-              </Link>
-            </CardContent>
-          </Card>
-          <Button onClick={() => router.back()} variant="outline" className="w-full">
-            Back
-          </Button>
-        </div>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Need Help?</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="mb-4 text-sm">
+              Create a product and add it to your store.
+            </p>
+            <Link href="/create-post">
+              <Button variant="outline">Ask Community</Button>
+            </Link>
+          </CardContent>
+        </Card>
+        <Button onClick={() => router.back()} variant="outline" className="w-full">
+          Back
+        </Button>
       </div>
     </div>
   );
 };
 
-export default CreateProduct; 
+export default CreateProduct;

@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { fetchComments, postComment, upvoteComment, downvoteComment, postReply, fetchReplies } from "@/app/api/commentService"; 
+import { fetchUserById } from "@/app/admin/api/user";
+import { User } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface CommentData {
   commentId: string;
@@ -25,6 +28,27 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   const [replyBoxes, setReplyBoxes] = useState<{ [key: string]: boolean }>({});
   const [replyMessages, setReplyMessages] = useState<{ [key: string]: string }>({});
   const [replies, setReplies] = useState<{ [key: string]: CommentData[] }>({});
+  const [userAvatar, setUserAvatar] = useState<string | null>(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const loadUserData = async () => {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          const userData = await fetchUserById(userId);
+          setUserAvatar(userData.avatar);
+          setIsLoggedIn(true);
+        } catch (error) {
+          console.error("Error fetching user data:", error);
+          setIsLoggedIn(false);
+        }
+      }
+    };
+
+    loadUserData();
+  }, []);
 
   const loadComments = async () => {
     try {
@@ -39,7 +63,28 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
     loadComments();
   }, [postId]);
 
+  const isUserLoggedIn = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return false;
+
+    try {
+      const user = await fetchUserById(userId);
+      return !!user;
+    } catch {
+      return false;
+    }
+  };
+
   const handleAddComment = async () => {
+    if (!(await isUserLoggedIn())) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to add a comment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (newComment.trim()) {
       try {
         await postComment(postId, newComment);
@@ -69,6 +114,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   };
 
   const handleAddReply = async (parentCommentId: string) => {
+    if (!(await isUserLoggedIn())) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to reply to a comment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const message = replyMessages[parentCommentId];
     if (message.trim()) {
       try {
@@ -83,6 +137,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   };
 
   const handleUpvote = async (commentId: string) => {
+    if (!(await isUserLoggedIn())) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to upvote a comment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { numberOfUpvotes, numberOfDevotes } = await upvoteComment(commentId);
       setComments((prevComments) =>
@@ -121,6 +184,15 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
   };
 
   const handleDownvote = async (commentId: string) => {
+    if (!(await isUserLoggedIn())) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to downvote a comment.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { numberOfUpvotes, numberOfDevotes } = await downvoteComment(commentId);
       setComments((prevComments) =>
@@ -160,26 +232,28 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 
   return (
     <div className="mt-4">
-      <div className="flex items-center space-x-3 mb-4">
-        <img
-          src="/default-avatar.png"
-          alt="User avatar"
-          className="h-8 w-8 rounded-full"
-        />
-        <input
-          type="text"
-          value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
-          placeholder="Add a comment..."
-          className="flex-1 p-2 border border-gray-300 rounded-full text-sm"
-        />
-        <button
-          onClick={handleAddComment}
-          className="px-4 py-2 bg-blue-500 text-white rounded-full text-sm"
-        >
-          Add comment
-        </button>
-      </div>
+      {isLoggedIn && (
+        <div className="flex items-center space-x-3 mb-4">
+          <img
+            src={userAvatar || '/default-avatar.png'}
+            alt="User avatar"
+            className="h-8 w-8 rounded-full"
+          />
+          <input
+            type="text"
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Add a comment..."
+            className="flex-1 p-2 border border-gray-300 rounded-full text-sm"
+          />
+          <button
+            onClick={handleAddComment}
+            className="px-4 py-2 bg-blue-500 text-white rounded-full text-sm"
+          >
+            Add comment
+          </button>
+        </div>
+      )}
 
       <div className="space-y-4">
         {comments.map((comment) => (

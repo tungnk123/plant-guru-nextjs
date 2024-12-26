@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { fetchProductById } from '@/app/api/productService';
+import { fetchProductById, ProductData, updateProduct } from '@/app/api/productService';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -10,6 +10,7 @@ import { PlusIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { uploadImageToImgur } from "@/app/api/imgurService";
 import Link from 'next/link';
+
 const EditProduct = () => {
   const { id } = useParams();
   const [productName, setProductName] = useState("");
@@ -19,10 +20,10 @@ const EditProduct = () => {
   const [selectedImages, setSelectedImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [product, setProduct] = useState<ProductData | null>(null);
 
   const { toast } = useToast();
   const router = useRouter();
-
   useEffect(() => {
     const loadProduct = async () => {
       try {
@@ -32,6 +33,7 @@ const EditProduct = () => {
         setPrice(product.price);
         setDescription(product.description);
         setImagePreviews(product.productImages);
+        setProduct(product);
       } catch (error) {
         console.error('Failed to load product:', error);
         toast({
@@ -74,14 +76,16 @@ const EditProduct = () => {
       );
 
       const updatedProduct = {
-        productName,
-        quantity,
-        price,
-        description,
+        productName: productName,
+        quantity: quantity,
+        price: price,
+        description: description,
         productImages: [...imagePreviews, ...uploadedImages],
+        productId: product?.id,
+        sellerId: product?.sellerId
       };
 
-    //   await updateProduct(id as string, updatedProduct);
+      await updateProduct(id as string, updatedProduct);
       toast({
         title: "Product Updated",
         description: "Your product has been successfully updated!",
@@ -160,13 +164,13 @@ const EditProduct = () => {
 
               <div>
                 <label className="mb-2 block font-semibold">Product Images</label>
-                <div className="mb-4 flex space-x-4">
+                <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative">
                       <img
                         src={preview}
                         alt={`Preview ${index}`}
-                        className="h-auto w-[300px] rounded object-cover"
+                        className="h-auto w-full rounded object-cover"
                       />
                       <button
                         type="button"
@@ -179,7 +183,7 @@ const EditProduct = () => {
                   ))}
 
                   <div
-                    className="flex h-[300px] w-[300px] cursor-pointer items-center justify-center rounded border border-dashed p-4"
+                    className="flex h-[150px] w-full cursor-pointer items-center justify-center rounded border border-dashed p-4"
                     onClick={() =>
                       document.getElementById("imageUpload")?.click()
                     }
