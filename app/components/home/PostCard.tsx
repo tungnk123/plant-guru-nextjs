@@ -4,13 +4,13 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { PostResponse } from "@/app/api/postService";
 import CommentSection from "@/app/home/components/CommentSection";
-import { Comment } from "@/app/api/postService";
-
+import { User } from "lucide-react";
 
 const PostCard: React.FC<PostResponse> = (postDat) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [isCommentSectionOpen, setCommentSectionOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   const handleImageClick = (imageUrl: string) => {
     setSelectedImage(imageUrl);
     setModalOpen(true);
@@ -20,75 +20,98 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
     setModalOpen(false);
     setSelectedImage(null);
   };
+
   const handleCommentClick = () => {
     setCommentSectionOpen((prev) => !prev);
   };
 
-  const handleShare = () => { }
-  const handleMore = () => { }
+  const renderImages = () => {
+    const imageCount = postDat.images.length;
 
-  const postData = {
-    postId: postDat.postId,
-    userId: postDat.userId,
-    userAvatar: "https://www.gravatar.com/avatar",
-    imageUrl: postDat.imageUrl,
-    description: postDat.description,
-    title: postDat.title,
-    userNickName: postDat.userNickName,
-    numberOfUpvote: postDat.numberOfUpvote,
-    numberOfComment: postDat.numberOfComment,
-    numberOfShare: postDat.numberOfShare
-  }
+    if (imageCount <= 3) {
+      return postDat.images.map((imageUrl, index) => (
+        <Image
+          key={index}
+          src={imageUrl}
+          alt={`Image ${index}`}
+          width={220}
+          height={220}
+          className="cursor-pointer rounded-md object-cover"
+          onClick={() => handleImageClick(imageUrl)}
+        />
+      ));
+    }
 
-  
+    if (imageCount > 3) {
+      return (
+        <div className="grid grid-cols-2 gap-1">
+          {postDat.images.slice(0, 3).map((imageUrl, index) => (
+            <Image
+              key={index}
+              src={imageUrl}
+              alt={`Image ${index}`}
+              width={220}
+              height={220}
+              className="cursor-pointer rounded-md object-cover"
+              onClick={() => handleImageClick(imageUrl)}
+            />
+          ))}
+          <div className="relative">
+            <Image
+              src={postDat.images[3]}
+              alt="Image 3"
+              width={220}
+              height={220}
+              className="cursor-pointer rounded-md object-cover"
+              onClick={() => handleImageClick(postDat.images[3])}
+            />
+            {imageCount > 4 && (
+              <div
+                className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center text-white text-xl font-bold cursor-pointer"
+                onClick={() => handleImageClick(postDat.images[3])}
+              >
+                +{imageCount - 4 + 1}
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+  };
 
   return (
     <div className='w-full rounded-3xl border bg-white p-4 shadow-md'>
       <div className='mb-5 flex items-center justify-between'>
         <div className='flex items-center space-x-2'>
           <Image
-            src={postData.userAvatar}
-            alt={postData.userAvatar}
+            src={postDat.userAvatar}
+            alt={postDat.userAvatar}
             width={32}
             height={32}
             className='mr-2 h-8 w-8 rounded-full pointer-events-none select-none'
           />
-          <span className='font-semibold text-gray-800'>{postData.userNickName}</span>
+          <span className='font-semibold text-gray-800'>{postDat.userNickName}</span>
         </div>
       </div>
 
       <div className='mb-6'>
-        <h3 className='text-lg font-bold text-gray-900'>{postData.title}</h3>
+        <h3 className='text-lg font-bold text-gray-900'>{postDat.title}</h3>
         <p className='line-clamp-3 overflow-hidden text-sm text-gray-600'>
-          {postData.description}
+          {postDat.description}
         </p>
       </div>
 
-      {/* <Image
-        src={imageUrl}
-        alt={title}
-        height={478}
-        width={478}
-        className='mb-6 rounded-lg object-cover pointer-events-none select-none'
-      /> */}
       <div className="mb-4 flex gap-1">
-        <Image
-          src={postData.imageUrl}
-          alt={postData.imageUrl}
-          width={220}
-          height={220}
-          className="cursor-pointer rounded-md object-cover"
-          onClick={() => handleImageClick(postData.imageUrl)}
-        />
+        {renderImages()}
       </div>
 
       <div className='flex justify-between text-sm text-gray-500'>
         <div className='flex items-center space-x-2'>
           <VoteButton
-            initialVotes={postData.numberOfUpvote}
-            postId={postData.postId}
-            hasUpvoted={postDat.hasUpvoted} // Pass the prop to indicate upvote state
-            hasDevoted={postDat.hasDevoted} // Pass the prop to indicate downvote state
+            initialVotes={postDat.numberOfUpvote}
+            postId={postDat.postId}
+            hasUpvoted={postDat.hasUpvoted}
+            hasDevoted={postDat.hasDevoted}
           />
 
           <Button
@@ -102,49 +125,22 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
               alt='Comments'
               className='h-5 w-5 pointer-events-none select-none'
             />
-            <span>{postData.numberOfComment}</span>
+            <span>{postDat.numberOfComment}</span>
           </Button>
-
-          {/* <Button
-            className='flex items-center space-x-1 bg-transparent text-gray-700 shadow-none hover:bg-transparent'
-            onClick={handleShare}
-          >
-            <Image
-              src='/images/img_share_icon.svg'
-              height={20}
-              width={20}
-              alt='Share'
-              className='h-5 w-5 pointer-events-none select-none'
-            />
-            <span>{postData.numberOfShare}</span>
-          </Button> */}
         </div>
-
-        {/* <Button
-          className='bg-transparent text-gray-700 shadow-none hover:bg-transparent'
-          onClick={handleMore}
-        >
-          <Image
-            src='/images/img_more_icon.svg'
-            height={20}
-            width={20}
-            alt='More options'
-            className='h-5 w-5 pointer-events-none select-none'
-          />
-        </Button> */}
       </div>
 
       {isModalOpen && selectedImage && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75"
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black bg-opacity-75"
           onClick={handleModalClose}>
-          <div className="relative"
+          <div className="relative flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}>
             <Image
               src={selectedImage}
               alt="Zoomed Image"
               width={600}
               height={600}
-              className="rounded-lg"
+              className="max-w-full max-h-[80vh] object-contain rounded-lg"
             />
             <button
               className="absolute top-1 right-1 text-white"
@@ -153,9 +149,25 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
               ✕
             </button>
           </div>
+          <div className="mt-4 flex space-x-2">
+            {postDat.images.map((imageUrl, index) => (
+              <Image
+                key={index}
+                src={imageUrl}
+                alt={`Thumbnail ${index}`}
+                width={100}
+                height={100}
+                className="cursor-pointer rounded-md object-cover"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedImage(imageUrl);
+                }}
+              />
+            ))}
+          </div>
         </div>
       )}
-      {isCommentSectionOpen && <CommentSection postId={postData.postId} />}
+      {isCommentSectionOpen && <CommentSection postId={postDat.postId} />}
     </div>
   )
 }

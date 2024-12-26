@@ -9,6 +9,7 @@ import Navbar from '@/app/components/navbar/Navbar';
 import Link from 'next/link';
 import OutOfStockBadge from '@/app/components/OutOfStockBadge';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { useToast } from '@/hooks/use-toast';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -21,6 +22,7 @@ const ProductDetail = () => {
   const [isDescriptionLong, setIsDescriptionLong] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isOwner, setIsOwner] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
     if (id) {
@@ -63,6 +65,33 @@ const ProductDetail = () => {
       return () => clearInterval(interval);
     }
   }, [product]);
+
+  const isUserLoggedIn = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return false;
+
+    try {
+      const user = await fetchUserById(userId);
+      return !!user;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleBuyNowClick = async () => {
+    if (!(await isUserLoggedIn())) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to purchase this product.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (product && !isOwner && product.quantity > 0) {
+      router.push(`/products/confirmation/${product.id}`);
+    }
+  };
 
   if (loading) {
     return <LoadingSpinner />;
@@ -133,7 +162,7 @@ const ProductDetail = () => {
               Stock: {product.quantity > 0 ? product.quantity : <span className="text-red-500">Out of Stock</span>}
             </p>
             <button
-              onClick={() => router.push(`/products/confirmation/${product.id}`)}
+              onClick={handleBuyNowClick}
               className={`mt-4 px-8 py-3 font-semibold rounded-lg shadow-md transition duration-300 ${
                 product.quantity === 0 || isOwner
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'

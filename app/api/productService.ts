@@ -92,4 +92,27 @@ export async function fetchProductsByUser(userId: string): Promise<ProductData[]
     console.error('Error fetching products by user:', error);
     throw error;
   }
-} 
+}
+
+export const updateProduct = async (id: string, productData: Omit<ProductData, 'id' | 'wikiId'>): Promise<ProductData> => {
+  try {
+    const response = await fetch(`${BASE_URL}/${id}`, {
+      method: 'PUT',
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(productData),
+    });
+    console.log(JSON.stringify(productData));
+
+    if (!response.ok) {
+      throw new Error(`Failed to update product: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error updating product:', error);
+    throw error;
+  }
+}; 

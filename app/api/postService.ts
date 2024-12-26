@@ -6,7 +6,7 @@ export interface PostData {
   title: string;
   description: string;
   userId: string;
-  imageUrl: string;
+  images: string[];
   tag: string;
   background: string;
 }
@@ -18,7 +18,7 @@ export interface PostResponse {
   userAvatar: string;
   title: string;
   description: string;
-  imageUrl: string;
+  images: string[];
   tag: string;
   background: string;
   numberOfUpvote: number;

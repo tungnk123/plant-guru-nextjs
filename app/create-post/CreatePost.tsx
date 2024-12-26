@@ -1,11 +1,14 @@
-import { useState } from "react";
-import Link from "next/link";
+'use client'
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createPost, PostData } from '@/app/api/postService';
+import { useToast } from '@/hooks/use-toast';
+import { uploadImageToImgur } from '@/app/api/imgurService';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
-import { createPost, PostData } from "@/app/api/postService";
 import {
   Select,
   SelectContent,
@@ -13,8 +16,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast"
-import { uploadImageToImgur } from "@/app/api/imgurService";
 
 const tagOptions = {
   allCategory: "All Categories",
@@ -27,15 +28,16 @@ const tagOptions = {
 };
 
 const CreatePost = () => {
-  const [backgroundColor, setBackgroundColor] = useState("#FFFF00");
-  const [selectedImages, setSelectedImages] = useState<File[]>([]);
-  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [tag, setTag] = useState("allCategory");
+  const [backgroundColor, setBackgroundColor] = useState("#FFFF00");
+  const [selectedImages, setSelectedImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
 
   const { toast } = useToast();
+  const router = useRouter();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -66,13 +68,15 @@ const CreatePost = () => {
         throw new Error('User ID not found in local storage');
       }
 
-      const imageUrl = selectedImages.length > 0 ? await uploadImageToImgur(selectedImages[0]) : '';
+      const images = await Promise.all(
+        selectedImages.map((image) => uploadImageToImgur(image))
+      );
 
       const postData: PostData = {
         title,
         description,
         userId,
-        imageUrl,
+        images,
         tag,
         background: backgroundColor,
       };
@@ -94,12 +98,11 @@ const CreatePost = () => {
       setSelectedImages([]);
       setImagePreviews([]);
     } catch (error: any) {
-      console.error("Error in form submission:", error);
-
+      console.error("Error creating post:", error);
       toast({
         title: "Error",
-        description: `Failed to create post: ${error.message}`,
-        variant: "destructive",
+        description: error.message || "An error occurred while creating the post.",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -107,26 +110,20 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-center text-2xl font-bold">Create post</h1>
-      <p className="mb-8 text-center text-gray-600">
-        Create a plant post and share it with the community
-      </p>
-
-      <div className="grid grid-cols-3 gap-8">
-        <Card className="col-span-2">
+    <div className="container mx-auto py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="md:col-span-2">
+        <Card>
           <CardHeader>
-            <CardTitle>Create Your Post</CardTitle>
+            <CardTitle>Create a New Post</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="mb-2 block font-semibold">Title</label>
                 <Input
-                  type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Title"
+                  placeholder="Enter post title"
                   required
                 />
               </div>
@@ -136,20 +133,20 @@ const CreatePost = () => {
                 <Textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe your plant..."
+                  placeholder="Describe your post..."
                   required
                 />
               </div>
 
               <div>
-                <label className="mb-2 block font-semibold">Plant Images</label>
-                <div className="mb-4 flex space-x-4">
+                <label className="mb-2 block font-semibold">Images</label>
+                <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative">
                       <img
                         src={preview}
                         alt={`Preview ${index}`}
-                        className="h-auto w-[300px] rounded object-cover"
+                        className="h-auto w-full rounded object-cover"
                       />
                       <button
                         type="button"
@@ -162,7 +159,7 @@ const CreatePost = () => {
                   ))}
 
                   <div
-                    className="flex h-[300px] w-[300px] cursor-pointer items-center justify-center rounded border border-dashed p-4"
+                    className="flex h-[150px] w-full cursor-pointer items-center justify-center rounded border border-dashed p-4"
                     onClick={() =>
                       document.getElementById("imageUpload")?.click()
                     }
@@ -196,72 +193,57 @@ const CreatePost = () => {
                 </Select>
               </div>
 
-              <div>
-                <label className="mb-2 block font-semibold">Background</label>
-                <Input
-                  type="color"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="h-8 w-full p-1"
-                />
-              </div>
-
               <Button type="submit" disabled={loading} className="w-full">
-                {loading ? "Posting..." : "Post"}
+                {loading ? "Creating..." : "Create Post"}
               </Button>
             </form>
           </CardContent>
         </Card>
+      </div>
 
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Still need help?</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="mb-4 text-sm">
-                Create a plant post and share it with the community.
-              </p>
-              <Link href="/community">
-                <Button variant="outline">Ask Community</Button>
-              </Link>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Common Categories</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex items-center rounded bg-gray-100 p-2">
-                  <span role="img" aria-label="All Categories">
-                    🌍
-                  </span>
-                  <span className="ml-2">All Categories</span>
-                </div>
-                <div className="flex items-center rounded bg-green-100 p-2">
-                  <span role="img" aria-label="Plants">
-                    🌱
-                  </span>
-                  <span className="ml-2">Plants</span>
-                </div>
-                <div className="flex items-center rounded bg-yellow-100 p-2">
-                  <span role="img" aria-label="Flowers">
-                    🌸
-                  </span>
-                  <span className="ml-2">Flowers</span>
-                </div>
-                <div className="flex items-center rounded bg-red-100 p-2">
-                  <span role="img" aria-label="Sell & Trade">
-                    💰
-                  </span>
-                  <span className="ml-2">Sell & Trade</span>
-                </div>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Need Help?</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="mb-4 text-sm">
+              Create a post and share it with the community.
+            </p>
+            <Button variant="outline">Ask Community</Button>
+          </CardContent>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center rounded bg-gray-100 p-2">
+                <span role="img" aria-label="All Categories">
+                  🌍
+                </span>
+                <span className="ml-2">All Categories</span>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+              <div className="flex items-center rounded bg-green-100 p-2">
+                <span role="img" aria-label="Plants">
+                  🌱
+                </span>
+                <span className="ml-2">Plants</span>
+              </div>
+              <div className="flex items-center rounded bg-yellow-100 p-2">
+                <span role="img" aria-label="Flowers">
+                  🌸
+                </span>
+                <span className="ml-2">Flowers</span>
+              </div>
+              <div className="flex items-center rounded bg-red-100 p-2">
+                <span role="img" aria-label="Sell & Trade">
+                  💰
+                </span>
+                <span className="ml-2">Sell & Trade</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Button onClick={() => router.back()} variant="outline" className="w-full">
+          Back
+        </Button>
       </div>
     </div>
   );
