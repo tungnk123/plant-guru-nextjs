@@ -9,6 +9,23 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { PlusIcon } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+const tagOptions = {
+  allCategory: "All Categories",
+  plants: "Plants",
+  flowers: "Flowers",
+  guides: "Guides & Tips",
+  diseases: "Diseases",
+  qna: "Q&A",
+  diy: "DIY Projects",
+};
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
@@ -81,12 +98,11 @@ const CreatePost = () => {
       setSelectedImages([]);
       setImagePreviews([]);
     } catch (error: any) {
-      console.error("Error in form submission:", error);
-
+      console.error("Error creating post:", error);
       toast({
         title: "Error",
-        description: `Failed to create post: ${error.message}`,
-        variant: "destructive",
+        description: error.message || "An error occurred while creating the post.",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -94,26 +110,20 @@ const CreatePost = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-center text-2xl font-bold">Create post</h1>
-      <p className="mb-8 text-center text-gray-600">
-        Create a plant post and share it with the community
-      </p>
-
-      <div className="grid grid-cols-3 gap-8">
-        <Card className="col-span-2">
+    <div className="container mx-auto py-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div className="md:col-span-2">
+        <Card>
           <CardHeader>
-            <CardTitle>Create Your Post</CardTitle>
+            <CardTitle>Create a New Post</CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="mb-2 block font-semibold">Title</label>
                 <Input
-                  type="text"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="Title"
+                  placeholder="Enter post title"
                   required
                 />
               </div>
@@ -130,13 +140,13 @@ const CreatePost = () => {
 
               <div>
                 <label className="mb-2 block font-semibold">Images</label>
-                <div className="mb-4 flex space-x-4">
+                <div className="mb-4 grid grid-cols-2 sm:grid-cols-3 gap-4">
                   {imagePreviews.map((preview, index) => (
                     <div key={index} className="relative">
                       <img
                         src={preview}
                         alt={`Preview ${index}`}
-                        className="h-auto w-[300px] rounded object-cover"
+                        className="h-auto w-full rounded object-cover"
                       />
                       <button
                         type="button"
@@ -149,7 +159,7 @@ const CreatePost = () => {
                   ))}
 
                   <div
-                    className="flex h-[300px] w-[300px] cursor-pointer items-center justify-center rounded border border-dashed p-4"
+                    className="flex h-[150px] w-full cursor-pointer items-center justify-center rounded border border-dashed p-4"
                     onClick={() =>
                       document.getElementById("imageUpload")?.click()
                     }
@@ -167,29 +177,73 @@ const CreatePost = () => {
                 />
               </div>
 
+              <div>
+                <label className="mb-2 block font-semibold">Tags</label>
+                <Select value={tag} onValueChange={(value) => setTag(value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select a category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.entries(tagOptions).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <Button type="submit" disabled={loading} className="w-full">
                 {loading ? "Creating..." : "Create Post"}
               </Button>
             </form>
           </CardContent>
         </Card>
+      </div>
 
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Need Help?</CardTitle>
-            </CardHeader>
-            <CardContent className="text-center">
-              <p className="mb-4 text-sm">
-                Create a post and share it with the community.
-              </p>
-              <Button variant="outline">Ask Community</Button>
-            </CardContent>
-          </Card>
-          <Button onClick={() => router.back()} variant="outline" className="w-full">
-            Back
-          </Button>
-        </div>
+      <div className="space-y-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Need Help?</CardTitle>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="mb-4 text-sm">
+              Create a post and share it with the community.
+            </p>
+            <Button variant="outline">Ask Community</Button>
+          </CardContent>
+          <CardContent>
+            <div className="space-y-2">
+              <div className="flex items-center rounded bg-gray-100 p-2">
+                <span role="img" aria-label="All Categories">
+                  🌍
+                </span>
+                <span className="ml-2">All Categories</span>
+              </div>
+              <div className="flex items-center rounded bg-green-100 p-2">
+                <span role="img" aria-label="Plants">
+                  🌱
+                </span>
+                <span className="ml-2">Plants</span>
+              </div>
+              <div className="flex items-center rounded bg-yellow-100 p-2">
+                <span role="img" aria-label="Flowers">
+                  🌸
+                </span>
+                <span className="ml-2">Flowers</span>
+              </div>
+              <div className="flex items-center rounded bg-red-100 p-2">
+                <span role="img" aria-label="Sell & Trade">
+                  💰
+                </span>
+                <span className="ml-2">Sell & Trade</span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+        <Button onClick={() => router.back()} variant="outline" className="w-full">
+          Back
+        </Button>
       </div>
     </div>
   );

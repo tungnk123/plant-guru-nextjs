@@ -2,6 +2,8 @@ import { downvotePost, upvotePost } from '@/app/api/postService';
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
+import { fetchUserById } from '@/app/admin/api/user';
 
 interface VoteButtonProps {
   initialVotes: number;
@@ -14,9 +16,30 @@ const VoteButton: React.FC<VoteButtonProps> = ({ initialVotes, postId, hasUpvote
   const [votes, setVotes] = useState(initialVotes);
   const [upvoted, setUpvoted] = useState(hasUpvoted);
   const [devoted, setDevoted] = useState(hasDevoted);
+  const { toast } = useToast();
 
+  const isUserLoggedIn = async () => {
+    const userId = localStorage.getItem('userId');
+    if (!userId) return false;
+
+    try {
+      const user = await fetchUserById(userId);
+      return !!user;
+    } catch {
+      return false;
+    }
+  };
 
   const handleUpvote = async () => {
+    if (!(await isUserLoggedIn())) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to upvote.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
       const { numberOfUpvotes } = await upvotePost(postId);
       setVotes(numberOfUpvotes);
@@ -28,8 +51,17 @@ const VoteButton: React.FC<VoteButtonProps> = ({ initialVotes, postId, hasUpvote
   };
 
   const handleDownvote = async () => {
+    if (!(await isUserLoggedIn())) {
+      toast({
+        title: "Login Required",
+        description: "Please log in to downvote.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      const { numberOfUpvotes: numberOfUpvotes } = await downvotePost(postId);
+      const { numberOfUpvotes } = await downvotePost(postId);
       setVotes(numberOfUpvotes);
       setUpvoted(false);
       setDevoted(!devoted);
