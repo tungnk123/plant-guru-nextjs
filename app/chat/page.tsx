@@ -15,7 +15,7 @@ interface Message {
 }
 
 const Page = () => {
-  const myId = 'c0c1191f-d47f-4819-831c-ddf2061ecb2c';
+  const myId = localStorage.getItem('userId');
   const [chatRooms, setChatRooms] = useState([]);
   const [selectedChat, setSelectedChat] = useState(null);
   const [messages, setMessages] = useState<Message[]>([]);
