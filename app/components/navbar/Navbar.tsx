@@ -5,7 +5,7 @@ import Logo from './Logo'
 import { useRouter } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import PrimaryButton from '@/app/components/PrimaryButton'
-import { Plus } from 'lucide-react'
+import { Plus, MessageCircle } from 'lucide-react'
 import { usePathname } from 'next/navigation'
 import { fetchUserById, User } from '@/app/admin/api/user'
 import {
@@ -68,6 +68,10 @@ export default function Navbar({ toggle }: NavbarProps) {
     } else {
         router.push('/create-product');
     }
+  };
+
+  const handleChatIconClick = () => {
+    router.push('/chat');
   };
 
   return (
@@ -162,6 +166,10 @@ export default function Navbar({ toggle }: NavbarProps) {
               Login
             </Button>
           )}
+
+          <button onClick={handleChatIconClick} className="flex items-center space-x-2">
+            <MessageCircle className="h-6 w-6 text-black" />
+          </button>
         </div>
       </div>
     </div>
