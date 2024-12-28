@@ -105,6 +105,11 @@ export default function Navbar({ toggle }: NavbarProps) {
             </Link>
           </li>
           <li>
+            <Link href='/group' className='inter-medium text-1xl'>
+              <p>Group</p>
+            </Link>
+          </li>
+          <li>
             <NavigationMenu>
               <NavigationMenuList>
                 <NavigationMenuItem>
