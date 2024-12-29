@@ -73,7 +73,7 @@ export const navItems: NavItem[] = [
     items: []
   },
   {
-    title: 'Plant Encyclopedia',
+    title: 'Plant Wiki',
     url: '/admin/dashboard/wiki',
     icon: 'post',
     shortcut: ['p', 'p'],

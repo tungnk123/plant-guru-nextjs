@@ -2,15 +2,19 @@ import { searchParamsCache } from '@/lib/searchparams'; // Assuming this handles
 import { SearchParams } from 'nuqs'; // Assuming this is a function for parsing search params
 import React from 'react';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
-import EmployeeListingPage from './_components/employee-listing-page';
+import WikiListingPage from './_components/wiki-listing-page';
 
 type pageProps = {
   searchParams: SearchParams;
 };
 
-const Page = ({ searchParams }: pageProps) => {
+const Page = async ({ searchParams }: pageProps) => {
   searchParamsCache.parse(searchParams);
-  return <NuqsAdapter><EmployeeListingPage/></NuqsAdapter>;
+  return (
+    <NuqsAdapter>
+      <WikiListingPage />
+    </NuqsAdapter>
+  );
 };
 
 export default Page;
