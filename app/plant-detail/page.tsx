@@ -1,8 +1,14 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { GoogleGenerativeAI } from '@google/generative-ai'
 import Navbar from '../components/navbar/Navbar'
 import Image from 'next/image'
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Leaf, Flower, Thermometer, Sun } from 'lucide-react';
 
 interface PlantDetails {
   name: string
@@ -35,6 +41,7 @@ interface PlantDetails {
 const Page = () => {
   const [detailData, setDetailData] = useState<PlantDetails | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const router = useRouter();
 
   const randomValue = (choices: string[]) =>
     choices[Math.floor(Math.random() * choices.length)]
@@ -60,7 +67,6 @@ const Page = () => {
           .trim()
       }
     })
-
 
     details.bloom_time = randomValue(['Spring', 'Summer', 'Fall', 'Winter'])
 
@@ -151,189 +157,139 @@ const Page = () => {
     );
   }
 
-  const toggleMenu = () => {
-
-  };
-
-
   return (
-    <section className="w-full bg-white py-10">
-      <div className="full-w mx-10 bg-white overflow-hidden">
-        <div className="relative flex flex-col md:flex-row">
-          <div className="p-8 md:w-2/3">
-            <h1 className="text-5xl font-bold text-black">
-              {detailData.common_names && detailData.common_names.length > 0
-                ? detailData.common_names[0]
-                : detailData.name}
-            </h1>
+    <div className="min-h-screen bg-gradient-to-b from-green-50 via-blue-50 to-purple-50">
+      <Navbar />
+      <section className="w-full py-10">
+        <div className="max-w-6xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden">
+          <div className="relative flex flex-col md:flex-row">
+            <div className="p-8 md:w-2/3">
+              <h1 className="text-6xl font-bold text-black mb-4">
+                {detailData.common_names && detailData.common_names.length > 0
+                  ? detailData.common_names[0]
+                  : detailData.name}
+              </h1>
 
-            <div className="flex flex-row mt-7">
-              <div className="flex flex-col">
-                <p className="text-gray-800 font-semibold">Common Names</p>
-                {detailData.common_names && detailData.common_names.length > 0 ? (
-                  <ul className="text-sm text-[#685F5F] list-disc list-inside">
-                    {detailData.common_names.slice(0, 3).map((name, index) => (
-                      <li key={index}>{name}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-[#685F5F]">N/A</p>
-                )}
+              <div className="flex flex-row mt-7">
+                <div className="flex flex-col">
+                  <p className="text-gray-800 font-semibold">Common Names</p>
+                  {detailData.common_names && detailData.common_names.length > 0 ? (
+                    <ul className="text-sm text-[#685F5F] list-disc list-inside">
+                      {detailData.common_names.slice(0, 3).map((name, index) => (
+                        <li key={index}>{name}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-[#685F5F]">N/A</p>
+                  )}
+                </div>
+
+                <div className="flex flex-col ms-48">
+                  <p className="text-gray-800 font-semibold">Synonyms</p>
+                  {detailData.synonyms && detailData.synonyms.length > 0 ? (
+                    <ul className="text-sm text-[#685F5F] list-disc list-inside">
+                      {detailData.synonyms.slice(0, 3).map((synonym, index) => (
+                        <li key={index}>{synonym}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-sm text-[#685F5F]">N/A</p>
+                  )}
+                </div>
               </div>
 
-              <div className="flex flex-col ms-48">
-                <p className="text-gray-800 font-semibold">Synonyms</p>
-                {detailData.synonyms && detailData.synonyms.length > 0 ? (
-                  <ul className="text-sm text-[#685F5F] list-disc list-inside">
-                    {detailData.synonyms.slice(0, 3).map((synonym, index) => (
-                      <li key={index}>{synonym}</li>
-                    ))}
-                  </ul>
-                ) : (
-                  <p className="text-sm text-[#685F5F]">N/A</p>
-                )}
-              </div>
-            </div>
+              <p className="mt-5 text-base font-normal text-black">
+                {detailData.description || "This plant is known for its various uses."}
+              </p>
 
-            <p className="mt-5 text-base font-normal text-black">
-              {detailData.description || "This plant is known for its various uses."}
-            </p>
+              <div className="mt-36">
+                <h2 className="text-3xl font-medium text-black">Scientific Classification</h2>
+                <div className="grid grid-cols-2 gap-4 mt-4">
+                  <div className="flex items-center space-x-4">
+                    <Leaf className="w-8 h-8 text-green-500" />
+                    <div className="flex flex-col">
+                      <p className="text-gray-800 font-semibold">Lifespan</p>
+                      <p className="text-sm text-[#685F5F]">{detailData.lifespan || "N/A"}</p>
+                    </div>
+                  </div>
 
-            <div className="mt-36">
-              <h2 className="text-3xl font-medium text-black">Scientific Classification</h2>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src="/images/img_plant_detail_lifespan.svg"
-                    alt="Lifespan Icon"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-gray-800 font-semibold">Lifespan</p>
-                    <p className="text-sm text-[#685F5F]">{detailData.lifespan || "N/A"}</p>
+                  <div className="flex items-center space-x-4">
+                    <Sun className="w-8 h-8 text-yellow-500" />
+                    <div className="flex flex-col">
+                      <p className="text-gray-800 font-semibold">Plant Type</p>
+                      <p className="text-sm text-[#685F5F]">{detailData.plant_type || "N/A"}</p>
+                    </div>
                   </div>
-                </div>
+                  <div className="flex items-center space-x-4">
+                    <Flower className="w-8 h-8 text-pink-500" />
+                    <div className="flex flex-col">
+                      <p className="text-gray-800 font-semibold">Bloom Time</p>
+                      <p className="text-sm text-[#685F5F]">{detailData.bloom_time || "N/A"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Leaf className="w-8 h-8 text-green-700" />
+                    <div className="flex flex-col">
+                      <p className="text-gray-800 font-semibold">Leaf Color</p>
+                      <p className="text-sm text-[#685F5F]">{detailData.leaf_color || "N/A"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Flower className="w-8 h-8 text-red-500" />
+                    <div className="flex flex-col">
+                      <p className="text-gray-800 font-semibold">Flower Color</p>
+                      <p className="text-sm text-[#685F5F]">{detailData.flower_color || "N/A"}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-4">
+                    <Leaf className="w-8 h-8 text-green-500" />
+                    <div className="flex flex-col">
+                      <p className="text-gray-800 font-semibold">Edible Part</p>
+                      {detailData.edible_parts && detailData.edible_parts.length > 0 ? (
+                        <ul className="text-sm text-[#685F5F] list-disc list-inside">
+                          {detailData.edible_parts.map((part, index) => (
+                            <li key={index}>{part}</li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-[#685F5F]">N/A</p>
+                      )}
+                    </div>
+                  </div>
 
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src="/images/img_plant_detail_plant_type.svg"
-                    alt="Planttype Icon"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-gray-800 font-semibold">Plant Type</p>
-                    <p className="text-sm text-[#685F5F]">{detailData.plant_type || "N/A"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src="/images/img_plant_detail_bloom_time.svg"
-                    alt="Bloomtime Icon"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-gray-800 font-semibold">Bloom Time</p>
-                    <p className="text-sm text-[#685F5F]">{detailData.bloom_time || "N/A"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src="/images/img_plant_detail_leaf_color.svg"
-                    alt="FlowerColor Icon"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-gray-800 font-semibold">Leaf Color</p>
-                    <p className="text-sm text-[#685F5F]">{detailData.leaf_color || "N/A"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src="/images/img_plant_detail_flower_color.svg"
-                    alt="FlowerColor Icon"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-gray-800 font-semibold">Flower Color</p>
-                    <p className="text-sm text-[#685F5F]">{detailData.flower_color || "N/A"}</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src="/images/img_plant_detail_plant_type.svg"
-                    alt="Edible Icon"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-gray-800 font-semibold">Edible Part</p>
-                    {detailData.edible_parts && detailData.edible_parts.length > 0 ? (
-                      <ul className="text-sm text-[#685F5F] list-disc list-inside">
-                        {detailData.edible_parts.map((part, index) => (
-                          <li key={index}>{part}</li>
-                        ))}
-                      </ul>
-                    ) : (
-                      <p className="text-sm text-[#685F5F]">N/A</p>
-                    )}
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-4">
-                  <Image
-                    src="/images/img_plant_detail_ideal_temp.svg"
-                    alt="FlowerColor Icon"
-                    width={32}
-                    height={32}
-                    className="w-8 h-8"
-                  />
-                  <div className="flex flex-col">
-                    <p className="text-gray-800 font-semibold">Ideal Temperature</p>
-                    <p className="text-sm text-[#685F5F]">{detailData.ideal_temperature || "N/A"}</p>
+                  <div className="flex items-center space-x-4">
+                    <Thermometer className="w-8 h-8 text-blue-500" />
+                    <div className="flex flex-col">
+                      <p className="text-gray-800 font-semibold">Ideal Temperature</p>
+                      <p className="text-sm text-[#685F5F]">{detailData.ideal_temperature || "N/A"}</p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* <div className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-700">Care Guide</h2>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                <div className="flex items-center space-x-2">
-                  <span className="material-icons text-yellow-500">wb_sunny</span>
-                  <p className="text-gray-600">Sunlight: Full Sun</p>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <span className="material-icons text-green-500">yard</span>
-                  <p className="text-gray-600">Soil: Garden Soil</p>
-                </div>
-              </div>
-            </div> */}
-          </div>
-
-          <div className="absolute top-0 right-0 md:w-1/3 p-4">
-            <Image
-              src={detailData.image ?? "/images/img_identify_plant.svg"}
-              alt={detailData.name}
-              className="w-full h-auto rounded-lg shadow-md"
-              width={319}
-              height={319}
-            />
+            <div className="absolute top-0 right-0 md:w-1/3 p-4">
+              <Image
+                src={detailData.image ?? "/images/img_identify_plant.svg"}
+                alt={detailData.name}
+                className="w-full h-auto rounded-lg shadow-md"
+                width={319}
+                height={319}
+              />
+            </div>
           </div>
         </div>
-      </div>
-    </section>
-
+        <div className="mt-8 flex justify-center">
+          <Button 
+            variant="default" 
+            className="bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-md hover:shadow-lg transition-all"
+            onClick={() => router.push('/identify-plant')}
+          >
+            Back to Identify Plant
+          </Button>
+        </div>
+      </section>
+    </div>
   );
 };
 

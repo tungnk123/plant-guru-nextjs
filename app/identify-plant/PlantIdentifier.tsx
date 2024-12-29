@@ -59,7 +59,7 @@ const PlantIdentifier = () => {
     try {
       const base64Image = await base64Promise;
 
-      const apiKey = 'URWBmEBcg06oPXxGwSF8gE5vqYIosQ7x30gG2I98DOd9dADPzM';
+      const apiKey = 'OIfuPyd0H1YYgPl35Hh8wujY0vP0jb1qDvrFBtCXtxDovVD6PI';
       const apiUrl = 'https://plant.id/api/v3/identification';
       const params = new URLSearchParams({
         details:
@@ -168,7 +168,7 @@ const PlantIdentifier = () => {
                               className="object-cover transition-transform duration-500 group-hover:scale-105"
                             />
                           ) : (
-                            <div className="h-full flex flex-col items-center justify-center gap-4">
+                            <div className="h-full flex flex-col items-center justify-center gap-4" onClick={handleButtonClick}>
                               <div className="w-48 h-48">
                                 <LottieAnimation
                                   animationData={uploadAnimation}
