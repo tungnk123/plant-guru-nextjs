@@ -1,11 +1,11 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import EmployeeForm from './employee-form';
+import WikiForm from './wiki-form';
 import PageContainer from '@/components-admin/layout/page-container';
 
-export default function EmployeeViewPage() {
+export default function WikiViewPage() {
   return (
     <PageContainer>
-      <EmployeeForm />
+      <WikiForm />
     </PageContainer>
   );
 }
