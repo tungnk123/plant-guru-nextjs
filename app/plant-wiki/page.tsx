@@ -84,7 +84,7 @@ export default function PlantWikiPage() {
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                   <Input 
-                    placeholder="Search plants..." 
+                    placeholder="Search wiki articles..." 
                     className="h-12 text-lg pl-10 pr-4 w-full border-gray-200 focus:border-emerald-300 focus:ring-emerald-200"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}

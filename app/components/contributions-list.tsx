@@ -6,11 +6,12 @@ import { Button } from "@/components/ui/button";
 import { Check, X, Eye } from "lucide-react";
 import { Contribution } from "@/app/api/contributionService";
 import { formatCurrentDate } from "@/app/lib/utils";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import RejectDialog from "@/app/components/reject-dialog";
 import { getContributionDiff, ContributionDiff } from "@/app/api/contributionService";
 import ContributionDiffView from "./contribution-diff";
 import { toast } from "react-hot-toast";
+import { fetchUserById, User } from "@/app/admin/api/user";
 
 interface ContributionsListProps {
   contributions: Contribution[];
@@ -27,6 +28,32 @@ export default function ContributionsList({
   const [selectedContributionId, setSelectedContributionId] = useState<string | null>(null);
   const [selectedDiff, setSelectedDiff] = useState<ContributionDiff | null>(null);
   const [loadingDiff, setLoadingDiff] = useState(false);
+  const [contributorUsers, setContributorUsers] = useState<Record<string, User>>({});
+  const [loadingUsers, setLoadingUsers] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    const loadUserInfo = async (contributorId: string) => {
+      if (contributorUsers[contributorId] || loadingUsers[contributorId]) return;
+
+      setLoadingUsers(prev => ({ ...prev, [contributorId]: true }));
+      try {
+        console.log('Fetching user info for:', contributorId);
+        const user = await fetchUserById(contributorId);
+        console.log('Fetched user:', user);
+        setContributorUsers(prev => ({ ...prev, [contributorId]: user }));
+      } catch (error) {
+        console.error('Error loading user:', error);
+      } finally {
+        setLoadingUsers(prev => ({ ...prev, [contributorId]: false }));
+      }
+    };
+
+    contributions.forEach(contribution => {
+      if (contribution.contributorId) {
+        loadUserInfo(contribution.contributorId);
+      }
+    });
+  }, [contributions]);
 
   const handleRejectClick = (contributionId: string) => {
     setSelectedContributionId(contributionId);
@@ -76,14 +103,37 @@ export default function ContributionsList({
           <CardHeader className="bg-gray-50">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div>
-                  <p className="text-sm font-medium">
-                    Contributor ID: {contribution.contributorId}
-                  </p>
-                  <p className="text-xs text-gray-500">
-                    {formatCurrentDate()}
-                  </p>
-                </div>
+                {contributorUsers[contribution.contributorId] ? (
+                  <div className="flex items-center gap-3">
+                    {contributorUsers[contribution.contributorId].avatar && (
+                      <img
+                        src={contributorUsers[contribution.contributorId].avatar}
+                        alt="Avatar"
+                        className="w-8 h-8 rounded-full"
+                      />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium">
+                        {contributorUsers[contribution.contributorId].name || 
+                         contributorUsers[contribution.contributorId].email}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formatCurrentDate()}
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-sm font-medium">
+                      {loadingUsers[contribution.contributorId] 
+                        ? 'Loading user...' 
+                        : 'Unknown User'}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {formatCurrentDate()}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex gap-2">
                 <Button
