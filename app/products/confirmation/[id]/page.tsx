@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { fetchProductById, ProductData } from '@/app/api/productService';
 import BreadcrumbNavigation from '@/app/components/navbar/BreadcrumbNavigation';
 import Navbar from '@/app/components/navbar/Navbar';
+import OutOfStockBadge from '@/app/components/OutOfStockBadge';
 
 const ConfirmationPage = () => {
   const { id } = useParams();
@@ -61,12 +62,13 @@ const ConfirmationPage = () => {
       <div className="container mx-auto p-10 bg-gradient-to-r from-gray-100 to-white shadow-lg rounded-lg">
         <div className="flex flex-col md:flex-row items-start gap-8">
           <div className="flex flex-col items-center md:w-1/2">
-            <div className="w-full max-w-md h-96 flex items-center justify-center overflow-hidden rounded-lg shadow-xl">
+            <div className="w-full max-w-md h-96 flex items-center justify-center overflow-hidden rounded-lg shadow-xl relative">
               <img
                 className="object-cover w-full h-full transition-transform transform hover:scale-105"
-                src={product.productImages[currentImageIndex]}
+                src={product.productImages.length > 0 ? product.productImages[0] : '/images/ic_logo.svg'}
                 alt={product.productName}
               />
+              {product.quantity === 0 && <OutOfStockBadge />}
             </div>
           </div>
           <div className="flex-1 md:w-1/2">
