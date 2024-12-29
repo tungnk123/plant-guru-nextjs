@@ -158,3 +158,36 @@ export const submitContribution = async (
     throw error;
   }
 };
+
+export interface DiffLine {
+  content: string;
+  type: 0 | 1 | 2; // 0: unchanged, 1: added, 2: removed
+}
+
+export interface ContributionDiff {
+  originalContent: string;
+  contributionContent: string;
+  diffLines: DiffLine[];
+}
+
+export const getContributionDiff = async (wikiId: string, contributionId: string): Promise<ContributionDiff> => {
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/Contributions/${wikiId}/contributions/${contributionId}`,
+      {
+        headers: {
+          'accept': '*/*'
+        }
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to fetch contribution diff');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching contribution diff:', error);
+    throw error;
+  }
+};

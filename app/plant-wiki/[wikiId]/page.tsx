@@ -22,6 +22,7 @@ export default function WikiDetailPage() {
   const [loading, setLoading] = useState(true);
   const [contribution, setContribution] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submittedId, setSubmittedId] = useState<string | null>(null);
 
   useEffect(() => {
     const loadWiki = async () => {
@@ -48,7 +49,6 @@ export default function WikiDetailPage() {
 
     setIsSubmitting(true);
     try {
-      // Check if user is logged in
       const userId = localStorage.getItem('userId');
       if (!userId) {
         toast.error('Please login to contribute');
@@ -57,8 +57,8 @@ export default function WikiDetailPage() {
 
       const result = await submitContribution(params.wikiId as string, contribution);
       console.log('Contribution submitted:', result);
+      setSubmittedId(result.id);
       toast.success('Contribution submitted successfully');
-      setContribution('');
     } catch (error) {
       console.error('Error submitting contribution:', error);
       if (error instanceof Error && error.message === 'User not logged in') {
@@ -147,6 +147,16 @@ export default function WikiDetailPage() {
               <p className="text-sm text-gray-500">
                 Edit the content below to submit your contribution
               </p>
+              {submittedId && (
+                <div className="mt-2 p-2 bg-green-50 border border-green-200 rounded-md">
+                  <p className="text-sm text-green-700">
+                    Contribution submitted successfully!
+                  </p>
+                  <p className="text-xs text-green-600 font-mono mt-1">
+                    Contribution ID: {submittedId}
+                  </p>
+                </div>
+              )}
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
