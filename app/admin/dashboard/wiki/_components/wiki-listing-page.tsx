@@ -60,7 +60,7 @@ export default function WikiListingPage() {
               <BookOpen className="mr-2 h-4 w-4" /> View Wiki
             </Link>
             <Link
-              href="/plant-wiki/create"
+              href="/admin/dashboard/wiki/create"
               className={cn(buttonVariants({ variant: 'default' }))}
             >
               <Plus className="mr-2 h-4 w-4" /> Add Article

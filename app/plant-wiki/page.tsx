@@ -1,9 +1,8 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import Navbar from '@/app/components/navbar/Navbar';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, ThumbsUp, Users, Leaf, Eye } from 'lucide-react';
 import { fetchWikiCards, WikiCard } from '@/app/api/wikiService';
 import { useRouter } from 'next/navigation';
 import {
@@ -19,32 +18,70 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import Link from 'next/link';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Separator } from "@/components/ui/separator";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { motion } from "framer-motion";
+import { Sparkles, BookOpen, Leaf, Filter, Search, SortAsc, SortDesc, Calendar, Plus, Users2, Eye } from 'lucide-react';
 
 export default function PlantWikiPage() {   
   const router = useRouter();
-  const [wikiCards, setWikiCards] = useState<WikiCard[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortOrder, setSortOrder] = useState<'newest' | 'oldest' | 'a-z' | 'z-a'>('newest');
+  const [wikiArticles, setWikiArticles] = useState<WikiCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-    loadWikiCards();
+    const fetchArticles = async () => {
+      try {
+        const articles = await fetchWikiCards();
+        setWikiArticles(articles);
+      } catch (error) {
+        console.error('Error fetching articles:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticles();
   }, []);
 
-  const loadWikiCards = async () => {
-    try {
-      const cards = await fetchWikiCards();
-      setWikiCards(cards);
-    } catch (error) {
-      toast.error('Failed to load wiki articles');
-      console.error('Error loading wiki cards:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const filteredCards = wikiCards.filter(card =>
-    card.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredAndSortedArticles = useMemo(() => {
+    return [...wikiArticles]
+      .filter(article => {
+        const searchLower = searchTerm.toLowerCase();
+        return (
+          article.title?.toLowerCase().includes(searchLower) ||
+          article.description?.toLowerCase().includes(searchLower)
+        );
+      })
+      .sort((a, b) => {
+        switch (sortOrder) {
+          case 'newest':
+            return new Date(b.createdAt || Date.now()).getTime() - new Date(a.createdAt || Date.now()).getTime();
+          case 'oldest':
+            return new Date(a.createdAt || Date.now()).getTime() - new Date(b.createdAt || Date.now()).getTime();
+          case 'a-z':
+            return (a.title || '').localeCompare(b.title || '');
+          case 'z-a':
+            return (b.title || '').localeCompare(a.title || '');
+          default:
+            return 0;
+        }
+      });
+  }, [wikiArticles, searchTerm, sortOrder]);
 
   if (isLoading) {
     return (
@@ -58,123 +95,200 @@ export default function PlantWikiPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar toggle={() => {}} />
-      
-      {/* Hero Section */}
-      <div className="pt-24 pb-12 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <div className="flex justify-center mb-6">
-              <Badge variant="outline" className="px-4 py-1 text-lg font-medium text-emerald-600 border-emerald-200 bg-emerald-50">
-                <Leaf className="w-5 h-5 mr-2" />
-                Plant Encyclopedia
-              </Badge>
+      <div className="container mx-auto py-24 px-4">
+        <div className="max-w-7xl mx-auto">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="flex flex-col items-center text-center mb-12"
+          >
+            <div className="relative">
+              <div className="p-4 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl mb-4 shadow-inner">
+                <Leaf className="h-10 w-10 text-green-600" />
+              </div>
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+                className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"
+              />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl md:text-6xl bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+            
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-3">
               Plant Wiki
             </h1>
-            <p className="mt-3 max-w-md mx-auto text-base text-gray-600 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-              Discover and learn about different plant species, their care requirements, and growing tips.
+            <p className="text-gray-600 max-w-lg mb-6">
+              Discover and share knowledge about plants with our growing community
             </p>
             
-            {/* Search and Create Button */}
-            <div className="mt-8 max-w-xl mx-auto">
-              <div className="flex gap-3">
-                <div className="relative flex-1">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
-                  <Input 
-                    placeholder="Search wiki articles..." 
-                    className="h-12 text-lg pl-10 pr-4 w-full border-gray-200 focus:border-emerald-300 focus:ring-emerald-200"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    onClick={() => router.push('/plant-wiki/create')}
+                    className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-lg hover:shadow-green-200/50 transition-all duration-300"
+                  >
+                    <Plus className="h-5 w-5 mr-2" />
+                    Create New Article
+                    <Sparkles className="h-4 w-4 ml-2" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Share your plant knowledge!</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="max-w-3xl mx-auto mb-12"
+          >
+            <Card className="border-gray-200/50 shadow-xl backdrop-blur-sm bg-white/80">
+              <CardHeader className="pb-4">
+                <div className="flex items-center gap-2 text-gray-900 justify-center">
+                  <Filter className="h-5 w-5 text-green-600" />
+                  <h2 className="font-semibold">Search & Filters</h2>
                 </div>
-                <Button 
-                  onClick={() => router.push('/plant-wiki/create')}
-                  className="h-12 px-6 bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg hover:shadow-emerald-200 transition-all duration-300"
-                >
-                  <Plus className="h-5 w-5 mr-2" />
-                  Create Wiki
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+                <Separator className="mt-4" />
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <div className="relative max-w-xl mx-auto group">
+                  <div className="absolute inset-0 bg-green-200 opacity-20 blur-xl group-hover:opacity-30 transition-opacity rounded-full" />
+                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 group-hover:text-green-600 transition-colors" />
+                  <Input
+                    placeholder="Search by title or description..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-12 pr-4 h-12 text-lg border-gray-200 rounded-full shadow-sm focus:ring-2 focus:ring-green-500 focus:border-green-500 bg-white/80 backdrop-blur-sm"
+                  />
+                  {searchTerm && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 hover:bg-transparent text-gray-400 hover:text-gray-600"
+                      onClick={() => setSearchTerm('')}
+                    >
+                      ×
+                    </Button>
+                  )}
+                </div>
 
-      {/* Wiki Cards Section */}
-      <div className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">Wiki Articles</h2>
-            <Badge variant="secondary" className="px-3 py-1">
-              {filteredCards.length} articles
-            </Badge>
-          </div>
-          
-          {isLoading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <Card key={i} className="overflow-hidden">
-                  <CardHeader>
-                    <Skeleton className="h-6 w-3/4" />
-                  </CardHeader>
-                  <CardContent>
-                    <Skeleton className="h-48 w-full rounded-lg" />
-                  </CardContent>
-                  <CardFooter>
-                    <Skeleton className="h-4 w-full" />
-                  </CardFooter>
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredCards.map((card) => (
-                <Link 
-                  href={`/plant-wiki/${card.id}`} 
-                  key={card.id}
-                  className="block hover:no-underline"
-                >
-                  <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
-                    <CardHeader className="p-0">
-                      <div className="aspect-video relative">
-                        <img
-                          src={card.thumbnailImageUrl || '/placeholder.png'}
-                          alt={card.title}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    </CardHeader>
-                    <CardContent className="p-4">
-                      <h3 className="font-semibold text-lg mb-2 line-clamp-1">{card.title}</h3>
+                <div className="flex flex-wrap items-center justify-center gap-4">
+                  <Select
+                    value={sortOrder}
+                    onValueChange={(value: 'newest' | 'oldest' | 'a-z' | 'z-a') => setSortOrder(value)}
+                  >
+                    <SelectTrigger className="w-[200px] border-gray-200 bg-white/80 backdrop-blur-sm">
                       <div className="flex items-center gap-2">
-                        <Badge variant="secondary" className="flex items-center gap-1">
-                          <ThumbsUp className="h-3 w-3" />
-                          {card.upvotes} upvotes
-                        </Badge>
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <Users className="h-3 w-3" />
-                          {card.contributorCount || 0} contributors
-                        </Badge>
+                        <SortDesc className="h-4 w-4 text-green-600" />
+                        <SelectValue placeholder="Sort articles" />
                       </div>
-                    </CardContent>
-                  </Card>
-                </Link>
-              ))}
-            </div>
-          )}
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="newest">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-green-600" />
+                          Newest First
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="oldest">
+                        <div className="flex items-center gap-2">
+                          <Calendar className="h-4 w-4 text-green-600" />
+                          Oldest First
+                        </div>
+                      </SelectItem>
+                      <Separator className="my-2" />
+                      <SelectItem value="a-z">
+                        <div className="flex items-center gap-2">
+                          <SortAsc className="h-4 w-4 text-green-600" />
+                          Title A to Z
+                        </div>
+                      </SelectItem>
+                      <SelectItem value="z-a">
+                        <div className="flex items-center gap-2">
+                          <SortAsc className="h-4 w-4 rotate-180 text-green-600" />
+                          Title Z to A
+                        </div>
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
 
-          {!isLoading && filteredCards.length === 0 && (
-            <div className="text-center py-12">
-              <Leaf className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No articles found</h3>
-              <p className="text-gray-500">Try adjusting your search or create a new article.</p>
-            </div>
-          )}
+                  <Badge 
+                    variant="secondary" 
+                    className="bg-green-50 text-green-700 px-4 py-2 shadow-sm"
+                  >
+                    {filteredAndSortedArticles.length} article(s) found
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          >
+            {filteredAndSortedArticles.map((article, index) => (
+              <motion.div
+                key={article.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+              >
+                <Card 
+                  className="group overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer border-gray-200/50 bg-white/80 backdrop-blur-sm"
+                  onClick={() => router.push(`/plant-wiki/${article.id}`)}
+                >
+                  {article.thumbnailImageUrl && (
+                    <div className="relative aspect-[16/9] overflow-hidden">
+                      <img
+                        src={article.thumbnailImageUrl}
+                        alt={article.title}
+                        className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          e.currentTarget.src = 'https://via.placeholder.com/800x400?text=No+Image+Available';
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+                    </div>
+                  )}
+                  <CardContent className="p-5">
+                    <div className="flex items-center gap-2 mb-3">
+                      <BookOpen className="h-4 w-4 text-green-600" />
+                      <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 group-hover:text-green-600 transition-colors">
+                        {article.title}
+                      </h3>
+                    </div>
+                    <p className="text-gray-600 text-sm line-clamp-3 mb-4">
+                      {article.description}
+                    </p>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center gap-1">
+                          <Users2 className="h-3 w-3" />
+                          <span>{article.contributorCount || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Eye className="h-3 w-3" />
+                          <span>View</span>
+                        </div>
+                      </div>
+                      <span>{new Date(article.createdAt).toLocaleDateString()}</span>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
       </div>
     </div>
   );
 }
+

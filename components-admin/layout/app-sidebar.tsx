@@ -18,6 +18,9 @@ import {
 import { navItems } from '@/constants/data'
 import { Icons } from '../icons'
 import Image from 'next/image'
+import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
+import { LogOut, Settings } from 'lucide-react'
 
 export default function AppSidebar({
   onPageChange
@@ -27,54 +30,73 @@ export default function AppSidebar({
   const pathname = usePathname()
 
   return (
-    <Sidebar collapsible='icon'>
-      <SidebarHeader>
-        <div className='flex items-center gap-2 py-2 text-sidebar-accent-foreground'>
+    <Sidebar 
+      collapsible='icon'
+      className="border-r border-slate-200"
+    >
+      <SidebarHeader className="px-4 py-6 border-b border-slate-200">
+        <div className='flex items-center gap-3'>
           <Image
             src='/images/ic_logo.svg'
             alt='Logo'
             width='48'
             height='48'
-            className='relative'
+            className='rounded-xl'
           />
-          <div className='grid flex-1 text-left text-sm leading-tight'>
-            <span className='truncate font-semibold text-lg'>Plan Guru</span>
-            <span className='truncate text-xs'>Admin Page</span>
+          <div className='grid flex-1 text-left'>
+            <span className='text-lg font-bold text-slate-900'>Plan Guru</span>
+            <span className='text-xs text-slate-500'>Admin Dashboard</span>
           </div>
         </div>
       </SidebarHeader>
-      <SidebarContent>
+
+      <SidebarContent className="px-2">
         <SidebarGroup>
-          <SidebarGroupLabel>Overview</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-medium px-4 py-2 text-slate-500">
+            Overview
+          </SidebarGroupLabel>
           <SidebarMenu>
-            {navItems.map(item => {
-              const Icon = item.icon ? Icons[item.icon] : Icons.logo
+            {navItems.map((item) => {
+              const Icon = item.icon ? Icons[item.icon] : Icons.logo;
+              const isActive = pathname === item.url;
+              
               return item?.items && item?.items?.length > 0 ? (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     tooltip={item.title}
-                    isActive={pathname === item.url}
+                    isActive={isActive}
                     onClick={() => onPageChange(item.title)}
+                    className={cn(
+                      "w-full rounded-md transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100",
+                      isActive && "bg-green-500 text-white hover:bg-green-500 hover:text-white"
+                    )}
                   >
-                    {item.icon && <Icon />}
+                    <Icon className="h-5 w-5" />
                     <span>{item.title}</span>
                   </SidebarMenuButton>
-                  <ul>
-                    {item.items.map(subItem => (
-                      <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton
-                          asChild
-                          isActive={pathname === subItem.url}
-                        >
-                          <Link
-                            href={subItem.url}
-                            onClick={() => onPageChange(subItem.title)}
+                  <ul className="pl-4 mt-1 space-y-1">
+                    {item.items.map((subItem) => {
+                      const isSubActive = pathname === subItem.url;
+                      return (
+                        <SidebarMenuSubItem key={subItem.title}>
+                          <SidebarMenuSubButton
+                            asChild
+                            isActive={isSubActive}
+                            className={cn(
+                              "rounded-md transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100",
+                              isSubActive && "bg-green-500 text-white hover:bg-green-500 hover:text-white"
+                            )}
                           >
-                            <span>{subItem.title}</span>
-                          </Link>
-                        </SidebarMenuSubButton>
-                      </SidebarMenuSubItem>
-                    ))}
+                            <Link
+                              href={subItem.url}
+                              onClick={() => onPageChange(subItem.title)}
+                            >
+                              <span>{subItem.title}</span>
+                            </Link>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
                   </ul>
                 </SidebarMenuItem>
               ) : (
@@ -82,13 +104,17 @@ export default function AppSidebar({
                   <SidebarMenuButton
                     asChild
                     tooltip={item.title}
-                    isActive={pathname === item.url}
+                    isActive={isActive}
+                    className={cn(
+                      "w-full rounded-md transition-colors text-slate-600 hover:text-slate-900 hover:bg-slate-100",
+                      isActive && "bg-green-500 text-white hover:bg-green-500 hover:text-white"
+                    )}
                   >
                     <Link
                       href={item.url}
                       onClick={() => onPageChange(item.title)}
                     >
-                      <Icon />
+                      <Icon className="h-5 w-5" />
                       <span>{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -98,7 +124,25 @@ export default function AppSidebar({
           </SidebarMenu>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>Footer Content</SidebarFooter>
+
+      <SidebarFooter className="border-t border-slate-200 p-4">
+        <div className="flex items-center justify-between">
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+          >
+            <Settings className="h-5 w-5" />
+          </Button>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="text-slate-600 hover:text-slate-900 hover:bg-slate-100"
+          >
+            <LogOut className="h-5 w-5" />
+          </Button>
+        </div>
+      </SidebarFooter>
     </Sidebar>
   )
 }

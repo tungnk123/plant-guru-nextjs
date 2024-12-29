@@ -10,7 +10,7 @@ import { toast } from 'react-hot-toast';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { createWikiArticle } from '@/app/api/wikiService';
 import Navbar from '@/app/components/navbar/Navbar';
-import { BookPlus, Image as ImageIcon, FileText, Link2, AlertCircle, ArrowLeft } from 'lucide-react';
+import { ArrowLeft, BookPlus, Image as ImageIcon, FileText, Link2, AlertCircle } from 'lucide-react';
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
@@ -23,6 +23,7 @@ export default function CreateWikiPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!title.trim() || !content.trim()) {
       toast.error('Please fill in all required fields');
       return;
@@ -30,28 +31,35 @@ export default function CreateWikiPage() {
 
     setIsSubmitting(true);
     try {
-      const wiki = await createWikiArticle({
+      await createWikiArticle({
         title,
         description: content,
         thumbnailImageUrl: thumbnailImageUrl || '',
         authorId: localStorage.getItem('userId') || '',
         productIds: []
       });
-      toast.success('Wiki created successfully!');
+
+      toast.success('Wiki created successfully!', {
+        duration: 3000, // Show for 3 seconds
+      });
+
+      setTimeout(() => {
+        router.push('/plant-wiki');
+        router.refresh();
+      }, 1000);
+
     } catch (error) {
       console.error('Error creating wiki:', error);
       toast.error('Failed to create wiki');
-    } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-      <Navbar toggle={() => {}} />
       <div className="container mx-auto py-24 px-4">
         <div className="max-w-3xl mx-auto">
-        <div className="mb-6">
+          <div className="mb-6">
             <Button
               variant="ghost"
               className="group flex items-center gap-2 text-gray-600 hover:text-gray-900"
@@ -61,6 +69,7 @@ export default function CreateWikiPage() {
               Back to Wiki List
             </Button>
           </div>
+
           <Card className="border-gray-200/50 shadow-lg">
             <CardHeader className="space-y-4 pb-6">
               <div className="flex items-center gap-3">

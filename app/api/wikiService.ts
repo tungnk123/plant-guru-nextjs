@@ -58,7 +58,7 @@ export interface WikiCard {
   
   export const createWikiArticle = async (
     payload: CreateWikiArticlePayload
-  ): Promise<void> => {
+  ): Promise<{ id: string }> => {
     try {
       const response = await fetch(
         'https://un-silent-backend-develop.azurewebsites.net/api/Wiki/CreateWikiArticle',
@@ -76,7 +76,7 @@ export interface WikiCard {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
   
-      console.log('Wiki article created successfully');
+      return await response.json();
     } catch (error) {
       console.error('Error creating wiki article:', error);
       throw error;
