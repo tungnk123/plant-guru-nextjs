@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import Navbar from '@/app/components/navbar/Navbar';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, Plus, ThumbsUp, Users, Leaf } from 'lucide-react';
+import { Search, Plus, ThumbsUp, Users, Leaf, Eye } from 'lucide-react';
 import { fetchWikiCards, WikiCard } from '@/app/api/wikiService';
 import { useRouter } from 'next/navigation';
 import {
@@ -17,8 +17,10 @@ import {
 import { toast } from "react-hot-toast";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import LoadingSpinner from '@/app/components/LoadingSpinner';
+import Link from 'next/link';
 
-export default function PlantWikiPage() {
+export default function PlantWikiPage() {   
   const router = useRouter();
   const [wikiCards, setWikiCards] = useState<WikiCard[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +45,17 @@ export default function PlantWikiPage() {
   const filteredCards = wikiCards.filter(card =>
     card.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navbar toggle={() => {}} />
+        <div className="pt-24 flex justify-center">
+          <LoadingSpinner />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
@@ -119,45 +132,36 @@ export default function PlantWikiPage() {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredCards.map((card) => (
-                <Card 
-                  key={card.title}
-                  className="group overflow-hidden hover:shadow-xl transition-all duration-300 border-gray-100"
+                <Link 
+                  href={`/plant-wiki/${card.id}`} 
+                  key={card.id}
+                  className="block hover:no-underline"
                 >
-                  <CardHeader>
-                    <CardTitle className="text-xl font-semibold text-gray-800 group-hover:text-emerald-600 transition-colors duration-300">
-                      {card.title}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="aspect-w-16 aspect-h-9 rounded-xl overflow-hidden bg-gray-100">
-                      {card.thumbnailImageUrl ? (
-                        <img 
-                          src={card.thumbnailImageUrl} 
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer">
+                    <CardHeader className="p-0">
+                      <div className="aspect-video relative">
+                        <img
+                          src={card.thumbnailImageUrl || '/placeholder.png'}
                           alt={card.title}
-                          className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-500"
+                          className="w-full h-full object-cover"
                         />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
-                          <Leaf className="h-12 w-12 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                  <CardFooter className="flex justify-between text-sm text-gray-500 bg-gray-50 group-hover:bg-gray-100 transition-colors duration-300">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <ThumbsUp className="h-3 w-3" />
-                        {card.upvotes}
-                      </Badge>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="flex items-center gap-1">
-                        <Users className="h-3 w-3" />
-                        {card.contributorCount} contributors
-                      </Badge>
-                    </div>
-                  </CardFooter>
-                </Card>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="p-4">
+                      <h3 className="font-semibold text-lg mb-2 line-clamp-1">{card.title}</h3>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="flex items-center gap-1">
+                          <ThumbsUp className="h-3 w-3" />
+                          {card.upvotes} upvotes
+                        </Badge>
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Users className="h-3 w-3" />
+                          {card.contributorCount || 0} contributors
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               ))}
             </div>
           )}

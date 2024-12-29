@@ -2,36 +2,33 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { WikiCard } from '@/app/api/wikiService';
+import { Wiki, fetchWikiById } from '@/app/api/wikiService';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ThumbsUp, Users, Calendar } from 'lucide-react';
+import { ArrowLeft, ThumbsUp, Users, Calendar, Send } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { format } from 'date-fns';
+import { formatCurrentDate } from '@/app/lib/utils';
 import Navbar from '@/app/components/navbar/Navbar';
+import { Textarea } from '@/components/ui/textarea';
+import { submitContribution } from '@/app/api/contributionService';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 
-export default function WikiArticlePage() {
+export default function WikiDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const [wiki, setWiki] = useState<WikiCard | null>(null);
+  const [wiki, setWiki] = useState<Wiki | null>(null);
   const [loading, setLoading] = useState(true);
+  const [contribution, setContribution] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const loadWiki = async () => {
       try {
-        // Fetch wiki by ID
-        // const wikiData = await fetchWikiById(params.wikiId as string);
-        // setWiki(wikiData);
-        // Temporary mock data
-        setWiki({
-          id: params.wikiId as string,
-          title: "Plant Care Guide",
-          thumbnailImageUrl: "",
-          upvotes: 10,
-          contributorCount: 5,
-        });
+        const wikiData = await fetchWikiById(params.wikiId as string);
+        setWiki(wikiData);
+        setContribution(wikiData.content || '');
       } catch (error) {
         console.error('Error fetching wiki:', error);
         toast.error('Failed to load wiki article');
@@ -42,6 +39,37 @@ export default function WikiArticlePage() {
 
     loadWiki();
   }, [params.wikiId]);
+
+  const handleContribute = async () => {
+    if (!contribution.trim()) {
+      toast.error('Please enter your contribution');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Check if user is logged in
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        toast.error('Please login to contribute');
+        return;
+      }
+
+      const result = await submitContribution(params.wikiId as string, contribution);
+      console.log('Contribution submitted:', result);
+      toast.success('Contribution submitted successfully');
+      setContribution('');
+    } catch (error) {
+      console.error('Error submitting contribution:', error);
+      if (error instanceof Error && error.message === 'User not logged in') {
+        toast.error('Please login to contribute');
+      } else {
+        toast.error('Failed to submit contribution');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen bg-gray-50">
@@ -83,11 +111,11 @@ export default function WikiArticlePage() {
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
-                      {wiki.contributorCount} contributors
+                      {wiki.contributorIds.length} contributors
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      Last updated {format(new Date(), 'PP')}
+                      {formatCurrentDate()}
                     </Badge>
                   </div>
                 </div>
@@ -106,9 +134,40 @@ export default function WikiArticlePage() {
               )}
               
               <div className="prose max-w-none">
-                <p className="text-gray-600">
-                  Content will be displayed here...
+                <p className="text-gray-600 whitespace-pre-line">
+                  {wiki.content}
                 </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="mt-8 border border-gray-200">
+            <CardHeader>
+              <CardTitle>Contribute to this Wiki</CardTitle>
+              <p className="text-sm text-gray-500">
+                Edit the content below to submit your contribution
+              </p>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <Textarea
+                  placeholder="Share your knowledge..."
+                  value={contribution}
+                  onChange={(e) => setContribution(e.target.value)}
+                  className="min-h-[150px]"
+                />
+                <Button 
+                  className="w-full"
+                  onClick={handleContribute}
+                  disabled={isSubmitting || !contribution.trim() || contribution === wiki?.content}
+                >
+                  {isSubmitting ? (
+                    <LoadingSpinner className="h-4 w-4 mr-2" />
+                  ) : (
+                    <Send className="h-4 w-4 mr-2" />
+                  )}
+                  Submit Contribution
+                </Button>
               </div>
             </CardContent>
           </Card>

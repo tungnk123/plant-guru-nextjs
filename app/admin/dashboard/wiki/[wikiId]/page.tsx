@@ -10,20 +10,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2, ThumbsUp, Users, Calendar, ArrowLeft } from 'lucide-react';
 import { toast } from 'react-hot-toast';
-import { format } from 'date-fns';
+import { formatCurrentDate } from '@/app/lib/utils';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ContributionsList from '@/app/components/contributions-list';
-
-// Thêm hàm helper để parse ISO date string
-const formatDate = (dateString: string) => {
-  try {
-    const currentDate = new Date();
-    return format(currentDate, 'PPp'); // Format: "Dec 28, 2023, 3:56 PM"
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return 'Invalid date';
-  }
-};
 
 export default function AdminWikiPage() {
   const params = useParams();
@@ -85,14 +74,14 @@ export default function AdminWikiPage() {
     }
   };
 
-  const handleRejectContribution = async (contributionId: string) => {
+  const handleRejectContribution = async (contributionId: string, reason: string) => {
     try {
-      await rejectContribution(params.wikiId as string, contributionId);
+      await rejectContribution(params.wikiId as string, contributionId, reason);
       
       // Update contributions list by removing the rejected one
       setContributions(prev => prev.filter(c => c.id !== contributionId));
       
-      // Refresh history to show the rejected contribution
+      // Refresh history
       const newHistory = await fetchContributionHistory(params.wikiId as string);
       setHistory(newHistory);
       
@@ -166,7 +155,7 @@ export default function AdminWikiPage() {
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
                       <Calendar className="h-3 w-3" />
-                      {formatDate(new Date().toISOString())}
+                      {formatCurrentDate()}
                     </Badge>
                   </div>
                 </div>
@@ -214,7 +203,7 @@ export default function AdminWikiPage() {
                             Contributor ID: {contribution.contributorId}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {formatDate(new Date().toISOString())}
+                            {formatCurrentDate()}
                           </p>
                         </div>
                       </div>

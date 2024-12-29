@@ -62,7 +62,7 @@ export const approveContribution = async (wikiId: string, contributionId: string
   }
 };
 
-export const rejectContribution = async (wikiId: string, contributionId: string): Promise<void> => {
+export const rejectContribution = async (wikiId: string, contributionId: string, reason: string): Promise<void> => {
   try {
     const response = await fetch(
       `${API_BASE_URL}/Contributions/${wikiId}/contributions/${contributionId}/reject`,
@@ -71,7 +71,8 @@ export const rejectContribution = async (wikiId: string, contributionId: string)
         headers: {
           'accept': '*/*',
           'Content-Type': 'application/json'
-        }
+        },
+        body: JSON.stringify(reason)
       }
     );
 
@@ -102,6 +103,58 @@ export const fetchContributionHistory = async (wikiId: string): Promise<Contribu
     return await response.json();
   } catch (error) {
     console.error('Error fetching contribution history:', error);
+    throw error;
+  }
+};
+
+interface SubmitContributionRequest {
+  content: string;
+  contributorId: string;
+}
+
+interface SubmitContributionResponse {
+  id: string;
+  wikiId: string;
+  content: string;
+  status: number;
+  contributorId: string;
+}
+
+export const submitContribution = async (
+  wikiId: string, 
+  content: string
+): Promise<SubmitContributionResponse> => {
+  try {
+    // Get contributorId from localStorage
+    const contributorId = localStorage.getItem('userId');
+    if (!contributorId) {
+      throw new Error('User not logged in');
+    }
+
+    const payload: SubmitContributionRequest = {
+      content,
+      contributorId
+    };
+
+    const response = await fetch(
+      `${API_BASE_URL}/Contributions/${wikiId}/contributions`,
+      {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error('Failed to submit contribution');
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error submitting contribution:', error);
     throw error;
   }
 };
