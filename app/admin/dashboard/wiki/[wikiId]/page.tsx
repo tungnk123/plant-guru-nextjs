@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { WikiCard } from '@/app/api/wikiService';
-import { Contribution, fetchPendingContributions } from '@/app/api/contributionService';
+import { Wiki, fetchWikiById } from '@/app/api/wikiService';
+import { Contribution, fetchPendingContributions, fetchContributionHistory, approveContribution, rejectContribution } from '@/app/api/contributionService';
 import PageContainer from '@/components-admin/layout/page-container';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -14,29 +14,40 @@ import { format } from 'date-fns';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ContributionsList from '@/app/components/contributions-list';
 
+// Thêm hàm helper để parse ISO date string
+const formatDate = (dateString: string) => {
+  try {
+    const currentDate = new Date();
+    return format(currentDate, 'PPp'); // Format: "Dec 28, 2023, 3:56 PM"
+  } catch (error) {
+    console.error('Error formatting date:', error);
+    return 'Invalid date';
+  }
+};
+
 export default function AdminWikiPage() {
   const params = useParams();
   const router = useRouter();
-  const [wiki, setWiki] = useState<WikiCard | null>(null);
+  const [wiki, setWiki] = useState<Wiki | null>(null);
   const [contributions, setContributions] = useState<Contribution[]>([]);
+  const [history, setHistory] = useState<Contribution[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        // Fetch contributions only
-        const contributionsData = await fetchPendingContributions(params.wikiId as string);
+        const [wikiData, contributionsData, historyData] = await Promise.all([
+          fetchWikiById(params.wikiId as string),
+          fetchPendingContributions(params.wikiId as string),
+          fetchContributionHistory(params.wikiId as string)
+        ]);
         
-        // Temporary mock wiki data
-        setWiki({
-          id: params.wikiId as string,
-          title: "Plant Care Guide",
-          thumbnailImageUrl: "",
-          upvotes: 10,
-          contributorCount: 5,
-        });
+        console.log('Wiki Data:', wikiData);
+        console.log('History Data:', historyData);
         
+        setWiki(wikiData);
         setContributions(contributionsData);
+        setHistory(historyData);
       } catch (error) {
         console.error('Error fetching data:', error);
         toast.error('Failed to load data');
@@ -48,14 +59,48 @@ export default function AdminWikiPage() {
     loadData();
   }, [params.wikiId]);
 
-  const handleEdit = () => {
-    router.push(`/admin/dashboard/wiki/${params.wikiId}/edit`);
+  const handleApproveContribution = async (contributionId: string) => {
+    try {
+      const result = await approveContribution(params.wikiId as string, contributionId);
+      console.log('Approve result:', result);
+      
+      // Update contributions list by removing the approved one
+      setContributions(prev => prev.filter(c => c.id !== contributionId));
+      
+      // Update wiki content with the new content
+      setWiki(prev => prev ? {
+        ...prev,
+        content: result.content,
+        contributorIds: [...prev.contributorIds, contributionId] // Add contributor
+      } : null);
+
+      // Refresh history to show the approved contribution
+      const newHistory = await fetchContributionHistory(params.wikiId as string);
+      setHistory(newHistory);
+      
+      toast.success('Contribution approved successfully');
+    } catch (error) {
+      console.error('Error approving contribution:', error);
+      toast.error('Failed to approve contribution');
+    }
   };
 
-  const handleDelete = async () => {
-    // Add delete confirmation and API call
-    toast.success('Wiki article deleted');
-    router.push('/admin/dashboard/wiki');
+  const handleRejectContribution = async (contributionId: string) => {
+    try {
+      await rejectContribution(params.wikiId as string, contributionId);
+      
+      // Update contributions list by removing the rejected one
+      setContributions(prev => prev.filter(c => c.id !== contributionId));
+      
+      // Refresh history to show the rejected contribution
+      const newHistory = await fetchContributionHistory(params.wikiId as string);
+      setHistory(newHistory);
+      
+      toast.success('Contribution rejected successfully');
+    } catch (error) {
+      console.error('Error rejecting contribution:', error);
+      toast.error('Failed to reject contribution');
+    }
   };
 
   if (loading) {
@@ -86,7 +131,7 @@ export default function AdminWikiPage() {
             <Button
               variant="outline"
               className="flex items-center gap-2 border-blue-500 text-blue-500 hover:bg-blue-100"
-              onClick={handleEdit}
+              onClick={() => router.push(`/admin/dashboard/wiki/${wiki.id}/edit`)}
             >
               <Pencil className="h-4 w-4" />
               Edit
@@ -94,7 +139,7 @@ export default function AdminWikiPage() {
             <Button
               variant="outline"
               className="flex items-center gap-2 border-red-500 text-red-500 hover:bg-red-100"
-              onClick={handleDelete}
+              onClick={() => {/* handle delete */}}
             >
               <Trash2 className="h-4 w-4" />
               Delete
@@ -117,7 +162,11 @@ export default function AdminWikiPage() {
                     </Badge>
                     <Badge variant="outline" className="flex items-center gap-1">
                       <Users className="h-3 w-3" />
-                      {wiki.contributorCount} contributors
+                      {wiki.contributorIds.length} contributors
+                    </Badge>
+                    <Badge variant="outline" className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {formatDate(new Date().toISOString())}
                     </Badge>
                   </div>
                 </div>
@@ -136,8 +185,8 @@ export default function AdminWikiPage() {
               )}
               
               <div className="prose max-w-none">
-                <p className="text-gray-600">
-                  Content will be displayed here...
+                <p className="text-gray-600 whitespace-pre-line">
+                  {wiki.content}
                 </p>
               </div>
             </CardContent>
@@ -147,15 +196,48 @@ export default function AdminWikiPage() {
             <h2 className="text-xl font-bold mb-4">Pending Contributions</h2>
             <ContributionsList 
               contributions={contributions}
-              onApprove={(id) => {
-                setContributions(prev => prev.filter(c => c.id !== id));
-                toast.success('Contribution approved');
-              }}
-              onReject={(id) => {
-                setContributions(prev => prev.filter(c => c.id !== id));
-                toast.success('Contribution rejected');
-              }}
+              onApprove={handleApproveContribution}
+              onReject={handleRejectContribution}
             />
+          </div>
+
+          <div className="mt-8">
+            <h2 className="text-xl font-bold mb-4">Contribution History</h2>
+            <div className="space-y-4">
+              {history.map((contribution) => (
+                <Card key={contribution.id}>
+                  <CardHeader className="bg-gray-50">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-4">
+                        <div>
+                          <p className="text-sm font-medium">
+                            Contributor ID: {contribution.contributorId}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatDate(new Date().toISOString())}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge variant={contribution.status === 1 ? "success" : "destructive"}>
+                        {contribution.status === 1 ? 'Approved' : 'Rejected'}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="mt-2">
+                    <div className="prose max-w-none">
+                      <p className="text-gray-600 whitespace-pre-line">
+                        {contribution.content}
+                      </p>
+                    </div>
+                    {contribution.rejectionReason && (
+                      <div className="mt-2 text-sm text-red-600">
+                        Rejection reason: {contribution.rejectionReason}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
         </ScrollArea>
       </div>

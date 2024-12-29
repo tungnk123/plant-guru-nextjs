@@ -1,10 +1,26 @@
 // Define the type for a WikiCard
 export interface WikiCard {
     id: string;
-    thumbnailImageUrl: string;
     title: string;
+    description?: string;
+    thumbnailImageUrl: string;
     upvotes: number;
     contributorCount: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+  }
+
+  export interface Wiki {
+    id: string;
+    title: string;
+    description: string;
+    thumbnailImageUrl: string;
+    contributorIds: string[];
+    authorId: string;
+    upvotes: number;
+    downvotes: number;
+    content: string;
+    createdAt: string;
   }
   
   // Define a function to fetch the wiki cards using fetch
@@ -63,6 +79,32 @@ export interface WikiCard {
       console.log('Wiki article created successfully');
     } catch (error) {
       console.error('Error creating wiki article:', error);
+      throw error;
+    }
+  };
+  
+  const API_BASE_URL = 'https://un-silent-backend-develop.azurewebsites.net/api';
+
+  export const fetchWikiById = async (id: string): Promise<Wiki> => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/Wiki/GetWikiById/${id}`,
+        {
+          headers: {
+            'accept': '*/*'
+          }
+        }
+      );
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch wiki');
+      }
+  
+      const data = await response.json();
+      console.log('Wiki Data:', data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching wiki:', error);
       throw error;
     }
   };
