@@ -1,12 +1,26 @@
 import Link from 'next/link';
-import { useState } from 'react';
-import { Upload } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { Upload, Loader2, Sprout, Leaf, Cloud, Droplets } from 'lucide-react';
 import Image from 'next/image';
+import LottieAnimation from '@/app/components/LottieAnimation';
+import uploadAnimation from "@/public/animations/lottie_upload.json";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { motion, AnimatePresence } from "framer-motion";
+import { SP } from 'next/dist/shared/lib/utils';
 
 const PlantIdentifier = () => {
-  const [image, setImage] = useState<string | null>(
-    '/images/img_upload_image.png'
-  );
+  const [image, setImage] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [plantInfo, setPlantInfo] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -15,6 +29,12 @@ const PlantIdentifier = () => {
     if (file) {
       setImage(URL.createObjectURL(file));
       await identifyPlant(file);
+    }
+  };
+
+  const handleButtonClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
   };
 
@@ -80,133 +100,215 @@ const PlantIdentifier = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center bg-white relative overflow-hidden">
-      <h1 className="mt-4 text-2xl font-bold text-gray-800">
-        Identify Plants for free
-      </h1>
-      <p className="mt-2 max-w-md text-center text-sm text-gray-600">
-        Instantly identify plants, flowers, and trees. Explore gardening tips,
-        detailed care guides, and the plant world around you.
-      </p>
-
-      {/* Container for upload section and results */}
-      <div className="flex w-full mt-8 justify-center items-start transition-all duration-500 ease-in-out relative">
-        {/* Upload Section */}
-        <div
-          className={`transition-transform duration-500 ease-in-out ${plantInfo ? '-translate-x-[15%]' : 'translate-x-0'
-            } flex w-[400px] flex-col items-center rounded-lg border-2 border-black bg-[#80FF0022] p-6 shadow-md`}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={handleDrop}
-        >
-          <div className="mb-4 flex h-[250px] w-[250px] items-center justify-center rounded-md bg-gray-100">
-            {image ? (
-              <img
-                src={image}
-                alt="Uploaded"
-                className="h-full w-full rounded-md object-cover"
-              />
-            ) : (
-              <p className="text-gray-500">Drop an image here</p>
-            )}
-          </div>
-          <p>or drag and drop an image</p>
-
-          <div className="mt-4">
-            <label
-              htmlFor="file-upload"
-              className="flex cursor-pointer items-center gap-2 rounded-lg bg-yellow-300 px-4 py-2 text-black hover:bg-yellow-600"
-            >
-              <Upload className="h-5 w-5" />
-              Upload an image
-            </label>
-            <input
-              id="file-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-          </div>
-        </div>
-
-
-        {/* Separator */}
-        <div
-          className="w-[1px] bg-gray-500 h-[500px] mx-8 transition-opacity duration-500 ease-in-out"
-          style={{
-            height: `${Math.min(
-              (plantInfo?.result?.classification?.suggestions?.length || 0),
-              5
-            ) * 84}px`, // 84px per item height including margin
-          }}
-        ></div>
-
-        {/* Identification Results Section */}
-        {plantInfo && (
-          <div className="ml-16 w-[500px] transition-transform duration-500 ease-in-out">
-            <div className="rounded-md bg-white p-4 ">
-              <h2 className="text-center mb-4 text-lg font-bold">
-                Identification Result
-              </h2>
-              {plantInfo.result.classification.suggestions.slice(0, 5).map(
-                (suggestion: any, index: number) => (
-                  <div
-                    key={index}
-                    className="mb-4 flex items-center justify-between p-4 rounded-lg bg-[#80FF00] shadow-md cursor-pointer hover:ring-2 hover:ring-blue-400"
-                    onClick={() =>
-                      window.location.href = `/plant-detail/?data=${encodeURIComponent(
-                        JSON.stringify({
-                          name: suggestion.name || 'Unknown Plant',
-                          description:
-                            suggestion.details?.description?.value ||
-                            'No description available.',
-                          common_names: suggestion.details?.common_names || [],
-                          synonyms: suggestion.details?.synonyms || [],
-                          taxonomy: suggestion.details?.taxonomy || {},
-                          image: suggestion.details?.image?.value || '',
-                          url: suggestion.details?.url || '',
-                          edible_parts: suggestion.details?.edible_parts || [],
-                          gbif_id: suggestion.details?.gbif_id || 0,
-                          inaturalist_id:
-                            suggestion.details?.inaturalist_id || 0,
-                          rank: suggestion.details?.rank || '',
-                          probability: suggestion.probability || 0,
-                        })
-                      )}`
-                    }
-                  >
-                    <Image
-                      src={
-                        suggestion.details?.image?.value ||
-                        '/images/placeholder.png'
-                      }
-                      alt={suggestion.name || 'Unknown'}
-                      width={64}
-                      height={64}
-                      className="h-16 w-16 rounded-full border object-cover"
-                    />
-                    {/* Name */}
-                    <div className="flex-grow ml-4">
-                      <p className="text-lg font-bold text-black">{suggestion.name || 'Unknown Plant'}</p>
-                    </div>
-                    {/* Percentage */}
-                    <div className="text-lg font-bold text-black">
-                      {(suggestion.probability * 100).toFixed(0)}%
-                    </div>
-                  </div>
-                )
-              )}
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen flex flex-col items-center bg-gradient-to-b from-green-100 via-blue-100 to-purple-100 p-8">
+      <div className="absolute inset-0 bg-grid-black/[0.02] -z-10" />
+      <div className="absolute inset-0 flex items-center justify-center -z-10">
+        <div className="w-full h-full max-w-5xl bg-gradient-to-r from-green-400/10 via-emerald-400/10 to-teal-400/10 blur-3xl" />
       </div>
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-5xl"
+      >
+        <Card className="border-slate-200/60 shadow-xl backdrop-blur-sm bg-white/70">
+          <CardHeader className="text-center space-y-6 pb-8">
+            <div className="space-y-2">
+              <Badge variant="outline" className="px-4 py-1 border-green-200 text-green-700">
+                AI-Powered Plant Recognition
+              </Badge>
+              <CardTitle className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-transparent bg-clip-text flex items-center justify-center gap-3 pt-2">
+                <Sprout className="h-8 w-8 text-green-500" />
+                Plant Identifier
+              </CardTitle>
+              <CardDescription className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Instantly identify plants, flowers, and trees. Explore gardening tips,
+                detailed care guides, and the plant world around you.
+              </CardDescription>
+            </div>
+            
+            <div className="flex justify-center gap-8 text-sm">
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-green-50 text-green-700">
+                <Leaf className="h-4 w-4" />
+                <span>10,000+ Plants</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-700">
+                <Cloud className="h-4 w-4" />
+                <span>Free Upload</span>
+              </div>
+              <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-700">
+                <Droplets className="h-4 w-4" />
+                <span>Care Guides</span>
+              </div>
+            </div>
+          </CardHeader>
 
-      {isLoading && (
-        <div className="mt-4 flex items-center gap-2">
-          <div className="h-4 w-4 animate-spin rounded-full border-2 border-yellow-500 border-t-transparent"></div>
-          <p className="text-yellow-500">Identifying the plant...</p>
-        </div>
-      )}
+          <CardContent className="p-8">
+            <div className="flex w-full justify-center items-start gap-8">
+              {/* Upload Section */}
+              <motion.div
+                layout
+                className={`transition-all duration-500 ${plantInfo ? 'w-1/3' : 'w-2/5'}`}
+              >
+                <Card className="border-slate-200/60 shadow-lg hover:shadow-xl transition-all">
+                  <CardContent className="p-6">
+                    <div
+                      className="relative group cursor-pointer rounded-lg border-2 border-dashed border-slate-300 hover:border-green-500/50 transition-all"
+                      onDragOver={(e) => e.preventDefault()}
+                      onDrop={handleDrop}
+                    >
+                      <div className="flex flex-col items-center justify-center p-6 text-center">
+                        <div className="mb-4 h-[300px] w-full relative rounded-lg overflow-hidden bg-gradient-to-br from-slate-50 to-green-50 group-hover:shadow-md transition-all">
+                          {image ? (
+                            <Image
+                              src={image}
+                              alt="Uploaded"
+                              fill
+                              className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="h-full flex flex-col items-center justify-center gap-4">
+                              <div className="w-48 h-48">
+                                <LottieAnimation
+                                  animationData={uploadAnimation}
+                                  loop={true}
+                                />
+                              </div>
+                              <p className="text-sm text-slate-500">Drop your image here</p>
+                            </div>
+                          )}
+                        </div>
+                        <Separator className="my-6" />
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Button 
+                                variant="default" 
+                                className="gap-2 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white shadow-md hover:shadow-lg transition-all"
+                                onClick={handleButtonClick}
+                              >
+                                <Upload className="h-4 w-4" />
+                                Upload an image
+                              </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>
+                              <p>Click to select an image</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          className="hidden"
+                          onChange={handleFileUpload}
+                        />
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </motion.div>
+
+              {/* Results Section */}
+              <AnimatePresence>
+                {plantInfo && (
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    className="flex-1"
+                  >
+                    <Card className="border-slate-200/60 shadow-lg">
+                      <CardHeader>
+                        <CardTitle className="text-xl text-green-700 flex items-center gap-2">
+                          <Sprout className="h-5 w-5" />
+                          Identification Results
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent className="space-y-4">
+                        {plantInfo.result.classification.suggestions.slice(0, 5).map(
+                          (suggestion: any, index: number) => (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              key={index}
+                            >
+                              <Button
+                                variant="outline"
+                                className="w-full h-auto p-4 hover:bg-green-50/50 hover:border-green-200 transition-all"
+                                onClick={() =>
+                                  window.location.href = `/plant-detail/?data=${encodeURIComponent(
+                                    JSON.stringify({
+                                      name: suggestion.name || 'Unknown Plant',
+                                      description: suggestion.details?.description?.value || 'No description available.',
+                                      common_names: suggestion.details?.common_names || [],
+                                      synonyms: suggestion.details?.synonyms || [],
+                                      taxonomy: suggestion.details?.taxonomy || {},
+                                      image: suggestion.details?.image?.value || '',
+                                      url: suggestion.details?.url || '',
+                                      edible_parts: suggestion.details?.edible_parts || [],
+                                      gbif_id: suggestion.details?.gbif_id || 0,
+                                      inaturalist_id: suggestion.details?.inaturalist_id || 0,
+                                      rank: suggestion.details?.rank || '',
+                                      probability: suggestion.probability || 0,
+                                    })
+                                  )}`
+                                }
+                              >
+                                <div className="flex items-center w-full gap-4">
+                                  <div className="relative h-16 w-16 rounded-full overflow-hidden border-2 border-slate-200">
+                                    <Image
+                                      src={suggestion.details?.image?.value || '/images/placeholder.png'}
+                                      alt={suggestion.name || 'Unknown'}
+                                      fill
+                                      className="object-cover"
+                                    />
+                                  </div>
+                                  <div className="flex-1 text-left">
+                                    <p className="font-semibold text-green-700">{suggestion.name || 'Unknown Plant'}</p>
+                                    <Progress 
+                                      value={suggestion.probability * 100} 
+                                      className="h-2 mt-2 bg-slate-100"
+                                    />
+                                  </div>
+                                  <Badge variant="outline" className="text-lg font-bold text-green-600 border-green-200">
+                                    {(suggestion.probability * 100).toFixed(0)}%
+                                  </Badge>
+                                </div>
+                              </Button>
+                            </motion.div>
+                          )
+                        )}
+                      </CardContent>
+                    </Card>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
+
+      {/* Loading State */}
+      <AnimatePresence>
+        {isLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center"
+          >
+            <Card className="border-slate-200/60 shadow-lg">
+              <CardContent className="flex items-center gap-3 p-6">
+                <Loader2 className="h-5 w-5 animate-spin text-green-500" />
+                <p className="text-lg text-green-700">Identifying the plant...</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
