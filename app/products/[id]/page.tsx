@@ -122,7 +122,7 @@ const ProductDetail = () => {
             <div className="w-full max-w-md h-96 flex items-center justify-center overflow-hidden rounded-lg shadow-xl relative">
               <img
                 className="object-cover w-full h-full transition-transform transform hover:scale-105"
-                src={product.productImages[currentImageIndex]}
+                src={product.productImages.length > 0 ? product.productImages[currentImageIndex] : '/images/ic_logo.svg'}
                 alt={product.productName}
               />
               {product.quantity === 0 && <OutOfStockBadge />}

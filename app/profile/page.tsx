@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Crown, Mail, User, Calendar, Shield, LogOut, Edit, Trash2, Plus } from 'lucide-react';
 import Navbar from '@/app/components/navbar/Navbar';
 import { fetchUserById } from '@/app/admin/api/user';
-import { fetchProductsByUser, ProductData } from '@/app/api/productService';
+import { fetchProductsByUser, ProductData, deleteProduct } from '@/app/api/productService';
 import { useRouter } from 'next/navigation';
 import { toast } from 'react-hot-toast';
 import {
@@ -25,6 +25,7 @@ import { Separator } from "@/components/ui/separator";
 import Link from 'next/link';
 import OutOfStockBadge from '@/app/components/OutOfStockBadge';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
+import { fetchOrdersByUser, OrderData } from '@/app/api/orderService';
 
 interface User {
   userId: string;
@@ -40,6 +41,8 @@ export default function ProfilePage() {
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
+  const [orders, setOrders] = useState<OrderData[]>([]);
+  const [activeTab, setActiveTab] = useState('profile');
   const router = useRouter();
 
   useEffect(() => {
@@ -72,6 +75,12 @@ export default function ProfilePage() {
             const productsData = await fetchProductsByUser(storedUserId);
             setProducts(productsData);
           }
+
+          // Fetch orders if the user is not premium
+          if (!userData.isHavePremium) {
+            const ordersData = await fetchOrdersByUser(storedUserId);
+            setOrders(ordersData);
+          }
         } else {
           console.log('Unexpected user data structure:', userData);
           toast.error('Could not load user profile');
@@ -95,9 +104,15 @@ export default function ProfilePage() {
     toast.success('Signed out successfully');
   };
 
-  const handleDeleteProduct = (productId: string) => {
-    // Implement product deletion logic here
-    console.log(`Deleting product with ID: ${productId}`);
+  const handleDeleteProduct = async (productId: string) => {
+    try {
+      await deleteProduct(productId);
+      toast.success('Product deleted successfully');
+      // Optionally, remove the deleted product from the state
+      setProducts((prevProducts) => prevProducts.filter(product => product.id !== productId));
+    } catch (error) {
+      toast.error('Failed to delete product');
+    }
   };
 
   if (loading) {
@@ -145,137 +160,169 @@ export default function ProfilePage() {
             </div>
           </CardHeader>
           <CardContent className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="col-span-1">
-                <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-inner">
-                  <img 
-                    src={user.avatar || '/images/ic_user.svg'} 
-                    alt={user.name}
-                    className="w-full h-full object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = '/images/ic_user.svg';
-                    }}
-                  />
-                </div>
-                <div className="mt-6 space-y-4">
-                  <Badge variant="outline" className="w-full justify-center py-2">
-                    {user.isHavePremium ? 'Premium Account' : 'Basic Account'}
-                  </Badge>
-                  <Button 
-                    variant="destructive"
-                    className="w-full"
-                    onClick={handleSignOut}
-                  >
-                    <LogOut className="h-4 w-4 mr-2" />
-                    Sign Out
-                  </Button>
-                </div>
-              </div>
-
-              <div className="col-span-2 space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-500 flex items-center gap-2">
-                      <User className="h-4 w-4" />
-                      Name
-                    </label>
-                    <p className="text-lg font-medium text-gray-900 bg-white/50 backdrop-blur-sm rounded-lg p-3 border">
-                      {user.name || 'Not set'}
-                    </p>
+            <div className="flex space-x-4 mb-6">
+              <Button variant={activeTab === 'profile' ? 'default' : 'outline'} onClick={() => setActiveTab('profile')}>
+                Profile
+              </Button>
+              {!user.isHavePremium && (
+                <Button variant={activeTab === 'orders' ? 'default' : 'outline'} onClick={() => setActiveTab('orders')}>
+                  Orders
+                </Button>
+              )}
+            </div>
+            {activeTab === 'profile' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="col-span-1">
+                  <div className="aspect-square rounded-2xl overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 shadow-inner">
+                    <img 
+                      src={user.avatar || '/images/ic_user.svg'} 
+                      alt={user.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/images/ic_user.svg';
+                      }}
+                    />
                   </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm text-gray-500 flex items-center gap-2">
-                      <Mail className="h-4 w-4" />
-                      Email
-                    </label>
-                    <p className="text-lg font-medium text-gray-900 bg-white/50 backdrop-blur-sm rounded-lg p-3 border">
-                      {user.email}
-                    </p>
+                  <div className="mt-6 space-y-4">
+                    <Badge variant="outline" className="w-full justify-center py-2">
+                      {user.isHavePremium ? 'Premium Account' : 'Basic Account'}
+                    </Badge>
+                    <Button 
+                      variant="destructive"
+                      className="w-full"
+                      onClick={handleSignOut}
+                    >
+                      <LogOut className="h-4 w-4 mr-2" />
+                      Sign Out
+                    </Button>
                   </div>
                 </div>
 
-                <Separator />
-
-                <div className="space-y-4">
-                  <h3 className="text-lg font-semibold flex items-center gap-2">
-                    <Shield className="h-5 w-5 text-gray-500" />
-                    Account Status
-                  </h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border">
-                      <p className="text-sm text-gray-500">Member Since</p>
-                      <p className="text-base font-medium text-gray-900">
-                        {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                <div className="col-span-2 space-y-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-sm text-gray-500 flex items-center gap-2">
+                        <User className="h-4 w-4" />
+                        Name
+                      </label>
+                      <p className="text-lg font-medium text-gray-900 bg-white/50 backdrop-blur-sm rounded-lg p-3 border">
+                        {user.name || 'Not set'}
                       </p>
                     </div>
-                    <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border">
-                      <p className="text-sm text-gray-500">Account Type</p>
-                      <p className="text-base font-medium text-gray-900">
-                        {user.isHavePremium ? 'Premium' : 'Basic'} Account
+
+                    <div className="space-y-2">
+                      <label className="text-sm text-gray-500 flex items-center gap-2">
+                        <Mail className="h-4 w-4" />
+                        Email
+                      </label>
+                      <p className="text-lg font-medium text-gray-900 bg-white/50 backdrop-blur-sm rounded-lg p-3 border">
+                        {user.email}
                       </p>
                     </div>
                   </div>
-                </div>
 
-                {user.isHavePremium && (
-                  <>
-                    <Separator />
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-semibold">Your Shop</h3>
-                      <div className="flex space-x-2">
-                        <Button
-                          variant="outline"
-                          onClick={() => setEditMode(!editMode)}
-                          className="flex items-center"
-                        >
-                          <Edit className="h-4 w-4 mr-2" />
-                          {editMode ? 'Cancel' : 'Edit'}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          onClick={() => router.push('/create-product')}
-                          className="flex items-center"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create Product
-                        </Button>
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <Shield className="h-5 w-5 text-gray-500" />
+                      Account Status
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border">
+                        <p className="text-sm text-gray-500">Member Since</p>
+                        <p className="text-base font-medium text-gray-900">
+                          {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A'}
+                        </p>
+                      </div>
+                      <div className="bg-white/50 backdrop-blur-sm rounded-lg p-4 border">
+                        <p className="text-sm text-gray-500">Account Type</p>
+                        <p className="text-base font-medium text-gray-900">
+                          {user.isHavePremium ? 'Premium' : 'Basic'} Account
+                        </p>
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {products.map((product) => (
-                        <div key={product.id} className="relative block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg hover:border-orange-500 transition-all duration-200 cursor-pointer">
-                          <Link href={editMode ? `/products/edit/${product.id}` : `/products/${product.id}`}>
-                            <img
-                              className="w-full h-48 object-cover"
-                              src={product.productImages[0] || '/placeholder.png'}
-                              alt={product.productName}
-                            />
-                            {product.quantity === 0 && <OutOfStockBadge />}
-                            <div className="p-4">
-                              <h3 className="text-lg font-semibold text-gray-800">{product.productName}</h3>
-                              <p className="text-orange-500 font-medium">${product.price.toFixed(2)}</p>
-                              <p className="text-sm text-gray-600">Stock: {product.quantity}</p>
-                            </div>
-                          </Link>
-                          {editMode && (
-                            <div className="absolute top-2 right-2">
-                              <Button
-                                variant="destructive"
-                                size="sm"
-                                onClick={() => handleDeleteProduct(product.id)}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          )}
+                  </div>
+
+                  {user.isHavePremium && (
+                    <>
+                      <Separator />
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-semibold">Your Shop</h3>
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => setEditMode(!editMode)}
+                            className="flex items-center"
+                          >
+                            <Edit className="h-4 w-4 mr-2" />
+                            {editMode ? 'Cancel' : 'Edit'}
+                          </Button>
+                          <Button
+                            variant="outline"
+                            onClick={() => router.push('/create-product')}
+                            className="flex items-center"
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create Product
+                          </Button>
                         </div>
-                      ))}
-                    </div>
-                  </>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {products.map((product) => (
+                          <div key={product.id} className="relative block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg hover:border-orange-500 transition-all duration-200 cursor-pointer">
+                            <Link href={editMode ? `/products/edit/${product.id}` : `/products/${product.id}`}>
+                              <img
+                                className="w-full h-48 object-cover"
+                                src={product.productImages.length > 0 ? product.productImages[0] : '/images/ic_logo.svg'}
+                                alt={product.productName}
+                              />
+                              {product.quantity === 0 && <OutOfStockBadge />}
+                              <div className="p-4">
+                                <h3 className="text-lg font-semibold text-gray-800">{product.productName}</h3>
+                                <p className="text-orange-500 font-medium">${product.price.toFixed(2)}</p>
+                                <p className="text-sm text-gray-600">Stock: {product.quantity}</p>
+                              </div>
+                            </Link>
+                            {editMode && (
+                              <div className="absolute top-2 right-2">
+                                <Button
+                                  variant="destructive"
+                                  size="sm"
+                                  onClick={() => handleDeleteProduct(product.id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+            )}
+            {activeTab === 'orders' && (
+              <div>
+                <h3 className="text-lg font-semibold mb-4">Your Orders</h3>
+                {orders.length > 0 ? (
+                  <ul className="space-y-4">
+                    {orders.map((order) => (
+                      <li key={order.id} className="bg-white p-4 rounded-lg shadow">
+                        <p><strong>Order ID:</strong> {order.id}</p>
+                        <p><strong>Status:</strong> {order.status}</p>
+                        <p><strong>Total Price:</strong> ${order.totalPrice.toFixed(2)}</p>
+                        <p><strong>Quantity:</strong> {order.quantity}</p>
+                        <p><strong>Shipping Address:</strong> {order.shippingAddress}</p>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No orders found.</p>
                 )}
               </div>
-            </div>
+            )}
           </CardContent>
         </Card>
       </div>
