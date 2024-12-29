@@ -1,5 +1,6 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface GroupItemProps {
   id: string;
@@ -25,11 +26,17 @@ export default function GroupItem({
   masterUserId,
 }: GroupItemProps) {
   const [isJoined, setIsJoined] = useState(initialIsJoined);
+  const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleJoinLeaveClick = async () => {
     if (userId === masterUserId) return;
 
-    const endpoint = 'https://localhost:7282/api/groups/join';
+    const endpoint = 'https://un-silent-backend-develop.azurewebsites.net/api/groups/join';
     const payload = {
       groupId: id,
       userId: userId,
@@ -55,8 +62,10 @@ export default function GroupItem({
   };
 
   const handleGroupClick = () => {
-    // Future implementation for navigating to group details
-    console.log(`Navigate to group details for group ID: ${id}`);
+    if (isClient) {
+      console.log(id);  
+      router.push(`/group/${id}`);
+    }
   };
 
   return (
@@ -76,8 +85,22 @@ export default function GroupItem({
         </h2>
         <p className="text-sm">{description}</p>
         <div className="flex items-center mt-2">
-          <span className="mr-4">👥 {numberOfMembers} Members</span>
-          <span>📝 {numberOfPosts} Posts</span>
+        <span className="mr-4">
+              <img
+                src="https://img.icons8.com/?size=100&id=11168&format=png&color=000000"
+                alt="Members Icon"
+                className="inline-block h-5 w-5 mr-1"
+              />
+              {numberOfMembers} Members
+            </span>
+            <span>
+              <img
+                src="https://img.icons8.com/?size=100&id=115225&format=png&color=000000"
+                alt="Posts Icon"
+                className="inline-block h-5 w-5 mr-1"
+              />
+              {numberOfPosts} Posts
+            </span>
         </div>
       </div>
       <div className="flex flex-col items-end">
@@ -94,8 +117,6 @@ export default function GroupItem({
         >
           {userId === masterUserId ? 'Your Group' : isJoined ? 'Joined' : 'Join group'}
         </button>
-        {/* Hide the "See more" button */}
-        {/* <button className="bg-green-100 text-green-700 px-4 py-2 rounded">See more</button> */}
       </div>
     </div>
   );
