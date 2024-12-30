@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 interface CellActionProps {
   data: Membership;
   onMembershipUpdate: (membership: Membership) => void;
-  onDeleteMembership: (id: string) => void; // Add onDeleteMembership prop
+  onDeleteMembership: (id: string) => void;
 }
 
 export const CellAction: React.FC<CellActionProps> = ({
@@ -31,15 +31,15 @@ export const CellAction: React.FC<CellActionProps> = ({
       await onDeleteMembership(data.id!);
 
       toast({
-        title: 'Success',
-        description: `Membership "${data.name}" has been deleted.`,
+        title: 'Membership Deleted',
+        description: `The membership "${data.name}" has been successfully deleted.`,
         variant: 'success',
       });
     } catch (error) {
       console.error('Error deleting membership:', error);
       toast({
-        title: 'Error',
-        description: 'Failed to delete membership. Please try again.',
+        title: 'Deletion Failed',
+        description: 'An error occurred while trying to delete the membership. Please try again later.',
         variant: 'destructive',
       });
     } finally {
