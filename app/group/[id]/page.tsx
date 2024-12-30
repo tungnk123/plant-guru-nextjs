@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Navbar from '../../components/navbar/Navbar'
+import PostCard from '../../components/home/PostCard';
 
 export default function GroupPage() {
   const { id } = useParams();
@@ -9,6 +10,7 @@ export default function GroupPage() {
   const userId = localStorage.getItem('userId');
   const [groupData, setGroupData] = useState(null);
   const [selectedTab, setSelectedTab] = useState('Posts'); // State for selected navigation button
+  const [posts, setPosts] = useState([]);
 
   const toggleMenu = () => {
     setIsMenuOpen((prevState) => !prevState);
@@ -29,6 +31,29 @@ export default function GroupPage() {
       fetchGroupData();
     }
   }, [id, userId]);
+
+  useEffect(() => {
+    const fetchPosts = async () => {
+      let endpoint;
+      if (selectedTab === 'Posts') {
+        endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/approved/${id}`;
+      } else if (selectedTab === 'Pending Posts') {
+        endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/pending/${id}`;
+      }
+
+      try {
+        const response = await fetch(endpoint);
+        const data = await response.json();
+        setPosts(data);
+      } catch (error) {
+        console.error('Error fetching posts:', error);
+      }
+    };
+
+    if (id) {
+      fetchPosts();
+    }
+  }, [id, selectedTab]);
 
   if (!groupData) {
     return <div>Loading...</div>;
@@ -89,6 +114,11 @@ export default function GroupPage() {
         >
           Pending Posts
         </button>
+      </div>
+      <div className="mt-8 space-y-4 mx-80">
+        {posts.map((post) => (
+          <PostCard key={post.postId} {...post} />
+        ))}
       </div>
     </div>
   );
