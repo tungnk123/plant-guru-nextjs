@@ -96,13 +96,13 @@ const Products = () => {
             <div className="relative block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg hover:border-orange-500 transition-all duration-200 cursor-pointer">
               <img
                 className="w-full h-48 object-cover"
-                src={product.productImages[0] || '/placeholder.png'}
+                src={product.productImages.length > 0 ? product.productImages[0] : '/images/ic_logo.svg'}
                 alt={product.productName}
               />
               {product.quantity === 0 && <OutOfStockBadge />}
               <div className="p-4">
                 <h3 className="text-lg font-semibold text-gray-800">{product.productName}</h3>
-                <p className="text-orange-500 font-medium">${product.price}</p>
+                <p className="text-orange-500 font-medium">${product.price.toFixed(2)}</p>
               </div>
             </div>
           </Link>
