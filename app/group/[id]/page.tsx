@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Navbar from '../../components/navbar/Navbar'
 import PostCard from '../../components/home/PostCard';
+import PostPendingCard from '../../group/components/PostPendingCard';
 
 export default function GroupPage() {
   const { id } = useParams();
@@ -11,6 +12,8 @@ export default function GroupPage() {
   const [groupData, setGroupData] = useState(null);
   const [selectedTab, setSelectedTab] = useState('Posts'); // State for selected navigation button
   const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 3;
 
   const toggleMenu = () => {
     setIsMenuOpen((prevState) => !prevState);
@@ -45,6 +48,7 @@ export default function GroupPage() {
         const response = await fetch(endpoint);
         const data = await response.json();
         setPosts(data);
+        setCurrentPage(1); // Reset to first page when tab changes
       } catch (error) {
         console.error('Error fetching posts:', error);
       }
@@ -58,6 +62,15 @@ export default function GroupPage() {
   if (!groupData) {
     return <div>Loading...</div>;
   }
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentPosts = posts.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(posts.length / itemsPerPage);
+
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="w-full">
@@ -116,9 +129,40 @@ export default function GroupPage() {
         </button>
       </div>
       <div className="mt-8 space-y-4 mx-80">
-        {posts.map((post) => (
-          <PostCard key={post.postId} {...post} />
+        {currentPosts.map((post) => (
+          selectedTab === 'Pending Posts' ? (
+            <PostPendingCard key={post.postId} {...post} />
+          ) : (
+            <PostCard key={post.postId} {...post} />
+          )
         ))}
+      </div>
+      <div className="flex justify-center mt-4 mb-10">
+        <button
+          onClick={() => handlePageChange(currentPage - 1)}
+          disabled={currentPage === 1}
+          className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
+        >
+          &lt;
+        </button>
+        {Array.from({ length: totalPages }, (_, index) => (
+          <button
+            key={index + 1}
+            onClick={() => handlePageChange(index + 1)}
+            className={`px-3 py-1 mx-1 border rounded ${
+              currentPage === index + 1 ? 'border-blue-500' : ''
+            }`}
+          >
+            {index + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => handlePageChange(currentPage + 1)}
+          disabled={currentPage === totalPages}
+          className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
+        >
+          &gt;
+        </button>
       </div>
     </div>
   );
