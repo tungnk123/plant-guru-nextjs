@@ -6,9 +6,10 @@ interface UserCardProps {
   userId: string;
   name: string;
   avatar: string;
+  showBanButton: boolean;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ userId, name, avatar }) => {
+const UserCard: React.FC<UserCardProps> = ({ userId, name, avatar, showBanButton }) => {
   const handleBan = () => {
     // Logic to ban the user
     console.log(`Banning user: ${userId}`);
@@ -26,12 +27,14 @@ const UserCard: React.FC<UserCardProps> = ({ userId, name, avatar }) => {
         />
         <span className="font-semibold text-gray-800">{name}</span>
       </div>
-      <button
-        onClick={handleBan}
-        className="px-3 py-1 bg-red-500 text-white rounded"
-      >
-        Ban
-      </button>
+      {showBanButton && (
+        <button
+          onClick={handleBan}
+          className="px-3 py-1 bg-red-500 text-white rounded"
+        >
+          Ban
+        </button>
+      )}
     </div>
   );
 };

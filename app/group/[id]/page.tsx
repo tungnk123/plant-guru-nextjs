@@ -71,6 +71,8 @@ export default function GroupPage() {
     return <div>Loading...</div>;
   }
 
+  const isMasterUser = userId === groupData.masterUserId;
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentPosts = posts.slice(indexOfFirstItem, indexOfLastItem);
@@ -129,17 +131,19 @@ export default function GroupPage() {
         >
           Members
         </button>
-        <button
-          className={`px-4 py-2 rounded ${selectedTab === 'Pending Posts' ? 'bg-green-200 text-green-800' : 'bg-gray-100 text-gray-800'}`}
-          onClick={() => setSelectedTab('Pending Posts')}
-        >
-          Pending Posts
-        </button>
+        {isMasterUser && (
+          <button
+            className={`px-4 py-2 rounded ${selectedTab === 'Pending Posts' ? 'bg-green-200 text-green-800' : 'bg-gray-100 text-gray-800'}`}
+            onClick={() => setSelectedTab('Pending Posts')}
+          >
+            Pending Posts
+          </button>
+        )}
       </div>
       <div className="mt-8 space-y-4 mx-80">
         {selectedTab === 'Members' ? (
           users.map((user) => (
-            <UserCard key={user.userId} {...user} />
+            <UserCard key={user.userId} {...user} showBanButton={isMasterUser} />
           ))
         ) : (
           currentPosts.map((post) => (
