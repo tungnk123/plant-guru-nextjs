@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Navbar from '../../components/navbar/Navbar'
 import PostCard from '../../components/home/PostCard';
 import PostPendingCard from '../../group/components/PostPendingCard';
@@ -8,6 +8,7 @@ import UserCard from '../../group/components/UserCard';
 
 export default function GroupPage() {
   const { id } = useParams();
+  const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const userId = localStorage.getItem('userId');
   const [groupData, setGroupData] = useState(null);
@@ -82,9 +83,13 @@ export default function GroupPage() {
     setCurrentPage(pageNumber);
   };
 
+  const handleCreatePost = () => {
+    router.push(`/group/${id}/create-post`);
+  };
+
   return (
     <div className="w-full">
-        <Navbar toggle={toggleMenu} />
+      <Navbar toggle={toggleMenu} />
       <div
         className="w-full h-64 bg-cover bg-center"
         style={{ backgroundImage: `url(${groupData.groupImage})` }}
@@ -140,6 +145,18 @@ export default function GroupPage() {
           </button>
         )}
       </div>
+      <div className="flex justify-end mx-80 mt-5">
+        <button
+          onClick={handleCreatePost}
+          className="justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 shadow h-9 px-4 py-2 bg-yellow-300 hover:bg-yellow-600 text-black flex items-center gap-2"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-plus">
+            <path d="M5 12h14"></path>
+            <path d="M12 5v14"></path>
+          </svg>
+          Create Post
+        </button>
+      </div>
       <div className="mt-8 space-y-4 mx-80">
         {selectedTab === 'Members' ? (
           users.map((user) => (
@@ -168,9 +185,8 @@ export default function GroupPage() {
             <button
               key={index + 1}
               onClick={() => handlePageChange(index + 1)}
-              className={`px-3 py-1 mx-1 border rounded ${
-                currentPage === index + 1 ? 'border-blue-500' : ''
-              }`}
+              className={`px-3 py-1 mx-1 border rounded ${currentPage === index + 1 ? 'border-blue-500' : ''
+                }`}
             >
               {index + 1}
             </button>

@@ -11,6 +11,17 @@ export interface PostData {
   background: string;
 }
 
+export interface PostGroupData {
+  title: string;
+  description: string;
+  userId: string;
+  groupId: string;
+  images: string[];
+  tag: string;
+  background: string;
+}
+
+
 export interface PostResponse {
   postId: string;
   userId: string;
@@ -49,6 +60,7 @@ export interface Comment {
 }
 
 const BASE_URL = 'https://un-silent-backend-develop.azurewebsites.net/api/posts'
+const BASE_URL_GROUP = 'https://un-silent-backend-develop.azurewebsites.net/api/groups/posts'
 
 const tagMap = {
   'plants': 'plants',
@@ -85,6 +97,29 @@ export const createPost = async (postData: PostData): Promise<any> => {
 
     const data = await response.json();
     return data;
+  } catch (error) {
+    console.error('Error creating post:', error);
+    throw error;
+  }
+};
+
+export const createPostGroup = async (postData: PostGroupData): Promise<any> => {
+  try {
+    const response = await fetch(
+      BASE_URL_GROUP,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: '*/*',
+        },
+        body: JSON.stringify(postData),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to create posts: ${response.statusText}`);
+    }
   } catch (error) {
     console.error('Error creating post:', error);
     throw error;

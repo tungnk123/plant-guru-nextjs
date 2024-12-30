@@ -32,7 +32,7 @@ const UserCard: React.FC<UserCardProps> = ({ userId, name, avatar, showBanButton
           onClick={handleBan}
           className="px-3 py-1 bg-red-500 text-white rounded"
         >
-          Ban
+          Kick out
         </button>
       )}
     </div>
