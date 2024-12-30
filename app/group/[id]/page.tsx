@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation';
 import Navbar from '../../components/navbar/Navbar'
 import PostCard from '../../components/home/PostCard';
 import PostPendingCard from '../../group/components/PostPendingCard';
+import UserCard from '../../group/components/UserCard';
 
 export default function GroupPage() {
   const { id } = useParams();
@@ -12,6 +13,7 @@ export default function GroupPage() {
   const [groupData, setGroupData] = useState(null);
   const [selectedTab, setSelectedTab] = useState('Posts'); // State for selected navigation button
   const [posts, setPosts] = useState([]);
+  const [users, setUsers] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
@@ -19,43 +21,49 @@ export default function GroupPage() {
     setIsMenuOpen((prevState) => !prevState);
   };
 
-  useEffect(() => {
-    const fetchGroupData = async () => {
-      try {
-        const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/groups/${userId}/${id}`);
-        const data = await response.json();
-        setGroupData(data);
-      } catch (error) {
-        console.error('Error fetching group data:', error);
-      }
-    };
+  const fetchGroupData = async () => {
+    try {
+      const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/groups/${userId}/${id}`);
+      const data = await response.json();
+      setGroupData(data);
+    } catch (error) {
+      console.error('Error fetching group data:', error);
+    }
+  };
 
+  const fetchPostsOrUsers = async () => {
+    let endpoint;
+    if (selectedTab === 'Posts') {
+      endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/approved/${id}`;
+    } else if (selectedTab === 'Pending Posts') {
+      endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/pending/${id}`;
+    } else if (selectedTab === 'Members') {
+      endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/${id}/users`;
+    }
+
+    try {
+      const response = await fetch(endpoint);
+      const data = await response.json();
+      if (selectedTab === 'Members') {
+        setUsers(data);
+      } else {
+        setPosts(data);
+      }
+      setCurrentPage(1); // Reset to first page when tab changes
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    }
+  };
+
+  useEffect(() => {
     if (id && userId) {
       fetchGroupData();
     }
   }, [id, userId]);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      let endpoint;
-      if (selectedTab === 'Posts') {
-        endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/approved/${id}`;
-      } else if (selectedTab === 'Pending Posts') {
-        endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/pending/${id}`;
-      }
-
-      try {
-        const response = await fetch(endpoint);
-        const data = await response.json();
-        setPosts(data);
-        setCurrentPage(1); // Reset to first page when tab changes
-      } catch (error) {
-        console.error('Error fetching posts:', error);
-      }
-    };
-
     if (id) {
-      fetchPosts();
+      fetchPostsOrUsers();
     }
   }, [id, selectedTab]);
 
@@ -129,41 +137,49 @@ export default function GroupPage() {
         </button>
       </div>
       <div className="mt-8 space-y-4 mx-80">
-        {currentPosts.map((post) => (
-          selectedTab === 'Pending Posts' ? (
-            <PostPendingCard key={post.postId} {...post} />
-          ) : (
-            <PostCard key={post.postId} {...post} />
-          )
-        ))}
+        {selectedTab === 'Members' ? (
+          users.map((user) => (
+            <UserCard key={user.userId} {...user} />
+          ))
+        ) : (
+          currentPosts.map((post) => (
+            selectedTab === 'Pending Posts' ? (
+              <PostPendingCard key={post.postId} {...post} onApprove={fetchPostsOrUsers} />
+            ) : (
+              <PostCard key={post.postId} {...post} />
+            )
+          ))
+        )}
       </div>
-      <div className="flex justify-center mt-4 mb-10">
-        <button
-          onClick={() => handlePageChange(currentPage - 1)}
-          disabled={currentPage === 1}
-          className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
-        >
-          &lt;
-        </button>
-        {Array.from({ length: totalPages }, (_, index) => (
+      {selectedTab !== 'Members' && (
+        <div className="flex justify-center mt-4 mb-10">
           <button
-            key={index + 1}
-            onClick={() => handlePageChange(index + 1)}
-            className={`px-3 py-1 mx-1 border rounded ${
-              currentPage === index + 1 ? 'border-blue-500' : ''
-            }`}
+            onClick={() => handlePageChange(currentPage - 1)}
+            disabled={currentPage === 1}
+            className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
           >
-            {index + 1}
+            &lt;
           </button>
-        ))}
-        <button
-          onClick={() => handlePageChange(currentPage + 1)}
-          disabled={currentPage === totalPages}
-          className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
-        >
-          &gt;
-        </button>
-      </div>
+          {Array.from({ length: totalPages }, (_, index) => (
+            <button
+              key={index + 1}
+              onClick={() => handlePageChange(index + 1)}
+              className={`px-3 py-1 mx-1 border rounded ${
+                currentPage === index + 1 ? 'border-blue-500' : ''
+              }`}
+            >
+              {index + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => handlePageChange(currentPage + 1)}
+            disabled={currentPage === totalPages}
+            className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
+          >
+            &gt;
+          </button>
+        </div>
+      )}
     </div>
   );
 } 

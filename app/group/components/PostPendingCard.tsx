@@ -3,13 +3,33 @@ import React, { useState } from "react";
 import Image from 'next/image';
 import { PostResponse } from "@/app/api/postService";
 
-const PostPendingCard: React.FC<PostResponse> = (postData) => {
+interface PostPendingCardProps extends PostResponse {
+  onApprove: () => void;
+}
+
+const PostPendingCard: React.FC<PostPendingCardProps> = ({ onApprove, ...postData }) => {
   const [isModalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  const handleApprove = () => {
-    // Logic to approve the post
-    console.log(`Approving post: ${postData.postId}`);
+  const handleApprove = async () => {
+    try {
+      const response = await fetch('https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/approvePost', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ postId: postData.postId }),
+      });
+
+      if (response.ok) {
+        console.log(`Post approved: ${postData.postId}`);
+        onApprove(); // Call the callback to refresh the list
+      } else {
+        console.error('Failed to approve post');
+      }
+    } catch (error) {
+      console.error('Error approving post:', error);
+    }
   };
 
   const handleDelete = () => {
@@ -113,12 +133,12 @@ const PostPendingCard: React.FC<PostResponse> = (postData) => {
         >
           Approve
         </button>
-        {/* <button
+        <button
           onClick={handleDelete}
           className="w-full px-4 py-2 bg-red-500 text-white rounded"
         >
           Delete
-        </button> */}
+        </button>
       </div>
 
       {isModalOpen && selectedImage && (
