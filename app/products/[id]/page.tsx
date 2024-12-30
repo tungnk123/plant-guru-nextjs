@@ -1,15 +1,20 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import Head from 'next/head';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchProductById, fetchProductsByUser, ProductData } from '@/app/api/productService';
 import { fetchUserById, User } from '@/app/admin/api/user';
 import BreadcrumbNavigation from '@/app/components/navbar/BreadcrumbNavigation';
 import Navbar from '@/app/components/navbar/Navbar';
-import Link from 'next/link';
 import OutOfStockBadge from '@/app/components/OutOfStockBadge';
-import LoadingSpinner from '@/app/components/LoadingSpinner';
 import { useToast } from '@/hooks/use-toast';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ShoppingCart, Store, Package, ChevronRight, ImageIcon } from "lucide-react";
+import Link from 'next/link';
+import LoadingSpinner from '@/app/components/LoadingSpinner';
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -101,111 +106,157 @@ const ProductDetail = () => {
     return <div>Loading...</div>;
   }
 
-  const handleThumbnailClick = (index: number) => {
-    setCurrentImageIndex(index);
-  };
-
-  const handleShopClick = () => {
-    router.push(`/shop/${user.userId}`);
-  };
-
   return (
-    <div>
-      <Head>
-        <title>{product.productName}</title>
-      </Head>
+    <div className="min-h-screen bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-orange-50 via-white to-gray-50">
       <Navbar toggle={() => {}} />
-      <BreadcrumbNavigation productName={product.productName} />
-      <div className="container mx-auto p-10 bg-gradient-to-r from-gray-100 to-white shadow-lg rounded-lg">
-        <div className="flex flex-col md:flex-row items-start gap-8">
-          <div className="flex flex-col items-center md:w-1/2">
-            <div className="w-full max-w-md h-96 flex items-center justify-center overflow-hidden rounded-lg shadow-xl relative">
-              <img
-                className="object-cover w-full h-full transition-transform transform hover:scale-105"
-                src={product.productImages.length > 0 ? product.productImages[currentImageIndex] : '/images/ic_logo.svg'}
-                alt={product.productName}
-              />
-              {product.quantity === 0 && <OutOfStockBadge />}
-            </div>
-            <div className="flex mt-4 space-x-2 overflow-x-auto h-28">
-              {product.productImages.map((image, index) => (
+      <div className="container mx-auto px-4 py-8">
+        <BreadcrumbNavigation productName={product.productName} />
+        
+        <div className="grid md:grid-cols-2 gap-8 mt-8">
+          {/* Product Images Section */}
+          <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+            <CardContent className="p-6">
+              <div className="relative aspect-square rounded-lg overflow-hidden">
                 <img
-                  key={index}
-                  className={`w-20 h-20 object-cover rounded-lg cursor-pointer transition-transform transform hover:scale-110 ${index === currentImageIndex ? 'border-2 border-orange-500' : ''}`}
-                  src={image}
-                  alt={`Thumbnail ${index}`}
-                  onClick={() => handleThumbnailClick(index)}
+                  src={product.productImages[currentImageIndex]}
+                  alt={product.productName}
+                  className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
                 />
-              ))}
-            </div>
-          </div>
-          <div className="flex-1 md:w-1/2">
-            <h1 className="text-4xl font-bold text-gray-800 mb-4">{product.productName}</h1>
-            <div
-              className={`text-lg text-gray-600 mb-4 leading-relaxed overflow-hidden ${
-                showFullDescription ? 'h-96 overflow-y-auto' : 'line-clamp-5'
-              }`}
-              style={{ maxHeight: '24rem' }}
-            >
-              {product.description}
-            </div>
-            {isDescriptionLong && !showFullDescription && (
-              <button
-                onClick={() => setShowFullDescription(true)}
-                className="text-blue-500 hover:underline"
-              >
-                See More
-              </button>
-            )}
-            <p className="text-3xl text-orange-500 font-semibold mb-4">${product.price}</p>
-            <p className="text-lg text-gray-700 mb-4">
-              Stock: {product.quantity > 0 ? product.quantity : <span className="text-red-500">Out of Stock</span>}
-            </p>
-            <button
-              onClick={handleBuyNowClick}
-              className={`mt-4 px-8 py-3 font-semibold rounded-lg shadow-md transition duration-300 ${
-                product.quantity === 0 || isOwner
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-orange-400 to-orange-600 text-white hover:shadow-lg'
-              }`}
-              disabled={product.quantity === 0 || isOwner}
-            >
-              {isOwner ? 'Cannot Buy Own Product' : 'Buy Now'}
-            </button>
-          </div>
-        </div>
-        <div
-          className="mt-10 p-4 bg-white rounded-lg shadow-md max-w-md cursor-pointer hover:shadow-lg transition-shadow duration-300"
-          onClick={handleShopClick}
-        >
-          <h2 className="text-2xl font-bold mb-4">Shop</h2>
-          <div className="flex items-center">
-            <img src={user.avatar} alt={user.name} className="w-16 h-16 rounded-full mr-4 border-2 border-gray-300" />
-            <div>
-              <h3 className="text-xl font-semibold">{user.name}</h3>
-              <p className="text-gray-600">{user.email}</p>
-            </div>
-          </div>
-        </div>
-        <div className="mt-10">
-          <h2 className="text-2xl font-bold mb-4">Other Products by {user.name}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {userProducts.slice(0, 8).map((userProduct) => (
-              <Link href={`/products/${userProduct.id}`} key={userProduct.id}>
-                <div className="relative block bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-lg hover:border-orange-500 transition-all duration-200 cursor-pointer">
-                  <img
-                    className="w-full h-48 object-cover"
-                    src={userProduct.productImages[0] || '/placeholder.png'}
-                    alt={userProduct.productName}
-                  />
-                  {userProduct.quantity === 0 && <OutOfStockBadge />}
-                  <div className="p-4">
-                    <h3 className="text-lg font-semibold text-gray-800">{userProduct.productName}</h3>
-                    <p className="text-orange-500 font-medium">${userProduct.price}</p>
+                {product.quantity === 0 && <OutOfStockBadge />}
+              </div>
+              
+              <ScrollArea className="w-full mt-4">
+                <div className="flex space-x-4 pb-4">
+                  {product.productImages.map((image, index) => (
+                    <div
+                      key={index}
+                      className={`relative flex-none aspect-square w-20 rounded-md overflow-hidden cursor-pointer transition-all duration-200 ${
+                        index === currentImageIndex ? 'ring-2 ring-orange-500' : 'opacity-70 hover:opacity-100'
+                      }`}
+                      onClick={() => setCurrentImageIndex(index)}
+                    >
+                      <img
+                        src={image}
+                        alt={`${product.productName} ${index + 1}`}
+                        className="object-cover w-full h-full"
+                      />
+                    </div>
+                  ))}
+                </div>
+                <ScrollBar orientation="horizontal" />
+              </ScrollArea>
+            </CardContent>
+          </Card>
+
+          {/* Product Details Section */}
+          <div className="space-y-6">
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <div className="space-y-2">
+                  <CardTitle className="text-3xl font-bold">{product.productName}</CardTitle>
+                  <div className="flex items-center gap-2">
+                    <Badge variant="secondary" className="bg-orange-100 text-orange-700">
+                      <Package className="w-4 h-4 mr-1" />
+                      {product.quantity > 0 ? `${product.quantity} in stock` : 'Out of Stock'}
+                    </Badge>
+                    <Badge variant="outline" className="bg-white">
+                      ${product.price.toFixed(2)}
+                    </Badge>
                   </div>
                 </div>
-              </Link>
-            ))}
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="prose max-w-none">
+                  <div className={`${!showFullDescription && isDescriptionLong ? 'line-clamp-3' : ''}`}>
+                    {product.description}
+                  </div>
+                  {isDescriptionLong && (
+                    <Button
+                      variant="link"
+                      onClick={() => setShowFullDescription(!showFullDescription)}
+                      className="text-orange-600 hover:text-orange-700 p-0"
+                    >
+                      {showFullDescription ? 'Show Less' : 'Read More'}
+                    </Button>
+                  )}
+                </div>
+
+                <Separator className="bg-gradient-to-r from-orange-100 to-transparent" />
+
+                <Button
+                  onClick={() => router.push(`/products/confirmation/${product.id}`)}
+                  className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white"
+                  size="lg"
+                  disabled={product.quantity === 0 || isOwner}
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  {isOwner ? 'Cannot Buy Own Product' : 'Buy Now'}
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Seller Information */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-xl">Seller Information</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center space-x-4">
+                  <img
+                    src={user.avatar}
+                    alt={user.name}
+                    className="w-12 h-12 rounded-full object-cover border-2 border-orange-200"
+                  />
+                  <div className="flex-1">
+                    <h3 className="font-semibold">{user.name}</h3>
+                    <p className="text-sm text-gray-600">{user.email}</p>
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => router.push(`/shop/${user.userId}`)}
+                    className="text-orange-600 hover:text-orange-700"
+                  >
+                    <Store className="w-4 h-4 mr-2" />
+                    Visit Shop
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Other Products */}
+            <Card className="border-0 shadow-lg bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="text-xl">More from this Seller</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ScrollArea className="w-full">
+                  <div className="flex space-x-4 pb-4">
+                    {userProducts.slice(0, 6).map((userProduct) => (
+                      <Link
+                        href={`/products/${userProduct.id}`}
+                        key={userProduct.id}
+                        className="flex-none w-48"
+                      >
+                        <Card className="h-full border hover:shadow-md transition-shadow">
+                          <div className="aspect-square relative">
+                            <img
+                              src={userProduct.productImages[0]}
+                              alt={userProduct.productName}
+                              className="object-cover w-full h-full rounded-t-lg"
+                            />
+                          </div>
+                          <CardContent className="p-3">
+                            <p className="font-medium line-clamp-1">{userProduct.productName}</p>
+                            <p className="text-sm text-orange-600">${userProduct.price.toFixed(2)}</p>
+                          </CardContent>
+                        </Card>
+                      </Link>
+                    ))}
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>

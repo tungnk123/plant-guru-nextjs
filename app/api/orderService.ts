@@ -108,4 +108,23 @@ export const denyOrder = async (orderId: string): Promise<void> => {
     console.error('Error denying order:', error);
     throw error;
   }
+};
+
+export const confirmPayment = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/orders/confirmPayment?orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to confirm payment: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    throw error;
+  }
 }; 
+
