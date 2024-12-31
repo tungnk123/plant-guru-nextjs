@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useToast } from '@/hooks/use-toast';
 
 interface GroupItemProps {
   id: string;
@@ -26,6 +27,7 @@ export default function GroupItem({
   masterUserId,
 }: GroupItemProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [isClient, setIsClient] = useState(false);
   const [status, setStatus] = useState(initialStatus);
 
@@ -67,6 +69,20 @@ export default function GroupItem({
   };
 
   const handleGroupClick = () => {
+    if(userId === masterUserId) {
+      router.push(`/group/${id}`);
+      return;
+    }
+    
+    if (status === "Not joined" || status === "Pending") {
+      toast({
+        title: "Access Denied",
+        description: "You need to join this group first.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (isClient) {
       console.log(id);  
       router.push(`/group/${id}`);
