@@ -173,11 +173,11 @@ export default function GroupPage() {
       <div className="mt-8 space-y-4 mx-80">
         {selectedTab === 'Members' ? (
           users.map((user) => (
-            <UserCard key={user.userId} {...user} showBanButton={isMasterUser} />
+            <UserCard key={user.userId} {...user} showBanButton={isMasterUser} groupId={id} />
           ))
         ) : selectedTab === 'Pending Members' ? (
           pendingUsers.map((user) => (
-            <UserCard key={user.userId} {...user} showBanButton={isMasterUser} isPending />
+            <UserCard key={user.userId} {...user} showBanButton={isMasterUser} isPending groupId={id} />
           ))
         ) : (
           currentPosts.map((post) => (

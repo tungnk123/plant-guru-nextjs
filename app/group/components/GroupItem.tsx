@@ -82,6 +82,14 @@ export default function GroupItem({
       });
       return;
     }
+    if (status === "Forbidden") {
+      toast({
+        title: "Access Denied",
+        description: "You are not allowed to access this group.",
+        variant: "destructive",
+      });
+      return;
+    }
 
     if (isClient) {
       console.log(id);  
