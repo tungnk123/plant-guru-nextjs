@@ -52,4 +52,79 @@ export const fetchOrdersByUser = async (userId: string): Promise<OrderData[]> =>
     console.error('Error fetching orders:', error);
     throw error;
   }
+};
+
+export const fetchOrdersForShop = async (shopId: string): Promise<OrderData[]> => {
+  try {
+    const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/orders/shops/${shopId}`, {
+      method: 'GET',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch shop orders: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching shop orders:', error);
+    throw error;
+  }
+};
+
+export const confirmOrder = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/orders/confirmOrder?orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to confirm order: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error confirming order:', error);
+    throw error;
+  }
+};
+
+export const denyOrder = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/orders/markAsFailedOrder?orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to deny order: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error denying order:', error);
+    throw error;
+  }
+};
+
+export const confirmPayment = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/orders/confirmPayment?orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to confirm payment: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error confirming payment:', error);
+    throw error;
+  }
 }; 
+

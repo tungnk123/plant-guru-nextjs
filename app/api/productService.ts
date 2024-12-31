@@ -115,4 +115,22 @@ export const updateProduct = async (id: string, productData: Omit<ProductData, '
     console.error('Error updating product:', error);
     throw error;
   }
+};
+
+export const deleteProduct = async (productId: string): Promise<void> => {
+  try {
+    const response = await fetch(`${BASE_URL}?productId=${productId}`, {
+      method: 'DELETE',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to delete product: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error deleting product:', error);
+    throw error;
+  }
 }; 
