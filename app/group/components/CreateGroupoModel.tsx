@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -11,6 +12,7 @@ export default function CreateGroupModal({ isOpen, onClose, userId }: CreateGrou
   const [groupName, setGroupName] = useState('');
   const [groupDescription, setGroupDescription] = useState('');
   const [groupImage, setGroupImage] = useState<File | null>(null);
+  const { toast } = useToast();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -61,11 +63,20 @@ export default function CreateGroupModal({ isOpen, onClose, userId }: CreateGrou
 
       if (!groupResponse.ok) {
         console.error('Failed to create group');
+        toast({
+          title: "Error",
+          description: "Failed to create group",
+          variant: "destructive"
+        });
         return;
       }
 
       console.log('Group created successfully');
-      alert('Group created successfully!');
+      toast({
+        title: "Group Created",
+        description: "Your group has been successfully created!",
+        variant: "success"
+      });
       resetForm();
       onClose();
     } catch (error) {
