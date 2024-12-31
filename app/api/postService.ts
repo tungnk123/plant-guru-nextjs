@@ -11,6 +11,17 @@ export interface PostData {
   background: string;
 }
 
+export interface PostGroupData {
+  title: string;
+  description: string;
+  userId: string;
+  groupId: string;
+  images: string[];
+  tag: string;
+  background: string;
+}
+
+
 export interface PostResponse {
   postId: string;
   userId: string;
@@ -49,6 +60,7 @@ export interface Comment {
 }
 
 const BASE_URL = 'https://un-silent-backend-develop.azurewebsites.net/api/posts'
+const BASE_URL_GROUP = 'https://un-silent-backend-develop.azurewebsites.net/api/groups/posts'
 
 const tagMap = {
   'plants': 'plants',
@@ -85,6 +97,29 @@ export const createPost = async (postData: PostData): Promise<any> => {
 
     const data = await response.json();
     return data;
+  } catch (error) {
+    console.error('Error creating post:', error);
+    throw error;
+  }
+};
+
+export const createPostGroup = async (postData: PostGroupData): Promise<any> => {
+  try {
+    const response = await fetch(
+      BASE_URL_GROUP,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: '*/*',
+        },
+        body: JSON.stringify(postData),
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to create posts: ${response.statusText}`);
+    }
   } catch (error) {
     console.error('Error creating post:', error);
     throw error;
@@ -134,6 +169,53 @@ export const fetchPosts = async (
     throw error;
   }
 };
+
+export const fetchPostsByGroup = async (
+  groupId: string,
+  page: number,
+  limit: number,
+  tag: string,
+  filter: string
+): Promise<FetchPostsResponse> => {
+  try {
+
+    // Map the tag and filter using the defined mappings
+    const mappedTag = tagMap[tag.toLowerCase()];
+    const mappedFilter = filterMap[filter.toLowerCase()];
+
+    // Construct the URL parameters
+    let tagString = mappedTag && mappedTag !== 'all' ? `&tag=${mappedTag}` : '';
+    let filterString = mappedFilter && mappedFilter !== 'all' ? `&filter=${mappedFilter}` : '';
+
+    const response = await fetch(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}${tagString}${filterString}`);
+    // localStorage.setItem('userId', '59a840af-a96e-48a8-81bd-03e6ff3567ab');
+    const userId = localStorage.getItem('userId')
+    var userIdString = ""
+    if (userId != null) {
+     userIdString = `userId=${userId}`
+    }
+    if (!response.ok) {
+      throw new Error(`Failed to fetch posts: ${response.statusText}`);
+    }
+    const data = await response.json();
+    if (!data || data.length === 0) {
+      return {
+        posts: [],
+        totalPages: 0,
+      };
+    }
+    console.log(`${BASE_URL}?${userIdString}&limit=${limit}&page=${page}${tagString}${filterString}`);
+    return {
+      posts: data.plantPostDtos,
+      totalPages: data.numberOfPage,
+    };
+  } catch (error) {
+    console.error('Error fetching posts:', error);
+    throw error;
+  }
+};
+
+
 
 export const upvotePost = async (targetId: string): Promise<{ numberOfUpvotes: number }> => {
   try {
