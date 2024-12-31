@@ -105,8 +105,8 @@ export const navItems: NavItem[] = [
     items: []
   },
   {
-    title: 'Sales',
-    url: '/admin/dashboard/sales',
+    title: 'Orders',
+    url: '/admin/dashboard/orders',
     icon: 'billing',
     shortcut: ['k', 'k'],
     isActive: false,

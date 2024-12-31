@@ -9,7 +9,7 @@ export interface OrderData {
   shippingAddress: string;
   status: string;
   createdAt: string;
-  updatedAt: string;
+  updatedAt?: string;
 }
 
 export const createOrder = async (orderData: Pick<OrderData, 'userId' | 'productId' | 'quantity' | 'shippingAddress'>): Promise<OrderData> => {
@@ -124,6 +124,27 @@ export const confirmPayment = async (orderId: string): Promise<void> => {
     }
   } catch (error) {
     console.error('Error confirming payment:', error);
+    throw error;
+  }
+};
+
+export const fetchOrders = async (): Promise<OrderData[]> => {
+  try {
+    const response = await fetch(ORDER_BASE_URL, {
+      method: 'GET',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch orders: ${response.statusText}`);
+    }
+
+    const orders: OrderData[] = await response.json();
+    return orders;
+  } catch (error) {
+    console.error('Error fetching orders:', error);
     throw error;
   }
 }; 

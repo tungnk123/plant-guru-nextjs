@@ -41,7 +41,7 @@ const formSchema = z.object({
   })
 });
 
-export default function EmployeeForm() {
+export default function OrderForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,7 +61,7 @@ export default function EmployeeForm() {
     <Card className="mx-auto w-full">
       <CardHeader>
         <CardTitle className="text-left text-2xl font-bold">
-          Employee Information
+          Order Information
         </CardTitle>
       </CardHeader>
       <CardContent>

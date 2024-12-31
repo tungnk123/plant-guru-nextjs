@@ -2,6 +2,7 @@ interface HeadingProps {
   title: string;
   description: string;
   icon?: React.ComponentType<any>;
+  className?: string;
 }
 
 export const Heading: React.FC<HeadingProps> = ({
