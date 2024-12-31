@@ -7,12 +7,18 @@ interface UserCardProps {
   name: string;
   avatar: string;
   showBanButton: boolean;
+  isPending?: boolean;
 }
 
-const UserCard: React.FC<UserCardProps> = ({ userId, name, avatar, showBanButton }) => {
-  const handleBan = () => {
-    // Logic to ban the user
-    console.log(`Banning user: ${userId}`);
+const UserCard: React.FC<UserCardProps> = ({ userId, name, avatar, showBanButton, isPending }) => {
+  const handleAction = () => {
+    if (isPending) {
+      // Logic to approve the user
+      console.log(`Approving user: ${userId}`);
+    } else {
+      // Logic to ban the user
+      console.log(`Banning user: ${userId}`);
+    }
   };
 
   return (
@@ -29,10 +35,10 @@ const UserCard: React.FC<UserCardProps> = ({ userId, name, avatar, showBanButton
       </div>
       {showBanButton && (
         <button
-          onClick={handleBan}
-          className="px-3 py-1 bg-red-500 text-white rounded"
+          onClick={handleAction}
+          className={`px-3 py-1 text-white rounded ${isPending ? 'bg-green-500' : 'bg-red-500'}`}
         >
-          Kick out
+          {isPending ? 'Approve' : 'Kick out'}
         </button>
       )}
     </div>
