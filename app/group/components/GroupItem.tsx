@@ -9,7 +9,7 @@ interface GroupItemProps {
   groupImage: string;
   numberOfMembers: number;
   numberOfPosts: number;
-  isJoined: boolean;
+  status: string;
   userId: string;
   masterUserId: string;
 }
@@ -21,20 +21,20 @@ export default function GroupItem({
   groupImage,
   numberOfMembers,
   numberOfPosts,
-  isJoined: initialIsJoined,
+  status: initialStatus,
   userId,
   masterUserId,
 }: GroupItemProps) {
-  const [isJoined, setIsJoined] = useState(initialIsJoined);
   const router = useRouter();
   const [isClient, setIsClient] = useState(false);
+  const [status, setStatus] = useState(initialStatus);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   const handleJoinLeaveClick = async () => {
-    if (userId === masterUserId) return;
+    if (userId === masterUserId || status === "Forbidden" || status === "Pending") return;
 
     const endpoint = 'https://un-silent-backend-develop.azurewebsites.net/api/groups/join';
     const payload = {
@@ -52,7 +52,12 @@ export default function GroupItem({
       });
 
       if (response.ok) {
-        setIsJoined(!isJoined);
+        if (status === "Not joined") {
+          setStatus("Pending");
+        } else if (status === "Joined") {
+          setStatus("Not joined");
+        }
+        console.log('Join/Leave action successful');
       } else {
         console.error('Failed to join/leave group');
       }
@@ -65,6 +70,22 @@ export default function GroupItem({
     if (isClient) {
       console.log(id);  
       router.push(`/group/${id}`);
+    }
+  };
+
+  const getButtonText = () => {
+    if (userId === masterUserId) return 'Your Group';
+    switch (status) {
+      case 'Not joined':
+        return 'Join group';
+      case 'Joined':
+        return 'Joined';
+      case 'Pending':
+        return 'Pending';
+      case 'Forbidden':
+        return 'Forbidden';
+      default:
+        return 'Join group';
     }
   };
 
@@ -85,22 +106,22 @@ export default function GroupItem({
         </h2>
         <p className="text-sm">{description}</p>
         <div className="flex items-center mt-2">
-        <span className="mr-4">
-              <img
-                src="https://img.icons8.com/?size=100&id=11168&format=png&color=000000"
-                alt="Members Icon"
-                className="inline-block h-5 w-5 mr-1"
-              />
-              {numberOfMembers} Members
-            </span>
-            <span>
-              <img
-                src="https://img.icons8.com/?size=100&id=115225&format=png&color=000000"
-                alt="Posts Icon"
-                className="inline-block h-5 w-5 mr-1"
-              />
-              {numberOfPosts} Posts
-            </span>
+          <span className="mr-4">
+            <img
+              src="https://img.icons8.com/?size=100&id=11168&format=png&color=000000"
+              alt="Members Icon"
+              className="inline-block h-5 w-5 mr-1"
+            />
+            {numberOfMembers} Members
+          </span>
+          <span>
+            <img
+              src="https://img.icons8.com/?size=100&id=115225&format=png&color=000000"
+              alt="Posts Icon"
+              className="inline-block h-5 w-5 mr-1"
+            />
+            {numberOfPosts} Posts
+          </span>
         </div>
       </div>
       <div className="flex flex-col items-end">
@@ -108,14 +129,18 @@ export default function GroupItem({
           onClick={handleJoinLeaveClick}
           className={`px-4 py-2 rounded mb-2 ${
             userId === masterUserId
+              ? 'bg-yellow-400 text-black cursor-not-allowed'
+              : status === "Forbidden"
+              ? 'bg-red-500 text-white cursor-not-allowed'
+              : status === "Pending"
               ? 'bg-blue-300 text-blue-700 cursor-not-allowed'
-              : isJoined
+              : status === "Joined"
               ? 'bg-gray-300 text-gray-700'
               : 'bg-green-500 text-white'
           }`}
-          disabled={userId === masterUserId}
+          disabled={userId === masterUserId || status === "Forbidden" || status === "Pending"}
         >
-          {userId === masterUserId ? 'Your Group' : isJoined ? 'Joined' : 'Join group'}
+          {getButtonText()}
         </button>
       </div>
     </div>

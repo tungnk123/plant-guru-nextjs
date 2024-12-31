@@ -110,7 +110,7 @@ export default function Page() {
                             groupImage={group.groupImage}
                             numberOfMembers={group.numberOfMembers}
                             numberOfPosts={group.numberOfPosts}
-                            isJoined={group.isJoined}
+                            status={group.status}
                             userId={userId}
                             masterUserId={group.masterUserId}
                         />
