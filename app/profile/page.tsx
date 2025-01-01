@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Crown, Mail, User, Calendar, Shield, LogOut, Edit, Trash2, Plus } from 'lucide-react';
+import { Crown, Mail, User, Calendar, Shield, LogOut, Edit, Trash2, Plus, CheckCircle } from 'lucide-react';
 import Navbar from '@/app/components/navbar/Navbar';
 import { fetchUserById } from '@/app/admin/api/user';
 import { fetchProductsByUser, ProductData, deleteProduct, fetchProductById } from '@/app/api/productService';
@@ -25,8 +25,19 @@ import { Separator } from "@/components/ui/separator";
 import Link from 'next/link';
 import OutOfStockBadge from '@/app/components/OutOfStockBadge';
 import LoadingSpinner from '@/app/components/LoadingSpinner';
-import { fetchOrdersByUser, OrderData, fetchOrdersForShop, confirmOrder, denyOrder } from '@/app/api/orderService';
+import { fetchOrdersByUser, OrderData, fetchOrdersForShop, markOrderAsFailed, markOrderAsSuccess, denyOrder, EnhancedOrderData, fetchOrders } from '@/app/api/orderService';
 import { format } from 'date-fns';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 interface User {
   userId: string;
@@ -42,8 +53,8 @@ export default function ProfilePage() {
   const [products, setProducts] = useState<ProductData[]>([]);
   const [loading, setLoading] = useState(true);
   const [editMode, setEditMode] = useState(false);
-  const [orders, setOrders] = useState<OrderData[]>([]);
-  const [shopOrders, setShopOrders] = useState<OrderData[]>([]);
+  const [orders, setOrders] = useState<EnhancedOrderData[]>([]);
+  const [shopOrders, setShopOrders] = useState<EnhancedOrderData[]>([]);
   const [activeTab, setActiveTab] = useState('profile');
   const router = useRouter();
 
@@ -60,6 +71,9 @@ export default function ProfilePage() {
         setUser(userData);
 
         const ordersData = await fetchOrdersByUser(storedUserId);
+        const sortedOrders = ordersData.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
         const ordersWithProductInfo = await Promise.all(
           ordersData.map(async (order) => {
             const product = await fetchProductById(order.productId);
@@ -77,17 +91,18 @@ export default function ProfilePage() {
           setProducts(productsData);
 
           const shopOrdersData = await fetchOrdersForShop(storedUserId);
-          const shopOrdersWithProductInfo = await Promise.all(
-            shopOrdersData.map(async (order) => {
+          const ordersWithProductInfo: EnhancedOrderData[] = await Promise.all(
+            ordersData.map(async (order) => {
               const product = await fetchProductById(order.productId);
-              return {
-                ...order,
+              return { 
+                ...order, 
                 productName: product.productName,
                 productImage: product.productImages.length > 0 ? product.productImages[0] : '/images/ic_logo.svg'
               };
             })
           );
-          setShopOrders(shopOrdersWithProductInfo);
+          setOrders(ordersWithProductInfo);
+          
         }
       } catch (error) {
         toast.error('Error loading profile');
@@ -118,15 +133,14 @@ export default function ProfilePage() {
   };
 
   const handleConfirmOrder = async (orderId: string) => {
-    const userConfirmed = window.confirm("Are you sure you want to accept this order?");
+    const userConfirmed = window.confirm("Are you sure you want to confirm this order?");
     if (userConfirmed) {
       try {
-        await confirmOrder(orderId);
+        await markOrderAsSuccess(orderId);
         toast.success('Order confirmed successfully');
-        // Optionally, update the order status in the state
         setShopOrders((prevOrders) =>
           prevOrders.map((order) =>
-            order.id === orderId ? { ...order, status: 'Not Paid' } : order
+            order.id === orderId ? { ...order, status: 'Success' } : order
           )
         );
       } catch (error) {
@@ -139,9 +153,8 @@ export default function ProfilePage() {
     const userConfirmed = window.confirm("Are you sure you want to deny this order?");
     if (userConfirmed) {
       try {
-        await denyOrder(orderId);
+          await markOrderAsFailed(orderId);
         toast.success('Order denied successfully');
-        // Optionally, update the order status in the state
         setShopOrders((prevOrders) =>
           prevOrders.map((order) =>
             order.id === orderId ? { ...order, status: 'Failed' } : order
@@ -150,6 +163,31 @@ export default function ProfilePage() {
       } catch (error) {
         toast.error('Failed to deny order');
       }
+    }
+  };
+
+  const handleConfirmReceipt = async (orderId: string) => {
+    try {
+      setLoading(true);
+      const response = await fetch(`/api/orders/${orderId}/confirm-receipt`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to confirm receipt');
+      }
+
+      toast.success("Order received successfully!");
+      fetchOrders(); 
+      router.refresh();
+    } catch (error) {
+      console.error('Error confirming receipt:', error);
+      toast.error("Failed to confirm receipt");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -314,6 +352,17 @@ export default function ProfilePage() {
                               <p><strong>Shipping Address:</strong> {order.shippingAddress}</p>
                             </div>
                           </div>
+                          {order.status === 'Paid' && (
+                          <div className="flex space-x-2 mt-4">
+                            <Button
+                              variant="default"
+                              onClick={() => handleConfirmOrder(order.id)}
+                            >
+                              Confirm get product
+                            </Button>
+                          
+                          </div>
+                        )}
                         </li>
                       </Link>
                     ))}
@@ -410,7 +459,7 @@ export default function ProfilePage() {
                             <p><strong>Shipping Address:</strong> {order.shippingAddress}</p>
                           </div>
                         </div>
-                        {order.status === 'Pending' && (
+                        {order.status === 'Paid' && (
                           <div className="flex space-x-2 mt-4">
                             <Button
                               variant="default"

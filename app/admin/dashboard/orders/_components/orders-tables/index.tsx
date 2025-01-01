@@ -5,28 +5,33 @@ import { DataTableFilterBox } from '@/components-admin/ui/table/data-table-filte
 import { DataTableResetFilter } from '@/components-admin/ui/table/data-table-reset-filter';
 import { DataTableSearch } from '@/components-admin/ui/table/data-table-search';
 import { Employee } from '@/constants/data';
-import { columns } from '../employee-tables/columns';
+import { columns } from './columns';
 import {
-  GENDER_OPTIONS,
-  useEmployeeTableFilters
-} from './use-employee-table-filters';
+  STATUS_OPTIONS,
+  useOrderTableFilters
+} from './use-orders-table-filters';
+import { OrderData } from '@/app/api/orderService';
 
-export default function EmployeeTable({
-  data,
-  totalData
-}: {
-  data: Employee[];
+interface OrderTableProps {
+  data: OrderData[];
   totalData: number;
-}) {
+  renderRowActions?: (order: OrderData) => React.ReactNode;
+}
+
+export default function OrderTable({
+  data,
+  totalData,
+  renderRowActions
+}: OrderTableProps) {
   const {
-    genderFilter,
-    setGenderFilter,
+    statusFilter,
+    setStatusFilter,
     isAnyFilterActive,
     resetFilters,
     searchQuery,
     setPage,
     setSearchQuery
-  } = useEmployeeTableFilters();
+  } = useOrderTableFilters(data);
 
   return (
     <div className="space-y-4">
