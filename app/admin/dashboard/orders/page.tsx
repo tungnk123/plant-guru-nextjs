@@ -12,24 +12,32 @@ export const metadata: Metadata = {
 };
 
 interface OrderPageProps {
-  searchParams: Promise<SearchParams>; // Updated to Promise<SearchParams>
+  searchParams: Promise<SearchParams>; // searchParams as a Promise
 }
 
 const OrderPage = async ({ searchParams }: OrderPageProps) => {
-  try {
-    // Await the resolution of searchParams
-    const resolvedSearchParams = await searchParams;
-    searchParamsCache.parse(resolvedSearchParams);
+  // Resolve the `searchParams` Promise safely
+  const resolvedSearchParams = await searchParams
+    .then((params) => {
+      searchParamsCache.parse(params); // Process the resolved params
+      return params;
+    })
+    .catch((error) => {
+      console.error('Failed to resolve searchParams:', error);
+      throw new Error('Invalid search parameters');
+    });
 
-    // Fetch orders using the API
+  try {
+    // Fetch orders from the API
     const orders: OrderData[] = await fetchOrders();
     const totalOrders = orders.length;
 
     return (
       <NuqsAdapter>
-        <OrderListingPage 
-          orders={orders} 
-          totalOrders={totalOrders} 
+        <OrderListingPage
+          orders={orders}
+          totalOrders={totalOrders}
+        // Pass resolved params to the component
         />
       </NuqsAdapter>
     );
