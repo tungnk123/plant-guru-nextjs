@@ -118,7 +118,7 @@ const PlantIdentifier = () => {
               <Badge variant="outline" className="px-4 py-1 border-green-200 text-green-700">
                 AI-Powered Plant Recognition
               </Badge>
-              <CardTitle className="text-4xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-transparent bg-clip-text flex items-center justify-center gap-3 pt-2">
+              <CardTitle className="text-6xl font-bold bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-transparent bg-clip-text flex items-center justify-center gap-3 pt-2">
                 <Sprout className="h-8 w-8 text-green-500" />
                 Plant Identifier
               </CardTitle>

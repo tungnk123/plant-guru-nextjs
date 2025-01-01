@@ -79,7 +79,7 @@ const Products = () => {
               Discover Amazing Products
             </Badge>
           </div>
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-orange-600 via-orange-500 to-pink-500 bg-clip-text text-transparent">
+          <h1 className="text-6xl font-bold bg-gradient-to-r from-orange-600 via-orange-500 to-pink-500 bg-clip-text text-transparent">
             Our Products Collection
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
