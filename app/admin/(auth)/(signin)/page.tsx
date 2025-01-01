@@ -1,14 +1,9 @@
-import { Metadata } from 'next';
-import SignInViewPage from '../_components/sigin-view';
-import { useRouter } from 'next/router';
+import { redirect } from 'next/navigation';
 
-export const metadata: Metadata = {
-  title: 'Authentication | Sign In',
-  description: 'Sign In page for authentication.'
+const Dashboard = () => {
+  redirect('/admin/dashboard/overview');
+
+  return null;
 };
 
-export default function Page() {
-  const router = useRouter();
-
-  return <SignInViewPage />;
-}
+export default Dashboard;

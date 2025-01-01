@@ -85,7 +85,7 @@ const Page = () => {
   const generatePlantDetails = async (description: string) => {
     try {
       const genAI = new GoogleGenerativeAI(
-        'AIzaSyCYhMw5ThRkupqH9iON1RCKbnvMCks7nSA'
+        'AIzaSyBxcN2hQwPYFwOrOamgCuR_ZV0afplLo4E'
       )
       const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 

@@ -7,9 +7,8 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuTrigger
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { OrderData } from '@/app/api/orderService';
 import { 
   Edit, 
   MoreHorizontal, 
@@ -24,6 +23,97 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
 
+const ORDER_BASE_URL = 'https://un-silent-backend-develop.azurewebsites.net/api/orders';
+
+export interface OrderData {
+  id: string;
+  userId: string;
+  productId: string;
+  sellerId: string;
+  quantity: number;
+  totalPrice: number;
+  shippingAddress: string;
+  status: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export const createOrder = async (orderData: Pick<OrderData, 'userId' | 'productId' | 'sellerId' | 'quantity' | 'shippingAddress'>): Promise<OrderData> => {
+  try {
+    const response = await fetch(ORDER_BASE_URL, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(orderData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to create order: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error;
+  }
+};
+
+export const confirmOrder = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(`${ORDER_BASE_URL}/confirmOrder?orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to confirm order: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error confirming order:', error);
+    throw error;
+  }
+};
+
+export const denyOrder = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(`${ORDER_BASE_URL}/markAsFailedOrder?orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to deny order: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error denying order:', error);
+    throw error;
+  }
+};
+
+export const markOrderAsSuccess = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(`${ORDER_BASE_URL}/markAsSuccessOrder?orderId=${orderId}`, {
+      method: 'POST',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to mark order as success: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error marking order as success:', error);
+    throw error;
+  }
+};
+
 interface CellActionProps {
   data: OrderData;
 }
@@ -37,7 +127,12 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const onConfirm = async () => {
     try {
       setLoading(true);
-      // Add your delete order logic here
+      await fetch(`${ORDER_BASE_URL}/${data.id}`, {
+        method: 'DELETE',
+        headers: {
+          'accept': '*/*',
+        },
+      });
       toast({
         title: "Order Deleted",
         description: `Order #${data.id.slice(0, 8)} has been deleted.`,
@@ -58,7 +153,14 @@ export const CellAction: React.FC<CellActionProps> = ({ data }) => {
   const handleStatusUpdate = async (newStatus: string) => {
     try {
       setLoading(true);
-      // Add your status update logic here
+      if (newStatus === 'processing') {
+        await confirmOrder(data.id);
+      } else if (newStatus === 'completed') {
+        await markOrderAsSuccess(data.id);
+      } else if (newStatus === 'cancelled') {
+        await denyOrder(data.id);
+      }
+
       toast({
         title: "Status Updated",
         description: `Order #${data.id.slice(0, 8)} status changed to ${newStatus}.`,

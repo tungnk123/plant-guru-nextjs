@@ -4,6 +4,7 @@ export interface OrderData {
   id: string;
   userId: string;
   productId: string;
+  sellerId: string;
   quantity: number;
   totalPrice: number;
   shippingAddress: string;
@@ -12,7 +13,13 @@ export interface OrderData {
   updatedAt?: string;
 }
 
-export const createOrder = async (orderData: Pick<OrderData, 'userId' | 'productId' | 'quantity' | 'shippingAddress'>): Promise<OrderData> => {
+export interface EnhancedOrderData extends OrderData {
+  productName: string;
+  productImage: string;
+}
+
+
+export const createOrder = async (orderData: Pick<OrderData, 'userId' | 'productId' | 'sellerId' | 'quantity' | 'shippingAddress'>): Promise<OrderData> => {
   try {
     const response = await fetch(ORDER_BASE_URL, {
       method: 'POST',
@@ -145,6 +152,48 @@ export const fetchOrders = async (): Promise<OrderData[]> => {
     return orders;
   } catch (error) {
     console.error('Error fetching orders:', error);
+    throw error;
+  }
+};
+
+export const markOrderAsFailed = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(
+      `${ORDER_BASE_URL}/markAsFailedOrder?orderId=${orderId}`,
+      {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to mark order as failed: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error marking order as failed:', error);
+    throw error;
+  }
+};
+
+export const markOrderAsSuccess = async (orderId: string): Promise<void> => {
+  try {
+    const response = await fetch(
+      `${ORDER_BASE_URL}/markAsSuccessOrder?orderId=${orderId}`,
+      {
+        method: 'POST',
+        headers: {
+          'accept': '*/*',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to mark order as success: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error marking order as success:', error);
     throw error;
   }
 }; 

@@ -12,13 +12,17 @@ import {
 } from './use-orders-table-filters';
 import { OrderData } from '@/app/api/orderService';
 
-export default function OrderTable({
-  data,
-  totalData
-}: {
+interface OrderTableProps {
   data: OrderData[];
   totalData: number;
-}) {
+  renderRowActions?: (order: OrderData) => React.ReactNode;
+}
+
+export default function OrderTable({
+  data,
+  totalData,
+  renderRowActions
+}: OrderTableProps) {
   const {
     statusFilter,
     setStatusFilter,

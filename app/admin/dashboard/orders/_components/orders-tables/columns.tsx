@@ -4,15 +4,15 @@ import { OrderData } from '@/app/api/orderService';
 import { ColumnDef } from '@tanstack/react-table';
 import { CellAction } from './cell-action';
 import { Badge } from "@/components/ui/badge";
-import { CalendarDays, Package, DollarSign, MapPin, User, Clock, Ban, CheckCircle, XCircle } from "lucide-react";
+import { CalendarDays, Package, DollarSign, MapPin, User, Clock, Ban, CheckCircle, XCircle, Store } from "lucide-react";
 import { format } from "date-fns";
 
 const getStatusConfig = (status: string) => {
   const statusMap: Record<string, { label: string; class: string; icon: JSX.Element }> = {
-    'Pending': { 
-      label: 'Pending', 
-      class: 'bg-yellow-100 text-yellow-800',
-      icon: <Clock className="w-3 h-3 mr-1" />
+    'Success': { 
+      label: 'Success', 
+      class: 'bg-green-400 text-green-800',
+      icon: <CheckCircle className="w-3 h-3 mr-1" />
     },
     'Not Paid': { 
       label: 'Not Paid', 
@@ -21,7 +21,7 @@ const getStatusConfig = (status: string) => {
     },
     'Paid': { 
       label: 'Paid', 
-      class: 'bg-green-100 text-green-800',
+      class: 'bg-yellow-100 text-yellow-800',
       icon: <CheckCircle className="w-3 h-3 mr-1" />
     },
     'Failed': { 
@@ -73,6 +73,20 @@ export const columns: ColumnDef<OrderData>[] = [
         </div>
         <div className="font-medium text-gray-700">
           {row.original.userId}
+        </div>
+      </div>
+    )
+  },
+  {
+    accessorKey: 'sellerId',
+    header: 'SELLER',
+    cell: ({ row }) => (
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+          <Store className="w-4 h-4 text-blue-600" />
+        </div>
+        <div className="font-medium text-gray-700">
+          {row.original.sellerId}
         </div>
       </div>
     )

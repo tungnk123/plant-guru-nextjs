@@ -81,14 +81,6 @@ export const navItems: NavItem[] = [
     items: []
   },
   {
-    title: 'Plant Guide',
-    url: '/admin/dashboard/guide',
-    icon: 'kanban',
-    shortcut: ['k', 'k'],
-    isActive: false,
-    items: []
-  },
-  {
     title: 'User',
     url: '/admin/dashboard/user',
     icon: 'user',
@@ -112,12 +104,4 @@ export const navItems: NavItem[] = [
     isActive: false,
     items: []
   },
-  {
-    title: 'Report',
-    url: '/admin/dashboard/report',
-    icon: 'kanban',
-    shortcut: ['k', 'k'],
-    isActive: false,
-    items: []
-  }
 ];
