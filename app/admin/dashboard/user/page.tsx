@@ -1,17 +1,25 @@
-import { searchParamsCache } from '@/lib/searchparams'; // Assuming this handles search params cache
-import { SearchParams } from 'nuqs'; // Assuming this is a function for parsing search params
+import { searchParamsCache } from '@/lib/searchparams'; // Handles search params cache
+import { SearchParams } from 'nuqs'; // Parses search params
 import React from 'react';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import UserListingPage from './_components/user-listing-page';
-import TestApi from '@/app/components/TestApi';
 
-type pageProps = {
-  searchParams: SearchParams;
+type PageProps = {
+  searchParams: Promise<SearchParams>; // Treating searchParams as a Promise
 };
 
-const Page = ({ searchParams }: pageProps) => {
-  searchParamsCache.parse(searchParams);
-  return <NuqsAdapter><UserListingPage/></NuqsAdapter>;
+const Page = async ({ searchParams }: PageProps) => {
+  // Await the resolution of searchParams
+  const resolvedSearchParams = await searchParams;
+
+  // Parse resolved search params
+  searchParamsCache.parse(resolvedSearchParams);
+
+  return (
+    <NuqsAdapter>
+      <UserListingPage />
+    </NuqsAdapter>
+  );
 };
 
 export default Page;

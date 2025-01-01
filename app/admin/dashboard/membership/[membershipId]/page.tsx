@@ -4,17 +4,19 @@ export const metadata = {
   title: 'Dashboard : Membership View',
 };
 
-export default function Page({ params }: { params: { membershipId: string } }) {
-  console.log('Membership ID (Server):', params.membershipId);
+interface PageProps {
+  params: { membershipId: string };
+}
 
-  if (!params.membershipId) {
-    return <div>Error: Membership ID is missing</div>;
-  }
+// Resolve the Promise before using it in the client component
+export default async function Page({ params }: { params: Promise<{ membershipId: string }> }) {
+  const resolvedParams = await params; // Resolve the promise
+  const { membershipId } = resolvedParams;
 
   return (
     <MembershipViewPage
       params={{
-        membershipId: params.membershipId,
+        membershipId,
       }}
     />
   );

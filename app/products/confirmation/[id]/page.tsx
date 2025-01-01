@@ -1,4 +1,5 @@
-'use client'
+'use client';
+
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { fetchProductById, ProductData } from '@/app/api/productService';
@@ -57,7 +58,7 @@ const ConfirmationPage = () => {
   const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const value = parseInt(inputValue);
-    
+
     if (inputValue === '') {
       setQuantity(0);
       return;
@@ -95,11 +96,13 @@ const ConfirmationPage = () => {
       paypal.Buttons({
         createOrder: (data, actions) => {
           return actions.order.create({
-            purchase_units: [{
-              amount: {
-                value: totalPrice.toFixed(2),
+            purchase_units: [
+              {
+                amount: {
+                  value: totalPrice.toFixed(2),
+                },
               },
-            }],
+            ],
           });
         },
         onApprove: async (data, actions) => {
@@ -108,6 +111,7 @@ const ConfirmationPage = () => {
               const orderData = {
                 userId,
                 productId: product.id,
+                sellerId: product.sellerId, // Ensure sellerId is part of product
                 quantity,
                 shippingAddress,
               };
@@ -123,7 +127,6 @@ const ConfirmationPage = () => {
                 description: `Order ${order.id} placed successfully`,
                 variant: 'success',
               });
-            
             } catch (error) {
               console.error('Error processing order:', error);
             }
@@ -157,7 +160,6 @@ const ConfirmationPage = () => {
           </CardHeader>
           <CardContent className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Product Image Section */}
               <div className="space-y-4">
                 <div className="aspect-square relative rounded-xl overflow-hidden border border-gray-200 shadow-md hover:shadow-xl transition-shadow duration-300">
                   <img
@@ -169,7 +171,6 @@ const ConfirmationPage = () => {
                 </div>
               </div>
 
-              {/* Product Details Section */}
               <div className="space-y-6">
                 <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 rounded-lg">
                   <h2 className="text-3xl font-bold text-gray-900">{product?.productName}</h2>
@@ -185,7 +186,6 @@ const ConfirmationPage = () => {
 
                 <Separator className="bg-gradient-to-r from-orange-500/20 to-transparent" />
 
-                {/* Quantity Input */}
                 <div className="space-y-2">
                   <Label htmlFor="quantity" className="flex items-center gap-2">
                     <Package className="h-4 w-4 text-orange-500" />
@@ -205,7 +205,6 @@ const ConfirmationPage = () => {
                   />
                 </div>
 
-                {/* Shipping Address Input */}
                 <div className="space-y-2">
                   <Label htmlFor="shipping" className="flex items-center gap-2">
                     <MapPin className="h-4 w-4 text-orange-500" />
@@ -223,7 +222,6 @@ const ConfirmationPage = () => {
 
                 <Separator className="bg-gradient-to-r from-orange-500/20 to-transparent" />
 
-                {/* Total Price */}
                 <div className="bg-gradient-to-r from-orange-50 to-transparent p-4 rounded-lg">
                   <div className="flex items-center justify-between">
                     <span className="text-lg font-medium">Total Price:</span>
@@ -233,10 +231,8 @@ const ConfirmationPage = () => {
                   </div>
                 </div>
 
-                {/* PayPal Button Container */}
                 <div id="paypal-button-container" className="w-full" />
 
-                {/* Confirm Purchase Button */}
                 <Button
                   onClick={handleConfirmPurchase}
                   className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg"
@@ -254,4 +250,4 @@ const ConfirmationPage = () => {
   );
 };
 
-export default ConfirmationPage; 
+export default ConfirmationPage;

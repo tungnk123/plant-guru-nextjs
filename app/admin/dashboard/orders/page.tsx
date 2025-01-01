@@ -12,13 +12,15 @@ export const metadata: Metadata = {
 };
 
 interface OrderPageProps {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>; // Updated to Promise<SearchParams>
 }
 
 const OrderPage = async ({ searchParams }: OrderPageProps) => {
-  searchParamsCache.parse(searchParams);
-
   try {
+    // Await the resolution of searchParams
+    const resolvedSearchParams = await searchParams;
+    searchParamsCache.parse(resolvedSearchParams);
+
     // Fetch orders using the API
     const orders: OrderData[] = await fetchOrders();
     const totalOrders = orders.length;
@@ -35,7 +37,9 @@ const OrderPage = async ({ searchParams }: OrderPageProps) => {
     console.error('Failed to fetch orders:', error);
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">Failed to load orders. Please try again later.</p>
+        <p className="text-red-500">
+          Failed to load orders. Please try again later.
+        </p>
       </div>
     );
   }
