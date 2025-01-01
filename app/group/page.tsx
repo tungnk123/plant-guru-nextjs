@@ -6,18 +6,22 @@ import Navbar from "../components/navbar/Navbar";
 import { HeroSection } from "./components/HeroSection";
 import GroupItem from "./components/GroupItem";
 import CreateGroupModal from "./components/CreateGroupoModel";
+import { motion } from "framer-motion";
+import { Users, Plus, ChevronLeft, ChevronRight, Loader2, UserCircle2, MessagesSquare } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 
-export const dynamic = "force-dynamic"; // Force dynamic rendering
+export const dynamic = "force-dynamic";
 
 export default function Page() {
   const router = useRouter();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [groups, setGroups] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [groupType, setGroupType] = useState("all"); // 'all', 'your', or 'joined'
-  const [searchQuery, setSearchQuery] = useState(""); // State for search query
-  const [isModalOpen, setIsModalOpen] = useState(false); // State for modal
-  const [userId, setUserId] = useState(""); // User ID state
+  const [groupType, setGroupType] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [userId, setUserId] = useState("");
   const [loading, setLoading] = useState(true);
   const itemsPerPage = 5;
 
@@ -85,95 +89,172 @@ export default function Page() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <p>Loading...</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="flex items-center space-x-2">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="text-xl font-medium text-gray-700">Loading...</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full">
-      <section className="w-full">
-        <Navbar toggle={toggleMenu} />
-        <HeroSection searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
-        <div className="ms-60 me-60 flex justify-between items-center mt-4 px-4">
-          <div className="flex space-x-4">
-            <button
-              onClick={() => setGroupType("all")}
-              className={`px-4 py-2 rounded-full border ${
-                groupType === "all" ? "bg-yellow-400" : "bg-white"
-              }`}
+    <div className="w-full min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <Navbar toggle={toggleMenu} />
+      
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="container mx-auto px-4 py-16"
+      >
+        <div className="text-center mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+          >
+            <h1 className="text-6xl font-bold mb-6 bg-gradient-to-r from-primary via-purple-500 to-blue-600 text-transparent bg-clip-text">
+              Discover Communities
+            </h1>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed mb-8">
+              Join groups, share experiences, and connect with people who share your interests
+            </p>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto mb-12"
+          >
+            <Card className="p-6 bg-gradient-to-br from-purple-50 to-purple-100/50 border-none shadow-md">
+              <UserCircle2 className="w-10 h-10 text-purple-500 mb-4 mx-auto" />
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Connect</h3>
+              <p className="text-gray-600">Find and join communities that match your interests</p>
+            </Card>
+
+            <Card className="p-6 bg-gradient-to-br from-blue-50 to-blue-100/50 border-none shadow-md">
+              <Users className="w-10 h-10 text-blue-500 mb-4 mx-auto" />
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Share</h3>
+              <p className="text-gray-600">Share your thoughts and experiences with others</p>
+            </Card>
+
+            <Card className="p-6 bg-gradient-to-br from-green-50 to-green-100/50 border-none shadow-md">
+              <MessagesSquare className="w-10 h-10 text-green-500 mb-4 mx-auto" />
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">Engage</h3>
+              <p className="text-gray-600">Participate in discussions and grow together</p>
+            </Card>
+          </motion.div>
+        </div>
+
+        <Card className="p-6 mb-8 bg-white/50 backdrop-blur-sm shadow-md border-none">
+          <div className="flex justify-between items-center flex-wrap gap-4">
+            <div className="flex space-x-4">
+              {[
+                { type: "all", label: "All Groups", icon: Users },
+                { type: "joined", label: "Groups You Joined", icon: UserCircle2 },
+                { type: "your", label: "Your Groups", icon: MessagesSquare },
+              ].map((item) => (
+                <Button
+                  key={item.type}
+                  onClick={() => setGroupType(item.type)}
+                  variant={groupType === item.type ? "default" : "outline"}
+                  className={`rounded-full transition-all duration-300 ${
+                    groupType === item.type
+                      ? "bg-gradient-to-r from-primary to-primary/80 text-white shadow-lg"
+                      : "hover:bg-gray-100"
+                  }`}
+                >
+                  <item.icon className="w-4 h-4 mr-2" />
+                  {item.label}
+                </Button>
+              ))}
+            </div>
+
+            <Button
+              onClick={handleCreateGroup}
+              className="bg-gradient-to-r from-primary to-primary/80 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
             >
-              All
-            </button>
-            <button
-              onClick={() => setGroupType("joined")}
-              className={`px-4 py-2 rounded-full border ${
-                groupType === "joined" ? "bg-yellow-400" : "bg-white"
-              }`}
-            >
-              Groups You Joined
-            </button>
-            <button
-              onClick={() => setGroupType("your")}
-              className={`px-4 py-2 rounded-full border ${
-                groupType === "your" ? "bg-yellow-400" : "bg-white"
-              }`}
-            >
-              Your Groups
-            </button>
+              <Plus className="w-4 h-4 mr-2" />
+              Create Group
+            </Button>
           </div>
-          <button
-            onClick={handleCreateGroup}
-            className="flex items-center px-4 py-2 rounded-md border bg-yellow-400 text-black"
-          >
-            <span className="mr-2">+</span> Create Group
-          </button>
-        </div>
-        <div className="mt-8 space-y-4 mx-60">
-          {currentGroups.map((group) => (
-            <GroupItem
+        </Card>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="space-y-4"
+        >
+          {currentGroups.map((group, index) => (
+            <motion.div
               key={group.id}
-              id={group.id}
-              groupName={group.groupName}
-              description={group.description}
-              groupImage={group.groupImage}
-              numberOfMembers={group.numberOfMembers}
-              numberOfPosts={group.numberOfPosts}
-              status={group.status}
-              userId={userId}
-              masterUserId={group.masterUserId}
-            />
-          ))}
-        </div>
-        <div className="flex justify-center mt-4">
-          <button
-            onClick={() => handlePageChange(currentPage - 1)}
-            disabled={currentPage === 1}
-            className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
-          >
-            &lt;
-          </button>
-          {Array.from({ length: totalPages }, (_, index) => (
-            <button
-              key={index + 1}
-              onClick={() => handlePageChange(index + 1)}
-              className={`px-3 py-1 mx-1 border rounded ${
-                currentPage === index + 1 ? "border-blue-500" : ""
-              }`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
             >
-              {index + 1}
-            </button>
+              <GroupItem
+                id={group.id}
+                groupName={group.groupName}
+                description={group.description}
+                groupImage={group.groupImage}
+                numberOfMembers={group.numberOfMembers}
+                numberOfPosts={group.numberOfPosts}
+                status={group.status}
+                userId={userId}
+                masterUserId={group.masterUserId}
+              />
+            </motion.div>
           ))}
-          <button
-            onClick={() => handlePageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
-            className="px-3 py-1 mx-1 border rounded disabled:opacity-50"
-          >
-            &gt;
-          </button>
-        </div>
-      </section>
+
+          {currentGroups.length === 0 && (
+            <div className="text-center py-12">
+              <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+              <h3 className="text-xl font-medium text-gray-600">No groups found</h3>
+              <p className="text-gray-500">Try adjusting your search or create a new group</p>
+            </div>
+          )}
+        </motion.div>
+
+        {totalPages > 1 && (
+          <div className="flex justify-center items-center space-x-2 mt-8">
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="rounded-full"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </Button>
+            
+            {Array.from({ length: totalPages }, (_, index) => (
+              <Button
+                key={index + 1}
+                onClick={() => handlePageChange(index + 1)}
+                variant={currentPage === index + 1 ? "default" : "outline"}
+                className={`rounded-full min-w-[2.5rem] ${
+                  currentPage === index + 1
+                    ? "bg-gradient-to-r from-primary to-primary/80 text-white"
+                    : ""
+                }`}
+              >
+                {index + 1}
+              </Button>
+            ))}
+
+            <Button
+              variant="outline"
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="rounded-full"
+            >
+              <ChevronRight className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
+      </motion.div>
+
       <CreateGroupModal
         userId={userId}
         isOpen={isModalOpen}
