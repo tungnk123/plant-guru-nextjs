@@ -302,4 +302,24 @@ export const fetchComments = async (
   }
 };
 
+export const getCountStatistic = async (): Promise<{ numberOfUser: number; numberOfPost: number; numberOfWiki: number }> => {
+  try {
+    const response = await fetch('https://un-silent-backend-develop.azurewebsites.net/api/posts/getCountStatistic', {
+      method: 'GET',
+      headers: {
+        'accept': '*/*',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch statistics: ${response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching statistics:', error);
+    throw error;
+  }
+};
+
 

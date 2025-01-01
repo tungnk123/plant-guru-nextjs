@@ -1,13 +1,72 @@
-import Head from 'next/head'
-import { Input } from '@/components/ui/input'
-import { Card, CardContent } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import Image from 'next/image'
-import { motion } from 'framer-motion'
-import { Search, Leaf, MessageSquare, Users, TrendingUp, ArrowRight, Sparkles } from 'lucide-react'
+import React, { useEffect, useState } from 'react';
+import { getCountStatistic } from '@/app/api/postService';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import Image from 'next/image';
+import { motion } from 'framer-motion';
+import { Leaf, MessageSquare, Users, Sparkles } from 'lucide-react';
+import Head from 'next/head';
 
 export const HeroSection = () => {
-  const stats = { plants: 10, posts: 10, users: 10 }
+  const [stats, setStats] = useState<{ numberOfUser: number; numberOfPost: number; numberOfWiki: number } | null>(null);
+  const [displayedUsers, setDisplayedUsers] = useState(0);
+  const [displayedPosts, setDisplayedPosts] = useState(0);
+  const [displayedWikis, setDisplayedWikis] = useState(0);
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const data = await getCountStatistic();
+        setStats(data);
+      } catch (error) {
+        console.error('Failed to fetch statistics:', error);
+      }
+    };
+
+    fetchStatistics();
+  }, []);
+
+  useEffect(() => {
+    if (stats) {
+      const duration = 1000; // Duration for the animation in milliseconds
+      const incrementUsers = Math.ceil(stats.numberOfUser / (duration / 100));
+      const incrementPosts = Math.ceil(stats.numberOfPost / (duration / 100));
+      const incrementWikis = Math.ceil(stats.numberOfWiki / (duration / 100));
+
+      const userInterval = setInterval(() => {
+        setDisplayedUsers((prev) => {
+          if (prev < stats.numberOfUser) {
+            return Math.min(prev + incrementUsers, stats.numberOfUser);
+          } else {
+            clearInterval(userInterval);
+            return prev;
+          }
+        });
+        
+        setDisplayedPosts((prev) => {
+          if (prev < stats.numberOfPost) {
+            return Math.min(prev + incrementPosts, stats.numberOfPost);
+          } else {
+            clearInterval(userInterval);
+            return prev;
+          }
+        });
+
+        setDisplayedWikis((prev) => {
+          if (prev < stats.numberOfWiki) {
+            return Math.min(prev + incrementWikis, stats.numberOfWiki);
+          } else {
+            clearInterval(userInterval);
+            return prev;
+          }
+        });
+      }, 100);
+
+      return () => {
+        clearInterval(userInterval);
+      };
+    }
+  }, [stats]);
 
   return (
     <div className="w-full py-8 relative overflow-hidden">
@@ -49,9 +108,9 @@ export const HeroSection = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold bg-gradient-to-r from-emerald-600 via-teal-500 to-cyan-600 text-transparent bg-clip-text">
-                      {stats.plants}
+                      {displayedUsers}
                     </p>
-                    <p className="text-sm text-gray-600">Plants Identified</p>
+                    <p className="text-sm text-gray-600">Users</p>
                   </div>
                 </div>
 
@@ -61,9 +120,9 @@ export const HeroSection = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold bg-gradient-to-r from-violet-600 via-purple-500 to-fuchsia-600 text-transparent bg-clip-text">
-                      {stats.posts}
+                      {displayedPosts}
                     </p>
-                    <p className="text-sm text-gray-600">Community Posts</p>
+                    <p className="text-sm text-gray-600">Posts</p>
                   </div>
                 </div>
 
@@ -73,17 +132,13 @@ export const HeroSection = () => {
                   </div>
                   <div>
                     <p className="text-2xl font-bold bg-gradient-to-r from-rose-600 via-pink-500 to-rose-600 text-transparent bg-clip-text">
-                      {stats.users}
+                      {displayedWikis}
                     </p>
-                    <p className="text-sm text-gray-600">Active Users</p>
+                    <p className="text-sm text-gray-600">Wikis</p>
                   </div>
                 </div>
-
-      
               </CardContent>
             </Card>
-
-          
           </motion.div>
 
           {/* Search Section */}
@@ -94,13 +149,13 @@ export const HeroSection = () => {
             className="lg:w-3/4"
           >
             <Card className="bg-gradient-to-br from-white/80 via-white/60 to-transparent backdrop-blur-sm shadow-xl border-none overflow-hidden hover:shadow-2xl transition-all duration-500">
-              <div className="absolute top-0 right-0 w-64 h-64 bg-[conic-gradient(from_45deg_at_top_right,_var(--tw-gradient-stops))] from-rose-200/30 via-purple-200/30 to-blue-200/30 rounded-full transform translate-x-32 -translate-y-32" />
-              <div className="absolute bottom-0 left-0 w-64 h-64 bg-[conic-gradient(from_225deg_at_bottom_left,_var(--tw-gradient-stops))] from-blue-200/30 via-emerald-200/30 to-teal-200/30 rounded-full transform -translate-x-32 translate-y-32" />
+              <div className="absolute top-0 right-0 w-64 h-full bg-[conic-gradient(from_45deg_at_top_right,_var(--tw-gradient-stops))] from-rose-200/30 via-purple-200/30 to-blue-200/30 rounded-full transform translate-x-32 -translate-y-32" />
+              <div className="absolute bottom-0 left-0 w-64 h-full bg-[conic-gradient(from_225deg_at_bottom_left,_var(--tw-gradient-stops))] from-blue-200/30 via-emerald-200/30 to-teal-200/30 rounded-full transform -translate-x-32 translate-y-32" />
               
               <CardContent className="p-8 relative">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center space-x-3">
-                    <div className="relative w-12 h-12 transform hover:scale-105 transition-transform duration-300">
+                    <div className="relative w-12 h-28 transform hover:scale-105 transition-transform duration-300">
                       <Image 
                         src="/images/ic_logo.svg" 
                         alt="Logo" 
@@ -118,18 +173,6 @@ export const HeroSection = () => {
                   >
                     Explore More
                   </Button>
-                </div>
-
-                <div className="relative group">
-                  <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-green-200/20 to-blue-200/20 rounded-full blur-xl group-hover:blur-2xl transition-all duration-300 opacity-0 group-hover:opacity-100" />
-                  <div className="relative">
-                    <Search className="absolute left-4 top-3.5 h-5 w-5 text-gray-400" />
-                    <Input
-                      type="text"
-                      placeholder="Search for a plant or ask a question..."
-                      className="w-full pl-12 pr-4 py-3 rounded-full border border-gray-200/50 bg-white/90 backdrop-blur-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-300"
-                    />
-                  </div>
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-2">
@@ -150,5 +193,5 @@ export const HeroSection = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
