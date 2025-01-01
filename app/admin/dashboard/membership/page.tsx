@@ -6,6 +6,7 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import MembershipListingPage from './_components/membership-listing-page';
 import MembershipService, { Membership } from '@/app/admin/api/membership';
 
+
 type PageProps = {
   searchParams: Promise<SearchParams>;
 };
