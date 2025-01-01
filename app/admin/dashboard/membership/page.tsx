@@ -1,17 +1,18 @@
-'use client'
+'use client';
 import React, { useEffect, useState } from 'react';
-import { searchParamsCache } from '@/lib/searchparams'; // Assuming this handles search params cache
-import { SearchParams } from 'nuqs'; // Assuming this is a function for parsing search params
+import { searchParamsCache } from '@/lib/searchparams';
+import { SearchParams } from 'nuqs';
 import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import MembershipListingPage from './_components/membership-listing-page';
 import MembershipService, { Membership } from '@/app/admin/api/membership';
 
 type PageProps = {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 };
 
-const Page = ({ searchParams }: PageProps) => {
-  searchParamsCache.parse(searchParams);
+const Page = async ({ searchParams }: PageProps) => {
+  const resolvedSearchParams = await searchParams;
+  searchParamsCache.parse(resolvedSearchParams);
 
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);

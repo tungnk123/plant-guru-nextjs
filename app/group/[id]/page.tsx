@@ -1,18 +1,19 @@
 "use client";
-import React, { useState, useEffect } from 'react';
-import { useParams, useRouter } from 'next/navigation';
-import Navbar from '../../components/navbar/Navbar'
-import PostCard from '../../components/home/PostCard';
-import PostPendingCard from '../../group/components/PostPendingCard';
-import UserCard from '../../group/components/UserCard';
+
+import React, { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import Navbar from "../../components/navbar/Navbar";
+import PostCard from "../../components/home/PostCard";
+import PostPendingCard from "../../group/components/PostPendingCard";
+import UserCard from "../../group/components/UserCard";
 
 export default function GroupPage() {
   const { id } = useParams();
   const router = useRouter();
+  const [userId, setUserId] = useState(""); // Manage userId state
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const userId = localStorage.getItem('userId');
   const [groupData, setGroupData] = useState(null);
-  const [selectedTab, setSelectedTab] = useState('Posts'); // State for selected navigation button
+  const [selectedTab, setSelectedTab] = useState("Posts");
   const [posts, setPosts] = useState([]);
   const [users, setUsers] = useState([]);
   const [pendingUsers, setPendingUsers] = useState([]);
@@ -23,41 +24,51 @@ export default function GroupPage() {
     setIsMenuOpen((prevState) => !prevState);
   };
 
+  // Fetch userId from localStorage on the client
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedUserId = localStorage.getItem("userId") || "";
+      setUserId(storedUserId);
+    }
+  }, []);
+
   const fetchGroupData = async () => {
     try {
-      const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/groups/${userId}/${id}`);
+      const response = await fetch(
+        `https://un-silent-backend-develop.azurewebsites.net/api/groups/${userId}/${id}`
+      );
       const data = await response.json();
       setGroupData(data);
     } catch (error) {
-      console.error('Error fetching group data:', error);
+      console.error("Error fetching group data:", error);
     }
   };
 
   const fetchPostsOrUsers = async () => {
     let endpoint;
-    if (selectedTab === 'Posts') {
+    if (selectedTab === "Posts") {
       endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/approved/${id}`;
-    } else if (selectedTab === 'Pending Posts') {
+    } else if (selectedTab === "Pending Posts") {
       endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/posts/pending/${id}`;
-    } else if (selectedTab === 'Members') {
+    } else if (selectedTab === "Members") {
       endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/${id}/users`;
-    } else if (selectedTab === 'Pending Members') {
+    } else if (selectedTab === "Pending Members") {
       endpoint = `https://un-silent-backend-develop.azurewebsites.net/api/groups/${id}/users/pending`;
     }
 
     try {
       const response = await fetch(endpoint);
       const data = await response.json();
-      if (selectedTab === 'Members') {
+      if (selectedTab === "Members") {
         setUsers(data);
-      } else if (selectedTab === 'Pending Members') {
+      } else if (selectedTab === "Pending Members") {
         setPendingUsers(data);
       } else {
         setPosts(data);
       }
-      setCurrentPage(1); // Reset to first page when tab changes
+      setCurrentPage(1);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
   };
 
@@ -84,7 +95,7 @@ export default function GroupPage() {
   const currentPosts = posts.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(posts.length / itemsPerPage);
 
-  const handlePageChange = (pageNumber: number) => {
+  const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
@@ -130,28 +141,44 @@ export default function GroupPage() {
       </div>
       <div className="flex justify-center border-t border-b pb-4 pt-4 mt-4 space-x-4">
         <button
-          className={`px-4 py-2 rounded ${selectedTab === 'Posts' ? 'bg-green-200 text-green-800' : 'bg-gray-100 text-gray-800'}`}
-          onClick={() => setSelectedTab('Posts')}
+          className={`px-4 py-2 rounded ${
+            selectedTab === "Posts"
+              ? "bg-green-200 text-green-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+          onClick={() => setSelectedTab("Posts")}
         >
           Posts
         </button>
         <button
-          className={`px-4 py-2 rounded ${selectedTab === 'Members' ? 'bg-green-200 text-green-800' : 'bg-gray-100 text-gray-800'}`}
-          onClick={() => setSelectedTab('Members')}
+          className={`px-4 py-2 rounded ${
+            selectedTab === "Members"
+              ? "bg-green-200 text-green-800"
+              : "bg-gray-100 text-gray-800"
+          }`}
+          onClick={() => setSelectedTab("Members")}
         >
           Members
         </button>
         {isMasterUser && (
           <>
             <button
-              className={`px-4 py-2 rounded ${selectedTab === 'Pending Posts' ? 'bg-green-200 text-green-800' : 'bg-gray-100 text-gray-800'}`}
-              onClick={() => setSelectedTab('Pending Posts')}
+              className={`px-4 py-2 rounded ${
+                selectedTab === "Pending Posts"
+                  ? "bg-green-200 text-green-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+              onClick={() => setSelectedTab("Pending Posts")}
             >
               Pending Posts
             </button>
             <button
-              className={`px-4 py-2 rounded ${selectedTab === 'Pending Members' ? 'bg-green-200 text-green-800' : 'bg-gray-100 text-gray-800'}`}
-              onClick={() => setSelectedTab('Pending Members')}
+              className={`px-4 py-2 rounded ${
+                selectedTab === "Pending Members"
+                  ? "bg-green-200 text-green-800"
+                  : "bg-gray-100 text-gray-800"
+              }`}
+              onClick={() => setSelectedTab("Pending Members")}
             >
               Pending Members
             </button>
@@ -163,7 +190,18 @@ export default function GroupPage() {
           onClick={handleCreatePost}
           className="justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&amp;_svg]:pointer-events-none [&amp;_svg]:size-4 [&amp;_svg]:shrink-0 shadow h-9 px-4 py-2 bg-yellow-300 hover:bg-yellow-600 text-black flex items-center gap-2"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" className="lucide lucide-plus">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className="lucide lucide-plus"
+          >
             <path d="M5 12h14"></path>
             <path d="M12 5v14"></path>
           </svg>
@@ -171,25 +209,40 @@ export default function GroupPage() {
         </button>
       </div>
       <div className="mt-8 space-y-4 mx-80">
-        {selectedTab === 'Members' ? (
+        {selectedTab === "Members" ? (
           users.map((user) => (
-            <UserCard key={user.userId} {...user} showBanButton={isMasterUser} groupId={id} />
+            <UserCard
+              key={user.userId}
+              {...user}
+              showBanButton={isMasterUser}
+              groupId={id}
+            />
           ))
-        ) : selectedTab === 'Pending Members' ? (
+        ) : selectedTab === "Pending Members" ? (
           pendingUsers.map((user) => (
-            <UserCard key={user.userId} {...user} showBanButton={isMasterUser} isPending groupId={id} />
+            <UserCard
+              key={user.userId}
+              {...user}
+              showBanButton={isMasterUser}
+              isPending
+              groupId={id}
+            />
           ))
         ) : (
-          currentPosts.map((post) => (
-            selectedTab === 'Pending Posts' ? (
-              <PostPendingCard key={post.postId} {...post} onApprove={fetchPostsOrUsers} />
+          currentPosts.map((post) =>
+            selectedTab === "Pending Posts" ? (
+              <PostPendingCard
+                key={post.postId}
+                {...post}
+                onApprove={fetchPostsOrUsers}
+              />
             ) : (
               <PostCard key={post.postId} {...post} />
             )
-          ))
+          )
         )}
       </div>
-      {selectedTab !== 'Members' && selectedTab !== 'Pending Members' && (
+      {selectedTab !== "Members" && selectedTab !== "Pending Members" && (
         <div className="flex justify-center mt-4 mb-10">
           <button
             onClick={() => handlePageChange(currentPage - 1)}
@@ -202,8 +255,9 @@ export default function GroupPage() {
             <button
               key={index + 1}
               onClick={() => handlePageChange(index + 1)}
-              className={`px-3 py-1 mx-1 border rounded ${currentPage === index + 1 ? 'border-blue-500' : ''
-                }`}
+              className={`px-3 py-1 mx-1 border rounded ${
+                currentPage === index + 1 ? "border-blue-500" : ""
+              }`}
             >
               {index + 1}
             </button>
@@ -219,4 +273,4 @@ export default function GroupPage() {
       )}
     </div>
   );
-} 
+}
