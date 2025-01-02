@@ -6,21 +6,20 @@ import { NuqsAdapter } from 'nuqs/adapters/next/app';
 import MembershipListingPage from './_components/membership-listing-page';
 import MembershipService, { Membership } from '@/app/admin/api/membership';
 
-
 type PageProps = {
   searchParams: Promise<SearchParams>;
 };
 
-const Page = async ({ searchParams }: PageProps) => {
-  const resolvedSearchParams = await searchParams;
-  searchParamsCache.parse(resolvedSearchParams);
-
+const Page = ({ searchParams }: PageProps) => {
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchMemberships = async () => {
+    const fetchData = async () => {
       try {
+        const resolvedSearchParams = await searchParams;
+        searchParamsCache.parse(resolvedSearchParams);
+
         const data = await MembershipService.getMemberships();
         setMemberships(data);
       } catch (error) {
@@ -30,8 +29,8 @@ const Page = async ({ searchParams }: PageProps) => {
       }
     };
 
-    fetchMemberships();
-  }, []);
+    fetchData();
+  }, [searchParams]);
 
   const handleMembershipUpdate = async (updatedMembership: Membership) => {
     setMemberships((prevMemberships) =>
