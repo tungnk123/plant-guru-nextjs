@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { Button } from '@/components/ui/button'
 import { PostResponse } from "@/app/api/postService";
 import CommentSection from "@/app/home/components/CommentSection";
-import { User } from "lucide-react";
+import UserComponent from '../UserComponent';
 
 const PostCard: React.FC<PostResponse> = (postDat) => {
   const [isModalOpen, setModalOpen] = useState(false);
@@ -23,6 +23,11 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
 
   const handleCommentClick = () => {
     setCommentSectionOpen((prev) => !prev);
+  };
+
+  const handleUserClick = () => {
+    // Define the action to perform when the user component is clicked
+    console.log(`User ${postDat.userNickName} clicked`);
   };
 
   const renderImages = () => {
@@ -82,16 +87,11 @@ const PostCard: React.FC<PostResponse> = (postDat) => {
   return (
     <div className='w-full rounded-3xl border bg-white p-4 shadow-md'>
       <div className='mb-5 flex items-center justify-between'>
-        <div className='flex items-center space-x-2'>
-          <Image
-            src={postDat.userAvatar}
-            alt={postDat.userAvatar}
-            width={32}
-            height={32}
-            className='mr-2 h-8 w-8 rounded-full pointer-events-none select-none'
-          />
-          <span className='font-semibold text-gray-800'>{postDat.userNickName}</span>
-        </div>
+        <UserComponent
+          avatar={postDat.userAvatar}
+          name={postDat.userNickName}
+          userId={postDat.userId}
+        />
       </div>
 
       <div className='mb-6'>
