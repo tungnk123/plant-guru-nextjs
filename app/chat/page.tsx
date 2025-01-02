@@ -3,6 +3,7 @@
 import ChatRoomItem from '@/app/chat/component/chatRoomItem';
 import { useState, useRef, useEffect } from 'react';
 import * as signalR from '@microsoft/signalr';
+import { useRouter } from 'next/navigation';
 
 // Define a type for the message objects
 interface Message {
@@ -24,6 +25,7 @@ const Page = () => {
   const [searchInput, setSearchInput] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const prevMessageCountRef = useRef<number>(0);
+  const router = useRouter();
 
   useEffect(() => {
     // Safely access localStorage in useEffect
@@ -210,11 +212,19 @@ const Page = () => {
   );
 
   return (
-    <div className="w-full h-screen flex">
-      {/* Sidebar */}
-      <div className="w-1/3 bg-gray-200 p-4 overflow-y-auto">
-        <h1 className="text-xl font-bold mb-4">CHAT</h1>
-        <div className="relative mb-4">
+    <div className='w-full h-screen flex'>
+      <div className='w-1/3 bg-gray-200 p-4 overflow-y-auto'>
+        <button
+          onClick={() => router.back()}
+          className="mb-4 p-2 bg-slate-500 text-white rounded-full"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+        <h1 className='text-xl font-bold mb-4'>CHAT</h1>
+        <div className='relative mb-4'>
+
           <input
             type="text"
             placeholder="Search..."

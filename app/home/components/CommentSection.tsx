@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { fetchComments, postComment, upvoteComment, downvoteComment, postReply, fetchReplies } from "@/app/api/commentService"; 
 import { fetchUserById } from "@/app/admin/api/user";
-import { User } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import UserComponent from "../../components/UserComponent";
 
 interface CommentData {
   commentId: string;
@@ -257,18 +257,19 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
 
       <div className="space-y-4">
         {comments.map((comment) => (
-          <div key={comment.commentId} className="flex space-x-3">
-            <img
-              src={comment.avatar}
-              alt={`${comment.name} avatar`}
-              className="h-8 w-8 rounded-full"
-            />
-            <div className="flex-1">
+          <div key={comment.commentId} className="flex flex-col space-y-2 ">
+            <div className="flex items-center space-x-2">
+              <UserComponent
+                avatar={comment.avatar}
+                name={comment.name}
+                userId={comment.userId}
+              />
+            </div>
+            <div className="flex-1 px-10">
               <div className="flex items-center justify-between">
-                <h4 className="font-semibold">{comment.name}</h4>
-                <span className="text-gray-500 text-sm">{comment.createdAt}</span>
+                <p className="text-sm text-gray-700 flex-1">{comment.message}</p>
+                <span className="text-gray-500 text-sm ml-4">{comment.createdAt}</span>
               </div>
-              <p className="text-sm text-gray-700">{comment.message}</p>
               <div className="mt-2 flex space-x-3 text-sm text-gray-500">
                 <button
                   onClick={() => handleUpvote(comment.commentId)}
@@ -308,18 +309,17 @@ const CommentSection: React.FC<CommentSectionProps> = ({ postId }) => {
                     </button>
                   </div>
                   {replies[comment.commentId] && replies[comment.commentId].map((reply) => (
-                    <div key={reply.commentId} className="ml-8 mt-2 flex space-x-3">
-                      <img
-                        src={reply.avatar}
-                        alt={`${reply.name} avatar`}
-                        className="h-8 w-8 rounded-full"
+                    <div key={reply.commentId} className="ml-8 mt-2 flex flex-col space-y-2">
+                      <UserComponent
+                        avatar={reply.avatar}
+                        name={reply.name}
+                        userId={reply.userId}
                       />
                       <div className="flex-1">
                         <div className="flex items-center justify-between">
-                          <h4 className="font-semibold">{reply.name}</h4>
-                          <span className="text-gray-500 text-sm">{reply.createdAt}</span>
+                          <p className="text-sm text-gray-700 flex-1">{reply.message}</p>
+                          <span className="text-gray-500 text-sm ml-4">{reply.createdAt}</span>
                         </div>
-                        <p className="text-sm text-gray-700">{reply.message}</p>
                         <div className="mt-2 flex space-x-3 text-sm text-gray-500">
                           <button
                             onClick={() => handleUpvote(reply.commentId)}
