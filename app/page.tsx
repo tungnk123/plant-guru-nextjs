@@ -21,8 +21,8 @@ const Page = () => {
     <div className="w-full">
       <section className="w-full">
         <Navbar toggle={toggleMenu} />
-        <HeroSection onTagChange={handleTagChange} />
-        <PostSection tag={tag} /> 
+        <HeroSection />
+        <PostSection /> 
       </section>
     </div>
   );

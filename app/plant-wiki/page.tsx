@@ -115,7 +115,7 @@ export default function PlantWikiPage() {
               />
             </div>
             
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-3">
+            <h1 className="text-6xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mb-3">
               Plant Wiki
             </h1>
             <p className="text-gray-600 max-w-lg mb-6">

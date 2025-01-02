@@ -2,6 +2,7 @@
   "compilerOptions": {
     "skipLibCheck": true,
     "strict": false,
+    "noImplicitAny": false,
 
     "lib": [
       "dom",
@@ -29,8 +30,6 @@
     },
 
     "target": "ES2017",
-    "skipLibCheck": true,
-    "strict": false
   },
   "include": [
     "next-env.d.ts",

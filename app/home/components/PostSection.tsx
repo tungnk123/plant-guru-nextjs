@@ -45,7 +45,7 @@ const PostSection = () => {
       </Head>
 
       <div className='flex flex-col my-10'>
-        <div className='flex flex-row mx-4'>
+        <div className='flex flex-row mx-auto'>
           <CategoryCards onTagChange={handleTagChange} />
           <div className="container w-5/6 mx-auto flex flex-col items-center space-y-1 rounded-3xl py-1">
             <span className='font-inter mb-2 flex justify-center text-[30px] font-medium'>

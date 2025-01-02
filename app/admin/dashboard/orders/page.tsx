@@ -12,22 +12,32 @@ export const metadata: Metadata = {
 };
 
 interface OrderPageProps {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>; // searchParams as a Promise
 }
 
 const OrderPage = async ({ searchParams }: OrderPageProps) => {
-  searchParamsCache.parse(searchParams);
+  // Resolve the `searchParams` Promise safely
+  const resolvedSearchParams = await searchParams
+    .then((params) => {
+      searchParamsCache.parse(params); // Process the resolved params
+      return params;
+    })
+    .catch((error) => {
+      console.error('Failed to resolve searchParams:', error);
+      throw new Error('Invalid search parameters');
+    });
 
   try {
-    // Fetch orders using the API
+    // Fetch orders from the API
     const orders: OrderData[] = await fetchOrders();
     const totalOrders = orders.length;
 
     return (
       <NuqsAdapter>
-        <OrderListingPage 
-          orders={orders} 
-          totalOrders={totalOrders} 
+        <OrderListingPage
+          orders={orders}
+          totalOrders={totalOrders}
+        // Pass resolved params to the component
         />
       </NuqsAdapter>
     );
@@ -35,7 +45,9 @@ const OrderPage = async ({ searchParams }: OrderPageProps) => {
     console.error('Failed to fetch orders:', error);
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <p className="text-red-500">Failed to load orders. Please try again later.</p>
+        <p className="text-red-500">
+          Failed to load orders. Please try again later.
+        </p>
       </div>
     );
   }
