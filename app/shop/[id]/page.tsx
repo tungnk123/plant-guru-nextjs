@@ -14,6 +14,7 @@ const ShopPage = () => {
   const { id } = useParams();
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<ProductData[]>([]);
+  const currentUserId = localStorage.getItem('userId');
 
   useEffect(() => {
     if (id) {
@@ -38,7 +39,7 @@ const ShopPage = () => {
 
   const startChat = async () => {
     const messageData = {
-      userSendId: localStorage.getItem('userId'),
+      userSendId: currentUserId,
       userReceiveId: user.userId,
       message: "Hello shop",
     };
@@ -77,12 +78,14 @@ const ShopPage = () => {
               <h1 className="text-3xl font-bold">{user.name}</h1>
               <p className="text-gray-600">{user.email}</p>
             </div>
-            <button onClick={startChat} className="justify-center ml-10 mr-auto bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6l-4 4V5z" />
-              </svg>
-              Chat
-            </button>
+            {currentUserId !== user.userId && (
+              <button onClick={startChat} className="justify-center ml-10 mr-auto bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v7a2 2 0 01-2 2H6l-4 4V5z" />
+                </svg>
+                Chat
+              </button>
+            )}
           </div>
           <h2 className="text-2xl font-bold mb-4">Products by {user.name}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

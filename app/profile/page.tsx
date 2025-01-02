@@ -191,6 +191,12 @@ export default function ProfilePage() {
     }
   };
 
+  const handleMyPostClick = () => {
+    if (user) {
+      router.push(`/profile/${user.userId}`);
+    }
+  };
+
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -248,6 +254,13 @@ export default function ProfilePage() {
                   Shop
                 </Button>
               )}
+              <div className="flex-grow"></div>
+              <Button
+                className="bg-black text-white" 
+                onClick={handleMyPostClick}
+              >
+                My Post
+              </Button>
             </div>
             {activeTab === 'profile' && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
