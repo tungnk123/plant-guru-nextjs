@@ -1,5 +1,5 @@
 export async function uploadImageToImgur(image: File): Promise<string> {
-    const clientId = 'df4181f12f0afbd'; // Replace with your Imgur client ID
+    const clientId = 'df4181f12f0afbd';
     const formData = new FormData();
     formData.append('image', image);
     formData.append('type', 'image');
