@@ -60,16 +60,17 @@ export async function fetchUserById(userId: string): Promise<User> {
 }
 
 // Upgrade user to premium
-export async function goPremium(userId: string): Promise<void> {
+export async function goPremium(userId: string, packageName: string = 'STANDARD', packagePrice: number = 19.99): Promise<void> {
   try {
     const response = await fetch(
-      `https://un-silent-backend-develop.azurewebsites.net/api/users/goPremium?userId=${userId}`,
+      'https://un-silent-backend-develop.azurewebsites.net/api/users/goPremium',
       {
         method: 'POST',
         headers: {
           Accept: '*/*',
+          'Content-Type': 'application/json',
         },
-        body: '', // Explicitly include an empty body for the POST request
+        body: JSON.stringify({ userId, packageName, packagePrice }), // Pass package details in request body
       }
     );
 
@@ -77,12 +78,13 @@ export async function goPremium(userId: string): Promise<void> {
       throw new Error(`Failed to upgrade user to premium: ${response.statusText}`);
     }
 
-    console.log(`User ${userId} upgraded to premium successfully.`);
+    console.log(`User ${userId} upgraded to premium successfully with package: ${packageName} at $${packagePrice}.`);
   } catch (error) {
     console.error(`Error upgrading user ${userId} to premium:`, error);
     throw error;
   }
 }
+
 
 // Remove premium status from a user
 export async function removePremium(userId: string): Promise<void> {

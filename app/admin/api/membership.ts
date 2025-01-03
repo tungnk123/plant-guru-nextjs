@@ -10,6 +10,15 @@ export interface Membership {
   lastModifiedAt?: string | null;
 }
 
+export interface MembershipHistory {
+  userId: string;
+  name: string;
+  email: string;
+  packageName: string;
+  packagePrice: number;
+  boughtAt: string;
+}
+
 // API service for Membership
 class MembershipService {
   // Fetch all memberships
@@ -18,7 +27,7 @@ class MembershipService {
       const response = await fetch(BASE_URL, {
         method: 'GET',
         headers: {
-          'Accept': 'application/json',
+          Accept: 'application/json',
         },
       });
 
@@ -42,7 +51,7 @@ class MembershipService {
       const response = await fetch(url, {
         method: 'GET',
         headers: {
-          'Accept': '*/*',
+          Accept: '*/*',
         },
       });
 
@@ -63,7 +72,7 @@ class MembershipService {
       const response = await fetch(BASE_URL, {
         method: 'POST',
         headers: {
-          'Accept': '*/*',
+          Accept: '*/*',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
@@ -86,7 +95,7 @@ class MembershipService {
       const response = await fetch(BASE_URL, {
         method: 'PUT',
         headers: {
-          'Accept': '*/*',
+          Accept: '*/*',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
@@ -110,7 +119,7 @@ class MembershipService {
       const response = await fetch(url, {
         method: 'DELETE',
         headers: {
-          'Accept': '*/*',
+          Accept: '*/*',
         },
       });
 
@@ -121,6 +130,30 @@ class MembershipService {
       console.log(`Membership with ID ${id} deleted successfully.`);
     } catch (error) {
       console.error(error);
+      throw error;
+    }
+  }
+
+  // Fetch membership history
+  static async getMembershipHistory(): Promise<MembershipHistory[]> {
+    try {
+      const url = `${BASE_URL}/membershipHistory`;
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Accept: '*/*',
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch membership history: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      console.log('Membership History:', data);
+      return data;
+    } catch (error) {
+      console.error('Error fetching membership history:', error);
       throw error;
     }
   }
