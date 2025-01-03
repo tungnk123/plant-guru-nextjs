@@ -293,6 +293,35 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   </div>
+
+                  <div className="mb-8">
+                <div className="flex items-center">
+                  <span className="mr-2 text-gray-600 font-bold text-lg">Level: {userLevel.level}</span>
+                  <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className="absolute h-full bg-gradient-to-r from-blue-500 to-green-500"
+                      style={{
+                        width: `${((experiencePoints / (userLevel.nextLevelPoints || 1)) * 100).toFixed(2)}%`,
+                      }}
+                    />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger>
+                          <div className="absolute inset-0 cursor-pointer" />
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{Math.floor(experiencePoints)} / {userLevel.nextLevelPoints ? Math.floor(userLevel.nextLevelPoints) : 'N/A'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                </div>
+                {userLevel.nextLevelPoints && (
+                  <p className="text-gray-600 text-sm mt-1 text-right">
+                    Points needed to reach next level: {Math.floor(userLevel.nextLevelPoints) - Math.floor(experiencePoints)}
+                  </p>
+                )}
+              </div>
                 </div>
               </div>
             )}
@@ -387,35 +416,6 @@ export default function ProfilePage() {
                 </div>
               </div>
             )}
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold">User Experience</h3>
-              <div className="flex items-center">
-                <span className="mr-2 text-gray-600">Level: {userLevel.level}</span>
-                <div className="relative w-full h-4 bg-gray-200 rounded-full overflow-hidden">
-                  <div
-                    className="absolute h-full bg-gradient-to-r from-blue-500 to-green-500"
-                    style={{
-                      width: `${((experiencePoints / (userLevel.nextLevelPoints || 1)) * 100).toFixed(2)}%`,
-                    }}
-                  />
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <div className="absolute inset-0 cursor-pointer" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{experiencePoints} / {userLevel.nextLevelPoints ? userLevel.nextLevelPoints.toFixed(0) : 'N/A'}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                </div>
-              </div>
-              {userLevel.nextLevelPoints && (
-                <p className="text-gray-600 text-sm mt-1 text-right">
-                  Next Level Points: {userLevel.nextLevelPoints.toFixed(0)}
-                </p>
-              )}
-            </div>
           </CardContent>
         </Card>
         {user.isHavePremium && activeTab === 'shop' && (
