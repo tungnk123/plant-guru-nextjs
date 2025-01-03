@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import Navbar from "../../components/navbar/Navbar";
 import PostCard from "../../components/home/PostCard";
 import { useRouter } from 'next/navigation';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { fetchUserExperience, getUserLevel } from "@/app/api/user-exp-service";
 
 export default function ProfilePage() {
   const { id } = useParams();
@@ -15,6 +17,7 @@ export default function ProfilePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const currentUserId = localStorage.getItem('userId');
+  const [userLevel, setUserLevel] = useState<{ level: number; nextLevelPoints: number | null }>({ level: 0, nextLevelPoints: null });
 
   const toggleMenu = () => {
     setIsMenuOpen((prevState) => !prevState);
@@ -26,6 +29,9 @@ export default function ProfilePage() {
         const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/users/${id}`);
         const data = await response.json();
         setUserData(data);
+        
+        const experienceData = await fetchUserExperience(data.userId);
+        setUserLevel(getUserLevel(experienceData.experiencePoints));
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
@@ -111,6 +117,13 @@ export default function ProfilePage() {
             </div>
           </div>
           <p className="text-gray-600 mb-4">{userData.email}</p>
+          <div>
+            <div className="flex items-center">
+              <span className="mr-2 text-gray-600 font-bold text-lg bg-gradient-to-r from-blue-500 to-green-500 text-transparent bg-clip-text">
+                Level: {userLevel.level}
+              </span>
+            </div>
+          </div>
           <div className="flex items-center mb-4">
             <span className="mr-4">
               <img
@@ -141,9 +154,8 @@ export default function ProfilePage() {
           <button
             key={index + 1}
             onClick={() => handlePageChange(index + 1)}
-            className={`px-3 py-1 mx-1 border rounded ${
-              currentPage === index + 1 ? "border-blue-500" : ""
-            }`}
+            className={`px-3 py-1 mx-1 border rounded ${currentPage === index + 1 ? "border-blue-500" : ""
+              }`}
           >
             {index + 1}
           </button>
