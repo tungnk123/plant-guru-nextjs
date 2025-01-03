@@ -60,7 +60,7 @@ export async function fetchUserById(userId: string): Promise<User> {
 }
 
 // Upgrade user to premium
-export async function goPremium(userId: string, packageName: string, packagePrice: number): Promise<void> {
+export async function goPremium(userId: string, packageName: string = 'STANDARD', packagePrice: number = 19.99): Promise<void> {
   try {
     const response = await fetch(
       'https://un-silent-backend-develop.azurewebsites.net/api/users/goPremium',
