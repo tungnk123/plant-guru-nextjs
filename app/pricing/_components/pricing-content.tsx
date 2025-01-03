@@ -100,7 +100,7 @@ export default function PricingContent() {
                     toast.success(
                       `Transaction completed by ${details.payer.name.given_name}`
                     );
-                    handlePostPayment(details);
+                    handlePostPayment(details, plan.name, plan.price);
                   })
                   .finally(() => {
                     setPaymentLoading(false);
@@ -126,12 +126,13 @@ export default function PricingContent() {
     };
   }, [plans]);
 
-  const handlePostPayment = async (details) => {
+  const handlePostPayment = async (details, planName, planPrice) => {
     try {
       const userId = localStorage.getItem("userId");
       if (!userId) throw new Error("User not logged in");
 
-      await goPremium(userId);
+      console.log(details);
+      await goPremium(userId, planName, planPrice);
 
       toast.success("Successfully upgraded to Premium!");
     } catch (error) {
