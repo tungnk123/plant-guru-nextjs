@@ -24,10 +24,22 @@ export default function PostListingPage() {
     try {
       const { totalPosts: total, posts: postList } = await fetchUnapprovedPosts();
       
-      // Sort posts by createdAt date in descending order (newest first)
-      const sortedPosts = postList.sort((a, b) => {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      // Add current datetime as default for posts without createdDateDatetime
+      const postsWithDefaultDate = postList.map(post => ({
+        ...post,
+        createdDateDatetime: new Date().toISOString()
+      }));
+      
+      console.log("postsWithDefaultDate", postsWithDefaultDate);
+
+      // Sort posts by createdDateDatetime
+      const sortedPosts = postsWithDefaultDate.sort((a, b) => {
+        return new Date(b.createdDateDatetime).getTime() - new Date(a.createdDateDatetime).getTime();
       });
+
+
+      console.log("first post", sortedPosts[0]);
+      console.log("second post", sortedPosts[1]);
 
       setTotalPosts(total);
       setPosts(sortedPosts);
@@ -40,7 +52,7 @@ export default function PostListingPage() {
   };
 
   useEffect(() => {
-    let filtered = [...posts]; // Create a copy to avoid mutating original array
+    let filtered = [...posts];
 
     if (filterTag) {
       filtered = filtered.filter((post) => post.tag.toLowerCase() === filterTag.toLowerCase());
@@ -57,9 +69,9 @@ export default function PostListingPage() {
       );
     }
 
-    // Ensure filtered results maintain the same sorting (newest first)
+    // Maintain sorting by createdDateDatetime
     filtered.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      return new Date(b.createdDateDatetime).getTime() - new Date(a.createdDateDatetime).getTime();
     });
 
     setFilteredPosts(filtered);

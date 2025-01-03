@@ -13,7 +13,8 @@ export type Post = {
   postDevotes: number; // Number of downvotes
   postComments: number; // Number of comments
   postShares: number; // Number of shares
-  createdAt: string; // Post creation date
+  createdAt: string;
+  createdDateDatetime: string; // Post creation date
 };
 
 

@@ -121,14 +121,15 @@ export function transformPostData(rawPosts: any[]): Post[] {
     userAvatar: post.userAvatar || 'img_default_avatar.png', // Default avatar
     title: post.title,
     description: post.description,
-    imageUrl: post.imageUrl || 'img_default_post.png', // Default image
+    imageUrl: post.images[0] || 'img_default_post.png', // Default image
     tag: post.tag,
     background: post.background || 'img_default_post.png',
     postUpvotes: post.numberOfUpvote || 0,
     postDevotes: post.numberOfDevote || 0,
     postComments: post.numberOfComment || 0,
     postShares: post.numberOfShare || 0,
-    createdAt: post.createdDate || '0001-01-01T00:00:00', // Fallback for invalid dates
+    createdAt: post.createdDate || '0001-01-01T00:00:00',
+    createdDateDatetime: post.createdDateDatetime || new Date().toISOString(),
   }));
 }
 

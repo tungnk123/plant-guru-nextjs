@@ -5,6 +5,7 @@ import { Post } from '@/constants/data';
 import { CellAction } from './cell-action';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Tooltip } from '@/components/ui/tooltip';
+import { format } from 'date-fns';
 
 // Define a function to dynamically generate columns with onUpdate
 export const getPostColumns = (onUpdate: () => void): ColumnDef<Post>[] => [
@@ -78,7 +79,7 @@ export const getPostColumns = (onUpdate: () => void): ColumnDef<Post>[] => [
     header: 'Background',
     cell: ({ row }) => (
       <img
-        src={row.original.background || '/images/img_default_post.png'}
+        src={row.original.imageUrl || '/public/images/img_default_post.png'}
         alt="Background"
         style={{
           width: '50px',
@@ -93,10 +94,18 @@ export const getPostColumns = (onUpdate: () => void): ColumnDef<Post>[] => [
   {
     accessorKey: 'createdAt',
     header: 'Created At',
-    cell: ({ row }) =>
-      row.original.createdAt === '0001-01-01T00:00:00'
-        ? 'Not Available'
-        : new Date(row.original.createdAt).toString(),
+    cell: ({ row }) => {
+      const dateStr = row.original.createdDateDatetime;
+      if (dateStr === '0001-01-01T00:00:00') {
+        return 'Not Available';
+      }
+      try {
+        // Định dạng ngày giờ theo kiểu dễ đọc
+        return format(new Date(dateStr), 'dd/MM/yyyy HH:mm:ss');
+      } catch (error) {
+        return 'Invalid Date';
+      }
+    },
     enableSorting: true,
   },
   {
