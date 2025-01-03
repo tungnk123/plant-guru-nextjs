@@ -10,6 +10,7 @@ declare module '@paypal/payouts-sdk' {
   }
   namespace payouts {
     class PayoutsPostRequest {
+      constructor(body: any);
       requestBody(body: any): void;
     }
   }
