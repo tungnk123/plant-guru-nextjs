@@ -7,6 +7,9 @@ import { fetchProductsByUser, ProductData } from '@/app/api/productService';
 import Navbar from '@/app/components/navbar/Navbar';
 import OutOfStockBadge from '@/app/components/OutOfStockBadge';
 import { useRouter } from 'next/navigation';
+import { fetchUserExperience, getUserLevel } from '@/app/api/experienceService';
+import { TooltipProvider } from "@/components/ui/tooltip";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 
 const ShopPage = () => {
 
@@ -15,7 +18,8 @@ const ShopPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<ProductData[]>([]);
   const currentUserId = localStorage.getItem('userId');
-
+  const [userLevel, setUserLevel] = useState<{ level: number; nextLevelPoints: number | null }>({ level: 0, nextLevelPoints: null });
+  const [experiencePoints, setExperiencePoints] = useState<number>(0)
   useEffect(() => {
     if (id) {
       const loadShopData = async () => {
@@ -87,6 +91,48 @@ const ShopPage = () => {
               </button>
             )}
           </div>
+          <div className='mb-8 space-y-2'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-2xl font-semibold text-gray-700'>
+                        Level:{' '}
+                        <span className='text-indigo-600'>
+                          {userLevel.level}
+                        </span>
+                      </span>
+                      {userLevel.nextLevelPoints && (
+                        <span className='text-sm font-medium text-gray-500'>
+                          {Math.floor(userLevel.nextLevelPoints) -
+                            Math.floor(experiencePoints)}{' '}
+                          points to next level
+                        </span>
+                      )}
+                    </div>
+
+                    <div className='relative h-6 w-96 rounded-full bg-gray-100 shadow-inner'>
+                      <div
+                        className='absolute h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 shadow'
+                        style={{
+                          width: `${((experiencePoints / (userLevel.nextLevelPoints || 1)) * 100).toFixed(2)}%`
+                        }}
+                      />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className='absolute inset-0 cursor-pointer' />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className='text-sm font-medium'>
+                              {Math.floor(experiencePoints)} /{' '}
+                              {userLevel.nextLevelPoints
+                                ? Math.floor(userLevel.nextLevelPoints)
+                                : 'N/A'}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
+        </div>
           <h2 className="text-2xl font-bold mb-4">Products by {user.name}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map((product) => (
@@ -108,7 +154,6 @@ const ShopPage = () => {
           </div>
         </div>
       </div>
-    </div>
   );
 };
 
