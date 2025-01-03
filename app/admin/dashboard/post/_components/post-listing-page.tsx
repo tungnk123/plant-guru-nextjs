@@ -23,9 +23,15 @@ export default function PostListingPage() {
     setLoading(true);
     try {
       const { totalPosts: total, posts: postList } = await fetchUnapprovedPosts();
+      
+      // Sort posts by createdAt date in descending order (newest first)
+      const sortedPosts = postList.sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
+
       setTotalPosts(total);
-      setPosts(postList);
-      setFilteredPosts(postList);
+      setPosts(sortedPosts);
+      setFilteredPosts(sortedPosts);
     } catch (error) {
       console.error('Error fetching posts:', error);
     } finally {
@@ -34,7 +40,7 @@ export default function PostListingPage() {
   };
 
   useEffect(() => {
-    let filtered = posts;
+    let filtered = [...posts]; // Create a copy to avoid mutating original array
 
     if (filterTag) {
       filtered = filtered.filter((post) => post.tag.toLowerCase() === filterTag.toLowerCase());
@@ -50,6 +56,11 @@ export default function PostListingPage() {
           post.tag.toLowerCase().includes(lowerQuery)
       );
     }
+
+    // Ensure filtered results maintain the same sorting (newest first)
+    filtered.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
     setFilteredPosts(filtered);
   }, [searchQuery, filterTag, posts]);
