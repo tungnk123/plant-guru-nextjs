@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import Navbar from "../../components/navbar/Navbar";
 import PostCard from "../../components/home/PostCard";
 import { useRouter } from 'next/navigation';
+import { fetchUserExperience, getUserLevel } from '@/app/api/experienceService';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function ProfilePage() {
   const { id } = useParams();
@@ -15,6 +17,9 @@ export default function ProfilePage() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const currentUserId = localStorage.getItem('userId');
+  const [userLevel, setUserLevel] = useState<{ level: number; nextLevelPoints: number | null }>({ level: 0, nextLevelPoints: null });
+  const [experiencePoints, setExperiencePoints] = useState<number>(0)
+
 
   const toggleMenu = () => {
     setIsMenuOpen((prevState) => !prevState);
@@ -122,8 +127,51 @@ export default function ProfilePage() {
             </span>
           </div>
           <p className="text-left mb-4">{userData.bio}</p>
+
+          <div className='mb-8 space-y-2'>
+                    <div className='flex items-center justify-between'>
+                      <span className='text-2xl font-semibold text-gray-700'>
+                        Level:{' '}
+                        <span className='text-indigo-600'>
+                          {userLevel.level}
+                        </span>
+                      </span>
+                      {userLevel.nextLevelPoints && (
+                        <span className='text-sm font-medium text-gray-500'>
+                          {Math.floor(userLevel.nextLevelPoints) -
+                            Math.floor(experiencePoints)}{' '}
+                          points to next level
+                        </span>
+                      )}
+                    </div>
+
+                    <div className='relative h-6 w-96 rounded-full bg-gray-100 shadow-inner'>
+                      <div
+                        className='absolute h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 shadow'
+                        style={{
+                          width: `${((experiencePoints / (userLevel.nextLevelPoints || 1)) * 100).toFixed(2)}%`
+                        }}
+                      />
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <div className='absolute inset-0 cursor-pointer' />
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className='text-sm font-medium'>
+                              {Math.floor(experiencePoints)} /{' '}
+                              {userLevel.nextLevelPoints
+                                ? Math.floor(userLevel.nextLevelPoints)
+                                : 'N/A'}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </div>
+                  </div>
         </div>
       </div>
+      
       <div className="mt-8 space-y-4 mx-80">
         {currentPosts.map((post) => (
           <PostCard key={post.postId} {...post} />
