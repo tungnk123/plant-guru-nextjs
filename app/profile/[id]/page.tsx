@@ -29,7 +29,7 @@ export default function ProfilePage() {
         const response = await fetch(`https://un-silent-backend-develop.azurewebsites.net/api/users/${id}`);
         const data = await response.json();
         setUserData(data);
-        
+
         const experienceData = await fetchUserExperience(data.userId);
         setUserLevel(getUserLevel(experienceData.experiencePoints));
       } catch (error) {
@@ -117,12 +117,10 @@ export default function ProfilePage() {
             </div>
           </div>
           <p className="text-gray-600 mb-4">{userData.email}</p>
-          <div>
-            <div className="flex items-center">
-              <span className="mr-2 text-gray-600 font-bold text-lg bg-gradient-to-r from-blue-500 to-green-500 text-transparent bg-clip-text">
-                Level: {userLevel.level}
-              </span>
-            </div>
+          <div className="flex items-center">
+            <span className="mr-2 text-gray-600 font-bold text-lg bg-gradient-to-r from-blue-500 to-green-500 text-transparent bg-clip-text">
+              Level: {userLevel.level}
+            </span>
           </div>
           <div className="flex items-center mb-4">
             <span className="mr-4">

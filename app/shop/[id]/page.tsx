@@ -7,6 +7,7 @@ import { fetchProductsByUser, ProductData } from '@/app/api/productService';
 import Navbar from '@/app/components/navbar/Navbar';
 import OutOfStockBadge from '@/app/components/OutOfStockBadge';
 import { useRouter } from 'next/navigation';
+import { fetchUserExperience, getUserLevel } from '@/app/api/user-exp-service';
 
 const ShopPage = () => {
 
@@ -15,6 +16,8 @@ const ShopPage = () => {
   const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<ProductData[]>([]);
   const currentUserId = localStorage.getItem('userId');
+  const [userLevel, setUserLevel] = useState<{ level: number; nextLevelPoints: number | null }>({ level: 0, nextLevelPoints: null });
+
 
   useEffect(() => {
     if (id) {
@@ -24,6 +27,9 @@ const ShopPage = () => {
           setUser(userData);
           const productsData = await fetchProductsByUser(id as string);
           setProducts(productsData);
+
+          const experienceData = await fetchUserExperience(id as string);
+          setUserLevel(getUserLevel(experienceData.experiencePoints));
         } catch (error) {
           console.error('Failed to load shop data:', error);
         }
@@ -64,7 +70,7 @@ const ShopPage = () => {
 
   return (
     <div>
-      <Navbar toggle={() => {}} />
+      <Navbar toggle={() => { }} />
       <div className="container mx-auto p-10">
         <div className="bg-gradient-to-r from-green-400 to-blue-500 text-white p-6 rounded-lg shadow-lg mb-8">
           <h1 className="text-4xl font-bold">Welcome to {user.name}'s Shop!</h1>
@@ -77,6 +83,11 @@ const ShopPage = () => {
             <div className="flex flex-col">
               <h1 className="text-3xl font-bold">{user.name}</h1>
               <p className="text-gray-600">{user.email}</p>
+              <div className="flex items-center">
+              <span className="mr-2 text-gray-600 font-bold text-lg bg-gradient-to-r from-blue-500 to-green-500 text-transparent bg-clip-text">
+                Level: {userLevel.level}
+              </span>
+            </div>
             </div>
             {currentUserId !== user.userId && (
               <button onClick={startChat} className="justify-center ml-10 mr-auto bg-blue-500 text-white px-4 py-2 rounded-lg shadow hover:bg-blue-600 transition-all duration-200 flex items-center">
@@ -87,6 +98,7 @@ const ShopPage = () => {
               </button>
             )}
           </div>
+
           <h2 className="text-2xl font-bold mb-4">Products by {user.name}</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {products.map((product) => (
