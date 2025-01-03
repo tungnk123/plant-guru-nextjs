@@ -19,6 +19,7 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { addExperiencePoints } from '@/app/api/experienceService';
 
 const tagOptions = [
   { 
@@ -154,43 +155,44 @@ const CreatePost = () => {
     try {
       const userId = localStorage.getItem('userId');
       if (!userId) {
-        throw new Error('User ID not found in local storage');
+        throw new Error('User ID not found');
       }
 
-      const images = await Promise.all(
+      // Upload images first
+      const imageUrls = await Promise.all(
         selectedImages.map((image) => uploadImageToImgur(image))
       );
 
+      // Create post data
       const postData: PostData = {
         title,
         description,
         userId,
-        images,
+        images: imageUrls,
         tag,
         background: backgroundColor,
       };
-      console.log(postData);
 
-      const data = await createPost(postData);
-      console.log("Post created successfully:", data);
+      // Create the post
+      const createdPost = await createPost(postData);
+
+      // Add experience points after successful post creation
+      await addExperiencePoints(userId, 100);
 
       toast({
-        title: "Post Created",
-        description: "Your plant post has been successfully created!",
+        title: "Success!",
+        description: "Post created successfully! You earned 100 experience points! 🌟",
         variant: "success"
       });
 
-      setTitle("");
-      setDescription("");
-      setTag("allCategory");
-      setBackgroundColor("#FFFF00");
-      setSelectedImages([]);
-      setImagePreviews([]);
+      // Reset form or redirect
+      router.push('/profile');
+
     } catch (error: any) {
-      console.error("Error creating post:", error);
+      console.error('Error:', error);
       toast({
         title: "Error",
-        description: error.message || "An error occurred while creating the post.",
+        description: error.message || "Something went wrong",
         variant: "destructive"
       });
     } finally {

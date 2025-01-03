@@ -43,3 +43,23 @@ export const getUserLevel = (experiencePoints: number): { level: number; nextLev
 
   return { level, nextLevelPoints };
 };
+
+export const addExperiencePoints = async (userId: string, points: number): Promise<void> => {
+  try {
+    const response = await fetch(`${BASE_URL}/${userId}/add-experience-points`, {
+      method: 'PUT',
+      headers: {
+        accept: '*/*',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(points),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to add experience points: ${response.statusText}`);
+    }
+  } catch (error) {
+    console.error('Error adding experience points:', error);
+    throw error;
+  }
+};
