@@ -28,6 +28,14 @@ const PostSection = () => {
         window.location.href = '/identify-plant';
       }
     },
+    {
+      title: 'Plant Products',
+      subtitle: 'A Market for Plants and Plant-related Products',
+      icon: '/images/img_plant_guide.svg',
+      onClick: () => {
+        window.location.href = '/products';
+      }
+    }
   ]
 
   const [tag, setTag] = useState('');
