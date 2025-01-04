@@ -92,6 +92,63 @@ Sử dụng git để clone project:
 
 ---
 
+## ***Hướng dẫn chạy dự án ASP.NET Web API***
+
+### **Backend chính:**
+
+### **Yêu cầu hệ thống**
+
+- **.NET SDK** (phiên bản >= 6.0) 
+- Kiểm tra .NET SDK: `dotnet --version`
+- **Visual studio** (phiên bản 2022) 
+
+1. **Clone dự án**: Sử dụng git để clone project:
+    ```bash
+    git clone https://github.com/21522354/PlanGuruAPI
+    ```
+2. **Mở dự án bằng visual studio**: 
+    - Mở visual studio chọn mở dự án có sẵn và trỏ thư mục đến thư mục dự án
+3. **Chạy dự án**:
+    ```bash
+    dotnet run
+    ```
+    - Hoặc bấm vào nút run trong giao diện của visual studio
+
+## ***Cấu trúc dự án***
+
+| **Thư mục/tầng** | **Mô tả** |
+| --- | --- |
+| `Domain` | Chứa các entity model cốt lõi của ứng dụng |
+| `Application` | Định nghĩa các luồng nghiệp vụ cụ thể (interface) mà ứng dụng cung cấp |
+| `Infrastructure` | Sử dụng model từ Domain và sử dụng các giao diện được cung cấp từ Application để triển khai hệ thống |
+| `Application(Web API)` | Chứa các endpoint để người dùng thao tác với hệ thống |
+
+---
+
+### **Quiz Service:**
+
+1. **Clone dự án**: Sử dụng git để clone project:
+    ```bash
+    git clone https://github.com/TriKhaiLe/QuizService.git
+    ```
+
+2. **Tích hợp Firestore:**
+    - Truy cập [Firebase Console](https://console.firebase.google.com)
+    - Tạo project mới
+    - Trong mục Project settings, tab General, sao chép Project ID
+    - Chuyển sang tab Service Account, tạo khóa riêng mới và tải file JSON về
+    - Trong Firestore database, tạo một database mới
+    - Mở file `appsettings.json.example` trong project Quiz Service, gắn dữ liệu cho ProjectId đã sao chép, và gắn giá trị cho CredentialsPath là đường dẫn tới file private key JSON đã tải về
+
+3. **Lấy Gemini API key:**
+    - Truy cập [AI Studio](https://aistudio.google.com/app/apikey) và lấy API key, gắn vào ApiKey trong `appsettings.json.example`
+
+4. **Đổi tên file:**
+    - Đổi tên file `appsettings.json.example` thành `appsettings.json`
+
+5. **Chạy dự án:**
+    - Chạy lệnh `dotnet run` từ thư mục chứa file `appsettings.json`
+
 ## ***Sản phẩm từ source code***
 
 ### **FrontEnd:**
