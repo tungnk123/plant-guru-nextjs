@@ -17,7 +17,7 @@ interface ButtonCardGridProps {
 
 const ButtonCardGrid: React.FC<ButtonCardGridProps> = ({ buttons }) => {
   return (
-    <div className="grid grid-cols-1 gap-6 px-6 sm:grid-cols-2 md:grid-cols-2">
+    <div className="grid grid-cols-1 gap-6 px-6 sm:grid-cols-3 md:grid-cols-3">
       {buttons.map((button, index) => (
         <ButtonCard key={index} {...button} />
       ))}
