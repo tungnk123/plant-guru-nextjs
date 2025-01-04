@@ -7,11 +7,10 @@ const Footer: React.FC = () => {
   return (
     <footer className="bg-yellow1 text-black pt-14 pb-8">
       <div className="container mx-auto px-4">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-14">
-          <Link href="/" className="text-center font-bold hover:underline">Home</Link>
-          <Link href="/plant-encyclopedia" className="text-center font-bold hover:underline">Plant Encyclopedia</Link>
+        <div className="grid grid-cols-3 md:grid-cols-3 gap-5 mb-14">
+          <Link href="/home" className="text-center font-bold hover:underline">Home</Link>
+          <Link href="/plant-wiki" className="text-center font-bold hover:underline">Plant Encyclopedia</Link>
           <Link href="/identify-plant" className="text-center font-bold hover:underline">Identify Plant</Link>
-          <Link href="/plant-guide" className="text-center font-bold hover:underline">Plant Guide</Link>
         </div>
 
         <div className="flex flex-col items-center mb-6">

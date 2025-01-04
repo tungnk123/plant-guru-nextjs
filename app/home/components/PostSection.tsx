@@ -16,20 +16,18 @@ const PostSection = () => {
       title: 'Plant Encyclopedia',
       subtitle: 'Discover the World of Plants',
       icon: '/images/img_encyclopedia.svg',
-      onClick: () => { }
+      onClick: () => {
+        window.location.href = '/plant-wiki';
+      }
     },
     {
       title: 'Identify plant ',
       subtitle: 'Identify Any Plant in Seconds',
       icon: '/images/img_identify_plant.svg',
-      onClick: () => { }
+      onClick: () => {
+        window.location.href = '/identify-plant';
+      }
     },
-    {
-      title: 'Plant Guides',
-      subtitle: 'Expert Guides for Every Type of Plant',
-      icon: '/images/img_plant_guide.svg',
-      onClick: () => { }
-    }
   ]
 
   const [tag, setTag] = useState('');

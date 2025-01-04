@@ -65,6 +65,7 @@ const ButtonCard: React.FC<ButtonProps> = ({
                             className="rounded-full bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 text-white 
                                 hover:from-green-700 hover:via-emerald-700 hover:to-teal-700 shadow-lg 
                                 hover:shadow-green-200/50 transition-all duration-300"
+                                onClick={onClick}
                         >
                             Explore
                         </Button>

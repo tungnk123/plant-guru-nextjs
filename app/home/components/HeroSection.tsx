@@ -42,7 +42,7 @@ export const HeroSection = () => {
             return prev;
           }
         });
-        
+
         setDisplayedPosts((prev) => {
           if (prev < stats.numberOfPost) {
             return Math.min(prev + incrementPosts, stats.numberOfPost);
@@ -74,11 +74,11 @@ export const HeroSection = () => {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-rose-100/30 via-purple-100/20 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_bottom_left,_var(--tw-gradient-stops))] from-blue-100/30 via-emerald-100/20 to-transparent" />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent" />
-      
+
       {/* Decorative Circles */}
       <div className="absolute top-20 right-20 w-64 h-64 bg-gradient-to-br from-purple-200/20 via-pink-200/20 to-rose-200/20 rounded-full blur-3xl" />
       <div className="absolute bottom-20 left-20 w-64 h-64 bg-gradient-to-tr from-blue-200/20 via-cyan-200/20 to-teal-200/20 rounded-full blur-3xl" />
-      
+
       <Head>
         <title>Plant GURU</title>
       </Head>
@@ -86,7 +86,7 @@ export const HeroSection = () => {
       <div className="container mx-auto relative">
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           {/* Stats Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -101,7 +101,7 @@ export const HeroSection = () => {
                     Community Stats
                   </h3>
                 </div>
-                
+
                 <div className="flex items-center space-x-4 group hover:transform hover:translate-x-2 transition-all duration-300">
                   <div className="p-3 rounded-full bg-gradient-to-br from-emerald-100 via-teal-200 to-cyan-100 group-hover:shadow-lg group-hover:shadow-emerald-200/50 transition-all duration-300">
                     <Leaf className="w-6 h-6 text-emerald-600" />
@@ -142,7 +142,7 @@ export const HeroSection = () => {
           </motion.div>
 
           {/* Search Section */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.3 }}
@@ -151,14 +151,14 @@ export const HeroSection = () => {
             <Card className="bg-gradient-to-br from-white/80 via-white/60 to-transparent backdrop-blur-sm shadow-xl border-none overflow-hidden hover:shadow-2xl transition-all duration-500">
               <div className="absolute top-0 right-0 w-64 h-full bg-[conic-gradient(from_45deg_at_top_right,_var(--tw-gradient-stops))] from-rose-200/30 via-purple-200/30 to-blue-200/30 rounded-full transform translate-x-32 -translate-y-32" />
               <div className="absolute bottom-0 left-0 w-64 h-full bg-[conic-gradient(from_225deg_at_bottom_left,_var(--tw-gradient-stops))] from-blue-200/30 via-emerald-200/30 to-teal-200/30 rounded-full transform -translate-x-32 translate-y-32" />
-              
+
               <CardContent className="p-8 relative">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center space-x-3">
                     <div className="relative w-12 h-28 transform hover:scale-105 transition-transform duration-300">
-                      <Image 
-                        src="/images/ic_logo.svg" 
-                        alt="Logo" 
+                      <Image
+                        src="/images/ic_logo.svg"
+                        alt="Logo"
                         fill
                         className="object-contain"
                       />
@@ -167,12 +167,6 @@ export const HeroSection = () => {
                       Plant GURU
                     </h1>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    className="rounded-full hover:bg-gradient-to-r hover:from-primary/10 hover:to-green-200/20 transition-all duration-300"
-                  >
-                    Explore More
-                  </Button>
                 </div>
 
                 <div className="mt-8 flex flex-wrap gap-2">
@@ -181,7 +175,7 @@ export const HeroSection = () => {
                       key={index}
                       variant="ghost"
                       size="sm"
-                      className="rounded-full bg-gradient-to-r from-primary/5 via-green-200/10 to-blue-200/5 hover:from-primary/10 hover:via-green-200/20 hover:to-blue-200/10 text-gray-600 transition-all duration-300"
+                      className="rounded-full bg-gradient-to-r from-primary/5 via-green-200/10 to-blue-200/5 cursor-default"
                     >
                       {tag}
                     </Button>
